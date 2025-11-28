@@ -1,0 +1,226 @@
+# Complete Project Structure for Comparison App
+# Copy this structure when you're ready to build the full version
+
+comparison-app/
+│
+├── .env                          # Your API keys (DO NOT COMMIT)
+├── .env.template                 # Template for others
+├── .gitignore                    # Git ignore file
+├── requirements.txt              # Python dependencies
+├── README.md                     # Project documentation
+├── QUICK_START.md               # Setup instructions
+├── SKILLS_ROADMAP.md            # Learning path
+│
+├── config.py                     # Configuration settings
+├── main.py                       # CLI entry point (Phase 1-2)
+├── app.py                        # Streamlit web app (Phase 3-4)
+│
+├── src/                          # Source code
+│   ├── __init__.py
+│   │
+│   ├── llm/                      # LLM interaction logic
+│   │   ├── __init__.py
+│   │   ├── intent_parser.py     # Parse user queries
+│   │   ├── comparator.py        # AI-powered comparison
+│   │   └── memory.py            # Conversation memory (Phase 4)
+│   │
+│   ├── api_clients/              # API integrations
+│   │   ├── __init__.py
+│   │   ├── base_client.py       # Base class for all clients
+│   │   ├── uber_client.py       # Uber API
+│   │   ├── lyft_client.py       # Lyft API
+│   │   ├── doordash_client.py   # DoorDash API (Phase 2)
+│   │   └── adapters.py          # Data normalization
+│   │
+│   ├── models/                   # Data models
+│   │   ├── __init__.py
+│   │   ├── ride.py              # RideEstimate model
+│   │   ├── query.py             # Query model
+│   │   └── preferences.py       # User preferences model
+│   │
+│   ├── services/                 # Business logic
+│   │   ├── __init__.py
+│   │   ├── comparison_service.py # Orchestrates comparisons
+│   │   ├── recommendation_service.py # Personalized recommendations (Phase 4)
+│   │   └── cache_service.py     # API caching (Phase 2)
+│   │
+│   ├── database/                 # Database layer (Phase 4)
+│   │   ├── __init__.py
+│   │   ├── db.py                # SQLite setup
+│   │   └── repositories.py      # Data access objects
+│   │
+│   └── utils/                    # Utility functions
+│       ├── __init__.py
+│       ├── formatters.py        # Output formatting
+│       ├── validators.py        # Input validation
+│       └── logger.py            # Logging setup
+│
+├── tests/                        # Unit tests
+│   ├── __init__.py
+│   ├── test_intent_parser.py
+│   ├── test_api_clients.py
+│   ├── test_comparator.py
+│   └── test_models.py
+│
+├── data/                         # Data files
+│   ├── user_data.db             # SQLite database (Phase 4)
+│   └── cache/                   # Cached API responses
+│
+├── notebooks/                    # Jupyter notebooks (optional)
+│   ├── exploration.ipynb        # API exploration
+│   └── analysis.ipynb           # User behavior analysis
+│
+└── docs/                         # Additional documentation
+    ├── api_integration.md       # API setup guides
+    ├── deployment.md            # Deployment instructions
+    └── architecture.md          # Architecture decisions
+
+---
+
+# File-by-File Breakdown
+
+## Phase 1 Files (POC)
+- main.py                        # Start here
+- src/llm/intent_parser.py       # AI query parsing
+- src/api_clients/uber_client.py # Mock Uber API
+- src/api_clients/lyft_client.py # Mock Lyft API
+- src/llm/comparator.py          # AI comparison
+- src/utils/formatters.py        # Display output
+
+## Phase 2 Files (Real APIs)
+- src/api_clients/base_client.py # Shared API logic
+- src/api_clients/adapters.py    # Data normalization
+- src/services/cache_service.py  # API caching
+- config.py                      # API credentials
+
+## Phase 3 Files (Web UI)
+- app.py                         # Streamlit app
+- src/services/comparison_service.py # Business logic
+- static/                        # CSS, images (if needed)
+
+## Phase 4 Files (Intelligence)
+- src/database/                  # All database files
+- src/llm/memory.py             # Conversation memory
+- src/services/recommendation_service.py # Personalization
+
+---
+
+# Git Best Practices
+
+## .gitignore contents
+.env
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+data/user_data.db
+data/cache/
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+## Commit Messages
+Phase 1:
+- "Initial POC with mock data"
+- "Add intent parsing with OpenAI"
+- "Implement comparison logic"
+
+Phase 2:
+- "Integrate Uber API"
+- "Add data normalization layer"
+- "Implement API caching"
+
+Phase 3:
+- "Create Streamlit web UI"
+- "Add session state management"
+- "Implement visualizations"
+
+Phase 4:
+- "Add user preferences database"
+- "Implement conversation memory"
+- "Add personalized recommendations"
+
+---
+
+# Development Workflow
+
+1. Start with main.py (CLI version)
+2. Test each component independently
+3. Add tests as you go
+4. Refactor when you add new features
+5. Document as you build
+6. Version control everything (except .env!)
+
+---
+
+# When to Create Each File
+
+Week 1-2 (Phase 1):
+✓ main.py
+✓ src/llm/intent_parser.py
+✓ src/llm/comparator.py
+✓ src/api_clients/uber_client.py (mock)
+✓ src/api_clients/lyft_client.py (mock)
+✓ src/models/ride.py
+✓ src/utils/formatters.py
+
+Week 3-4 (Phase 2):
+✓ src/api_clients/base_client.py
+✓ src/api_clients/uber_client.py (real)
+✓ src/api_clients/lyft_client.py (real)
+✓ src/api_clients/adapters.py
+✓ src/services/cache_service.py
+✓ config.py
+
+Week 5-6 (Phase 3):
+✓ app.py
+✓ src/services/comparison_service.py
+
+Week 7-8 (Phase 4):
+✓ src/database/db.py
+✓ src/database/repositories.py
+✓ src/llm/memory.py
+✓ src/services/recommendation_service.py
+
+---
+
+# Quick Commands Reference
+
+# Set up new project
+mkdir comparison-app && cd comparison-app
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Run CLI version
+python main.py
+
+# Run web version
+streamlit run app.py
+
+# Run tests
+pytest tests/
+
+# Check code quality
+flake8 src/
+black src/  # Auto-format
+
+# Git workflow
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin <your-repo>
+git push -u origin main
+
+---
+
+This structure will grow with your project. Start simple (Phase 1),
+then expand as you add features!

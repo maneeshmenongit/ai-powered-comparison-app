@@ -1,0 +1,12 @@
+# Core AI/LLM libraries
+openai==1.12.0
+python-dotenv==1.0.1
+
+# Terminal output formatting
+rich==13.7.0
+
+# Optional but recommended for full project
+langchain==0.1.9
+langchain-openai==0.0.6
+pydantic==2.6.1
+requests==2.31.0
