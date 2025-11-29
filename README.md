@@ -17,6 +17,24 @@ This is a working prototype that shows how AI agents can:
 
 ---
 
+## 📁 Project Structure
+
+```
+ai-powered-comparison-app/
+├── README.md              # This file
+├── requirements.txt       # Python dependencies
+├── .env.template         # API key template
+├── .gitignore           # Git ignore rules
+├── docs/                # Documentation
+│   ├── QUICK_START.md   # Setup guide
+│   ├── SKILLS_ROADMAP.md # Learning curriculum
+│   └── START_HERE.md    # Project overview
+└── src/                 # Source code
+    └── phase1_poc.py    # Phase 1 POC
+```
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Prerequisites
@@ -26,8 +44,9 @@ This is a working prototype that shows how AI agents can:
 ### 2. Installation
 
 ```bash
-# Clone or download the files
-cd comparison-app
+# Clone the repository
+git clone <your-repo-url>
+cd ai-powered-comparison-app
 
 # Create virtual environment (recommended)
 python -m venv venv
@@ -50,7 +69,7 @@ cp .env.template .env
 ### 4. Run the POC
 
 ```bash
-python comparison_poc.py
+python src/phase1_poc.py
 ```
 
 **Try these queries**:
