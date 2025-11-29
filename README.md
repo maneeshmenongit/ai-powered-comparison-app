@@ -1,19 +1,21 @@
-# AI-Powered Comparison Tool - Proof of Concept
+# AI-Powered Weather Comparison Tool
 
-## 🎯 What This POC Demonstrates
+## 🎯 What This Project Demonstrates
 
-This is a working prototype that shows how AI agents can:
+This is a multi-phase AI application that shows how LLMs can:
 1. **Understand natural language** - Parse messy user queries into structured data
 2. **Orchestrate API calls** - Make decisions about which services to query
 3. **Provide intelligent analysis** - Compare results and make recommendations
+4. **Handle real-world APIs** - With caching, error handling, and retry logic
 
-**Example Query**: "Compare Uber and Lyft from Times Square to JFK Airport"
+**Example Query**: "Compare weather in New York for the next 5 days"
 
 **What Happens**:
-- ✅ AI extracts: origin, destination, services
-- ✅ Calls mock APIs for each service
-- ✅ AI analyzes results and recommends best option
-- ✅ Displays beautiful comparison table
+- ✅ AI extracts: location, days, weather providers
+- ✅ Calls real weather APIs (Open-Meteo, WeatherAPI.com)
+- ✅ AI analyzes results and provides meteorological insights
+- ✅ Displays beautiful forecast comparison tables
+- ✅ Caches results to reduce API costs
 
 ---
 
@@ -23,14 +25,30 @@ This is a working prototype that shows how AI agents can:
 ai-powered-comparison-app/
 ├── README.md              # This file
 ├── requirements.txt       # Python dependencies
-├── .env.template         # API key template
+├── .env                  # API keys (DO NOT COMMIT)
 ├── .gitignore           # Git ignore rules
+├── main_phase2.py        # Phase 2 entry point ⭐ RUN THIS
 ├── docs/                # Documentation
 │   ├── QUICK_START.md   # Setup guide
 │   ├── SKILLS_ROADMAP.md # Learning curriculum
 │   └── START_HERE.md    # Project overview
+├── data/                # Data files
+│   └── cache/           # API response cache
 └── src/                 # Source code
-    └── phase1_poc.py    # Phase 1 POC
+    ├── phase1_poc.py    # Phase 1 - Mock data
+    ├── phase2_main.py   # Phase 2 - Real APIs (deprecated, use ../main_phase2.py)
+    ├── models/          # Data models
+    │   └── weather.py   # WeatherForecast dataclass
+    ├── api_clients/     # API client implementations
+    │   ├── base_client.py        # Base with retry logic
+    │   ├── openmeteo_client.py   # Open-Meteo (free, no key)
+    │   └── weatherapi_client.py  # WeatherAPI.com (free tier)
+    ├── llm/             # LLM-powered components
+    │   ├── intent_parser.py      # Parse queries
+    │   └── comparator.py         # Compare forecasts
+    ├── services/        # Business logic
+    │   └── cache_service.py      # File-based caching
+    └── utils/           # Utilities
 ```
 
 ---
@@ -66,7 +84,7 @@ cp .env.template .env
 # OPENAI_API_KEY=sk-proj-...
 ```
 
-### 4. Run the POC
+### 4. Run Phase 1 (Mock Data POC)
 
 ```bash
 python src/phase1_poc.py
@@ -75,7 +93,17 @@ python src/phase1_poc.py
 **Try these queries**:
 - "Compare Uber and Lyft from Times Square to JFK Airport"
 - "Which is cheaper from Manhattan to Brooklyn, Uber or Lyft?"
-- "Show me ride prices from Central Park to LaGuardia"
+
+### 5. Run Phase 2 (Real Weather APIs) ⭐
+
+```bash
+python main_phase2.py
+```
+
+**Try these queries**:
+- "Compare weather in New York for the next 5 days"
+- "What's the weather forecast for London?"
+- "Show me the weather in Tokyo for the next week"
 
 ---
 
@@ -148,8 +176,9 @@ def compare_rides(estimates: List[RideEstimate]) -> str:
 
 ## 📊 Data Flow Diagram
 
+### Phase 1 (Mock Data)
 ```
-User Query
+User Query ("Compare Uber and Lyft...")
     ↓
 [OpenAI: Parse Intent] → Structured JSON
     ↓
@@ -158,6 +187,25 @@ User Query
 [OpenAI: Compare & Recommend] → Natural language analysis
     ↓
 [Display Results] → Formatted table + recommendation
+```
+
+### Phase 2 (Real Weather APIs)
+```
+User Query ("Compare weather in New York...")
+    ↓
+[OpenAI: Parse Intent] → {location, days, providers}
+    ↓
+[Check Cache] → Cache hit? Return cached data
+    ↓ (Cache miss)
+[Call Weather APIs] → Open-Meteo + WeatherAPI.com
+    ↓ (with retry logic)
+[Normalize Data] → WeatherForecast objects
+    ↓
+[Cache Results] → Save to disk (60min TTL)
+    ↓
+[OpenAI: Compare Forecasts] → Natural language analysis
+    ↓
+[Display Results] → Formatted tables + AI insights
 ```
 
 ---
@@ -178,18 +226,21 @@ This is why starting with AI for learning is so accessible.
 
 ## 🔄 Phase 1 vs Future Phases
 
-### ✅ Phase 1 (Current POC)
+### ✅ Phase 1 (Completed - POC)
 - [x] Natural language query parsing
 - [x] Mock API integration
 - [x] AI-powered comparison
 - [x] Beautiful CLI output
 
-### 🚧 Phase 2 (Next Steps)
-- [ ] Real Uber API integration
-- [ ] Real Lyft API integration
-- [ ] Add DoorDash / food delivery comparison
-- [ ] Error handling for failed API calls
-- [ ] Rate limiting and caching
+### ✅ Phase 2 (Completed - Real Weather APIs)
+- [x] Pivoted from ride-sharing to weather APIs (due to Uber ToS restrictions)
+- [x] Open-Meteo API integration (free, no key required)
+- [x] WeatherAPI.com integration (free tier available)
+- [x] BaseAPIClient with retry logic and exponential backoff
+- [x] File-based caching system (60min TTL)
+- [x] Data normalization across providers
+- [x] WeatherForecast data models with dataclasses
+- [x] AI-powered forecast comparison and analysis
 
 ### 🎯 Phase 3 (Web Interface)
 - [ ] Streamlit web UI
