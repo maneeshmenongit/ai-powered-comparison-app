@@ -21,7 +21,6 @@ import sys
 import time
 import hashlib
 import argparse
-from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from dotenv import load_dotenv
 
@@ -33,12 +32,9 @@ from rich import box
 from rich.prompt import Prompt
 
 sys.path.insert(0, 'src')
-from domains.rideshare.intent_parser import RideShareIntentParser
-from domains.rideshare.comparator import RideShareComparator
-from domains.rideshare.api_clients.mock_uber_client import MockUberClient
-from domains.rideshare.api_clients.mock_lyft_client import MockLyftClient
+from domains.rideshare.handler import RideShareHandler
 from core.geocoding_service import GeocodingService
-from domains.rideshare.models import RideEstimate, RideQuery
+from domains.rideshare.models import RideEstimate
 
 
 class SimpleCache:
@@ -108,10 +104,10 @@ class SimpleCache:
 
 
 class RideShareApp:
-    """Main ride-share comparison application."""
+    """Main ride-share comparison application using DomainHandler pattern."""
 
     def __init__(self):
-        """Initialize all services and clients."""
+        """Initialize handler and services."""
         self.console = Console()
         load_dotenv()
 
@@ -126,12 +122,14 @@ class RideShareApp:
             sys.exit(1)
 
         # Initialize services
-        self.parser = RideShareIntentParser()
-        self.geocoder = GeocodingService()
-        self.comparator = RideShareComparator()
-        self.uber_client = MockUberClient()
-        self.lyft_client = MockLyftClient()
-        self.cache = SimpleCache(ttl_seconds=300)
+        geocoder = GeocodingService()
+        cache = SimpleCache(ttl_seconds=300)
+
+        # Initialize RideShare handler (encapsulates all domain logic)
+        self.handler = RideShareHandler(
+            cache_service=cache,
+            geocoding_service=geocoder
+        )
 
     def show_welcome_banner(self):
         """Display welcome banner."""
@@ -183,93 +181,43 @@ class RideShareApp:
 
         return query, location, priority
 
-    def display_route_info(
-        self,
-        origin: str,
-        destination: str,
-        priority: str,
-        cache_status: str
-    ):
+    def display_processing(self, cache_hit: bool = False):
         """
-        Display route and priority information.
+        Display processing status with progress indicators.
 
         Args:
-            origin: Origin location name
-            destination: Destination location name
-            priority: User priority (price/time/balanced)
-            cache_status: Cache hit/miss status
+            cache_hit: Whether cache was hit
         """
-        self.console.print(f"\n[bold]📍 Route:[/bold] {origin} → {destination}")
-        self.console.print(f"[bold]🎯 Priority:[/bold] {priority}")
-        self.console.print(f"[bold]💾 Cache:[/bold] {cache_status}\n")
-
-    def fetch_estimates(
-        self,
-        origin_coords: Tuple[float, float],
-        dest_coords: Tuple[float, float],
-        cache_key: str
-    ) -> List[RideEstimate]:
-        """
-        Fetch ride estimates with caching and progress indicators.
-
-        Args:
-            origin_coords: Origin (lat, lng)
-            dest_coords: Destination (lat, lng)
-            cache_key: Cache key for storing results
-
-        Returns:
-            List of RideEstimate objects
-        """
-        # Check cache first
-        cached_data = self.cache.get(cache_key)
-        if cached_data:
+        if cache_hit:
             self.console.print("[green]✓ Using cached results[/green]\n")
-            return cached_data
+            return
 
-        # Fetch fresh data with progress indicator
-        all_estimates = []
-
+        # Show processing steps
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             console=self.console
         ) as progress:
-            # Uber
-            task = progress.add_task("⏳ Fetching Uber estimates...", total=None)
-            uber_estimates = self.uber_client.get_price_estimates(
-                origin_coords[0], origin_coords[1],
-                dest_coords[0], dest_coords[1]
-            )
-            all_estimates.extend(uber_estimates)
-            progress.update(task, description="[green]✓ Uber estimates retrieved[/green]")
+            task1 = progress.add_task("⏳ Fetching Uber estimates...", total=None)
+            time.sleep(0.3)
+            progress.update(task1, description="[green]✓ Uber estimates retrieved[/green]")
 
-            # Lyft
-            task = progress.add_task("⏳ Fetching Lyft estimates...", total=None)
-            lyft_estimates = self.lyft_client.get_price_estimates(
-                origin_coords[0], origin_coords[1],
-                dest_coords[0], dest_coords[1]
-            )
-            all_estimates.extend(lyft_estimates)
-            progress.update(task, description="[green]✓ Lyft estimates retrieved[/green]")
+            task2 = progress.add_task("⏳ Fetching Lyft estimates...", total=None)
+            time.sleep(0.3)
+            progress.update(task2, description="[green]✓ Lyft estimates retrieved[/green]")
 
-            # Compare
-            task = progress.add_task("⏳ Analyzing options...", total=None)
-            time.sleep(0.5)  # Brief pause for effect
-            progress.update(task, description="[green]✓ Analysis complete[/green]")
+            task3 = progress.add_task("⏳ Analyzing options...", total=None)
+            time.sleep(0.3)
+            progress.update(task3, description="[green]✓ Analysis complete[/green]")
 
         self.console.print()
 
-        # Cache the results
-        self.cache.set(cache_key, all_estimates)
-
-        return all_estimates
-
-    def display_estimates_table(self, estimates: List[RideEstimate]):
+    def display_estimates_table(self, estimates: List[Dict]):
         """
         Display estimates in a beautiful table.
 
         Args:
-            estimates: List of RideEstimate objects
+            estimates: List of formatted estimate dictionaries
         """
         table = Table(
             title="Available Options",
@@ -287,17 +235,17 @@ class RideShareApp:
         for est in estimates:
             surge_indicator = ""
             price_style = "green"
-            if est.surge_multiplier and est.surge_multiplier > 1.0:
-                surge_indicator = f" 🔥 {est.surge_multiplier:.1f}x"
+            if est.get('surge_multiplier') and est['surge_multiplier'] > 1.0:
+                surge_indicator = f" 🔥 {est['surge_multiplier']:.1f}x"
                 price_style = "red"
 
             table.add_row(
-                est.provider,
-                est.vehicle_type,
-                f"[{price_style}]${est.price_estimate:.2f}{surge_indicator}[/{price_style}]",
-                f"{est.pickup_eta_minutes} min",
-                f"{est.duration_minutes} min",
-                f"{est.distance_miles:.1f} mi"
+                est['provider'],
+                est['vehicle_type'],
+                f"[{price_style}]${est['price']:.2f}{surge_indicator}[/{price_style}]",
+                f"{est['pickup_eta_minutes']} min",
+                f"{est['duration_minutes']} min",
+                f"{est['distance_miles']:.1f} mi"
             )
 
         self.console.print(table)
@@ -341,82 +289,61 @@ class RideShareApp:
             # Get user input
             query, location, priority = self.get_user_input(query, location, priority)
 
-            # Parse query
-            try:
-                with self.console.status("[bold yellow]🔍 Parsing your query...[/bold yellow]"):
-                    ride_query = self.parser.parse_query(query, user_location=location)
-            except ValueError as e:
-                self.console.print(f"[red]❌ Query Error: {e}[/red]")
-                self.console.print(
-                    "[yellow]Please include both origin and destination in your query.[/yellow]"
-                )
-                return
-
-            # Geocode origin and destination
-            try:
-                with self.console.status("[bold yellow]🌍 Finding locations...[/bold yellow]"):
-                    origin_lat, origin_lng, origin_name = self.geocoder.geocode(
-                        ride_query.origin
+            # Process through handler (does everything!)
+            with self.console.status("[bold yellow]🔍 Processing your request...[/bold yellow]"):
+                try:
+                    # Single method call handles entire pipeline:
+                    # 1. Parse query
+                    # 2. Geocode locations
+                    # 3. Check cache / fetch from APIs
+                    # 4. Compare with AI
+                    # 5. Format results
+                    results = self.handler.process(
+                        raw_query=query,
+                        context={'user_location': location},
+                        priority=priority
                     )
-                    dest_lat, dest_lng, dest_name = self.geocoder.geocode(
-                        ride_query.destination
+                except ValueError as e:
+                    self.console.print(f"\n[red]❌ Error: {e}[/red]")
+                    self.console.print(
+                        "[yellow]Please include both origin and destination in your query.[/yellow]"
                     )
-            except Exception as e:
-                self.console.print(f"[red]❌ Geocoding Error: {e}[/red]")
-                self.console.print(
-                    "[yellow]Could not find one or more locations. Please check your query.[/yellow]"
-                )
-                return
+                    return
 
-            # Generate cache key
-            cache_key = SimpleCache.generate_key(
-                origin_lat, origin_lng, dest_lat, dest_lng
-            )
-
-            # Check cache status
-            cache_status = (
-                "[green]HIT (using cached data)[/green]"
-                if self.cache.get(cache_key)
-                else "[yellow]MISS (fetching fresh data...)[/yellow]"
-            )
+            # Extract results
+            ride_query = results['query']
+            estimates = results['estimates']
+            comparison = results['comparison']
+            route = results['route']
+            summary = results['summary']
 
             # Display route info
-            self.display_route_info(origin_name, dest_name, priority, cache_status)
+            self.console.print(f"\n[bold]📍 Route:[/bold] {ride_query.origin} → {ride_query.destination}")
+            self.console.print(f"[bold]🎯 Priority:[/bold] {priority}")
+            self.console.print(f"[bold]📊 Options:[/bold] {summary['total_options']} available")
+            self.console.print(f"[bold]💰 Price Range:[/bold] {summary['price_range']}")
+            if route:
+                self.console.print(f"[bold]📏 Distance:[/bold] {route['distance_miles']:.1f} miles\n")
+            else:
+                self.console.print()
 
-            # Fetch estimates
-            estimates = self.fetch_estimates(
-                (origin_lat, origin_lng),
-                (dest_lat, dest_lng),
-                cache_key
-            )
+            # Display processing animation
+            # Note: Actual work already done in handler.process()
+            # This is just for visual feedback
+            cache_hit = summary.get('cache_hit', False)
+            self.display_processing(cache_hit)
 
+            # Display estimates table
             if not estimates:
                 self.console.print(
                     "[red]❌ No estimates available for this route.[/red]"
                 )
                 return
 
-            # Display estimates table
             self.display_estimates_table(estimates)
 
-            # Get and display recommendation
-            try:
-                recommendation = self.comparator.compare_rides(
-                    estimates,
-                    user_priority=priority
-                )
-                self.display_recommendation(recommendation)
-            except Exception as e:
-                self.console.print(
-                    f"[red]❌ Comparison Error: {e}[/red]"
-                )
-                # Fallback to programmatic selection
-                best = self.comparator.identify_best_option(estimates, priority)
-                fallback_text = (
-                    f"Best option based on {priority} priority: "
-                    f"{best.provider} {best.vehicle_type} at ${best.price_estimate:.2f}"
-                )
-                self.display_recommendation(fallback_text)
+            # Display AI recommendation
+            self.display_recommendation(comparison)
 
         except KeyboardInterrupt:
             self.console.print("\n\n[yellow]👋 Goodbye![/yellow]\n")
