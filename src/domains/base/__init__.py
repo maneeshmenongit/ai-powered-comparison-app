@@ -1,13 +1,13 @@
-"""Base domain handler pattern for multi-domain tourist companion app."""
+"""
+Base domain classes and interfaces.
 
-from .domain_handler import (
-    DomainQuery,
-    DomainResult,
-    DomainHandler
-)
+Provides abstract base classes that all domains must implement.
+"""
+
+from .domain_handler import DomainHandler, DomainQuery, DomainResult
 
 __all__ = [
-    "DomainQuery",
-    "DomainResult",
-    "DomainHandler",
+    'DomainHandler',
+    'DomainQuery',
+    'DomainResult',
 ]
