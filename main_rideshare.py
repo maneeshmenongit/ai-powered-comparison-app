@@ -33,7 +33,7 @@ from rich.prompt import Prompt
 
 sys.path.insert(0, 'src')
 from domains.rideshare.handler import RideShareHandler
-from core.geocoding_service import GeocodingService
+from core import GeocodingService, CacheService, RateLimiter
 from domains.rideshare.models import RideEstimate
 
 
@@ -121,14 +121,26 @@ class RideShareApp:
             )
             sys.exit(1)
 
-        # Initialize services
+        # Initialize core services
+        self.console.print("\n[cyan]🔧 Initializing services...[/cyan]")
+
         geocoder = GeocodingService()
-        cache = SimpleCache(ttl_seconds=300)
+        cache = CacheService(base_dir="data/cache", enabled=True)
+        rate_limiter = RateLimiter(enabled=True)
+
+        self.console.print("  ✅ Geocoding service")
+        self.console.print("  ✅ Cache service")
+        self.console.print("  ✅ Rate limiter")
+
+        # Store services for statistics display
+        self.cache = cache
+        self.rate_limiter = rate_limiter
 
         # Initialize RideShare handler (encapsulates all domain logic)
         self.handler = RideShareHandler(
             cache_service=cache,
-            geocoding_service=geocoder
+            geocoding_service=geocoder,
+            rate_limiter=rate_limiter
         )
 
     def show_welcome_banner(self):
@@ -344,6 +356,28 @@ class RideShareApp:
 
             # Display AI recommendation
             self.display_recommendation(comparison)
+
+            # Show cache statistics
+            cache_stats = self.cache.stats()
+            if cache_stats['total_requests'] > 0:
+                self.console.print(
+                    f"[dim]📊 Cache: {cache_stats['hits']} hits, "
+                    f"{cache_stats['misses']} misses "
+                    f"({cache_stats['hit_rate_percent']:.1f}% hit rate)[/dim]"
+                )
+
+            # Show rate limiter statistics (for providers used)
+            for provider in ride_query.providers:
+                provider_lower = provider.lower()
+                rate_stats = self.rate_limiter.stats(provider_lower)
+                if rate_stats and rate_stats['total_requests'] > 0:
+                    self.console.print(
+                        f"[dim]⚡ {provider} Rate Limiter: "
+                        f"{rate_stats['total_requests']} requests, "
+                        f"{rate_stats['available_tokens']:.0f} tokens available[/dim]"
+                    )
+
+            self.console.print()  # Extra newline at end
 
         except KeyboardInterrupt:
             self.console.print("\n\n[yellow]👋 Goodbye![/yellow]\n")

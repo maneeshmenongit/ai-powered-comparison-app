@@ -52,7 +52,8 @@ class RideShareHandler(DomainHandler):
     def __init__(
         self,
         cache_service: Optional[Any] = None,
-        geocoding_service: Optional[Any] = None
+        geocoding_service: Optional[Any] = None,
+        rate_limiter: Optional[Any] = None
     ):
         """
         Initialize ride-share handler with services and components.
@@ -60,6 +61,7 @@ class RideShareHandler(DomainHandler):
         Args:
             cache_service: Optional cache for storing API results (5min TTL)
             geocoding_service: Geocoding service for location resolution
+            rate_limiter: Optional rate limiter service
 
         Note:
             - Parser and comparator use OpenAI GPT-4o-mini
@@ -67,6 +69,7 @@ class RideShareHandler(DomainHandler):
             - Can be swapped with real clients when API access available
         """
         super().__init__(cache_service, geocoding_service)
+        self.rate_limiter = rate_limiter
 
         # Initialize domain-specific components
         self.parser = RideShareIntentParser()
@@ -196,6 +199,10 @@ class RideShareHandler(DomainHandler):
                 continue
 
             try:
+                # Rate limit check before API call
+                if self.rate_limiter:
+                    self.rate_limiter.acquire(provider_name_lower)
+
                 client = self.clients[provider_name_lower]
 
                 # Get price estimates (returns list of estimates for all vehicle types)
@@ -394,5 +401,6 @@ class RideShareHandler(DomainHandler):
         return (
             f"RideShareHandler(providers=[{providers}], "
             f"{'with cache' if self.cache else 'no cache'}, "
-            f"{'with geocoder' if self.geocoder else 'no geocoder'})"
+            f"{'with geocoder' if self.geocoder else 'no geocoder'}, "
+            f"{'with rate limiter' if self.rate_limiter else 'no rate limiter'})"
         )
