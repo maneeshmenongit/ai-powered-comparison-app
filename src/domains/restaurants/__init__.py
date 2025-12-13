@@ -1,13 +1,19 @@
-"""Restaurant domain for Hopwise.
+"""
+Hopwise - Restaurant Domain
+Every stop matters! Hop smarter!
 
-This domain handles restaurant discovery and recommendations.
+Restaurant comparison across multiple providers.
 """
 
-from .models import RestaurantQuery, Restaurant, price_range_to_number, number_to_price_range
+from .handler import RestaurantHandler
+from .models import RestaurantQuery, Restaurant
+from .intent_parser import RestaurantIntentParser
+from .comparator import RestaurantComparator
 
 __all__ = [
+    'RestaurantHandler',
     'RestaurantQuery',
     'Restaurant',
-    'price_range_to_number',
-    'number_to_price_range',
+    'RestaurantIntentParser',
+    'RestaurantComparator',
 ]
