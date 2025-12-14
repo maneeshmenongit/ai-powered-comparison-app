@@ -8,6 +8,35 @@ from typing import Optional, List, Dict
 from datetime import datetime
 
 
+# Filter categories
+FILTER_CATEGORIES = {
+    'Food': {
+        'name': 'Food',
+        'description': 'Restaurants serving main meals',
+        'keywords': ['restaurant', 'dining', 'meal', 'food', 'lunch', 'dinner'],
+        'icon': '🍽️'
+    },
+    'Drinks': {
+        'name': 'Drinks',
+        'description': 'Bars, lounges, wine bars, cocktail bars',
+        'keywords': ['bar', 'drinks', 'cocktails', 'wine', 'beer', 'lounge', 'pub'],
+        'icon': '🍸'
+    },
+    'Dessert': {
+        'name': 'Dessert',
+        'description': 'Bakeries, ice cream, sweets, desserts',
+        'keywords': ['dessert', 'bakery', 'ice cream', 'sweets', 'pastry', 'cake'],
+        'icon': '🍰'
+    },
+    'Cafe': {
+        'name': 'Cafe',
+        'description': 'Coffee shops, cafes, casual spots',
+        'keywords': ['cafe', 'coffee', 'espresso', 'latte', 'tea', 'casual'],
+        'icon': '☕'
+    }
+}
+
+
 @dataclass
 class RestaurantQuery:
     """
@@ -22,6 +51,7 @@ class RestaurantQuery:
         party_size: Number of people (optional)
         dietary_restrictions: List of restrictions (vegetarian, vegan, etc.)
         open_now: Whether restaurant must be open now
+        filter_category: Filter type (Food, Drinks, Dessert, Cafe)
     """
     cuisine: Optional[str] = None
     location: str = ""
@@ -31,6 +61,7 @@ class RestaurantQuery:
     party_size: Optional[int] = None
     dietary_restrictions: List[str] = field(default_factory=list)
     open_now: bool = False
+    filter_category: str = "Food"  # Default to Food
 
     def to_dict(self) -> Dict:
         """Convert to dictionary for caching/serialization."""
@@ -42,11 +73,14 @@ class RestaurantQuery:
             'distance_miles': self.distance_miles,
             'party_size': self.party_size,
             'dietary_restrictions': self.dietary_restrictions,
-            'open_now': self.open_now
+            'open_now': self.open_now,
+            'filter_category': self.filter_category
         }
 
     def __repr__(self) -> str:
         parts = []
+        if self.filter_category and self.filter_category != "Food":
+            parts.append(f"[{self.filter_category}]")
         if self.cuisine:
             parts.append(f"{self.cuisine}")
         parts.append(f"near {self.location}")
@@ -134,3 +168,39 @@ def number_to_price_range(number: int) -> str:
     if number <= 0:
         return ""
     return "$" * min(number, 4)
+
+
+def get_filter_category(filter_name: str) -> Dict:
+    """
+    Get filter category details.
+
+    Args:
+        filter_name: Filter category name (Food, Drinks, Dessert, Cafe)
+
+    Returns:
+        Filter category dictionary or Food if not found
+    """
+    return FILTER_CATEGORIES.get(filter_name, FILTER_CATEGORIES['Food'])
+
+
+def validate_filter_category(filter_name: str) -> str:
+    """
+    Validate and normalize filter category name.
+
+    Args:
+        filter_name: Filter name to validate
+
+    Returns:
+        Valid filter name (defaults to Food if invalid)
+    """
+    if filter_name in FILTER_CATEGORIES:
+        return filter_name
+
+    # Try case-insensitive match
+    filter_lower = filter_name.lower()
+    for key in FILTER_CATEGORIES.keys():
+        if key.lower() == filter_lower:
+            return key
+
+    # Default to Food
+    return "Food"
