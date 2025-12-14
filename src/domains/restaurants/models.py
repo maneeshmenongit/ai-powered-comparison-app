@@ -22,16 +22,16 @@ FILTER_CATEGORIES = {
         'keywords': ['bar', 'drinks', 'cocktails', 'wine', 'beer', 'lounge', 'pub'],
         'icon': '🍸'
     },
-    'Dessert': {
-        'name': 'Dessert',
-        'description': 'Bakeries, ice cream, sweets, desserts',
-        'keywords': ['dessert', 'bakery', 'ice cream', 'sweets', 'pastry', 'cake'],
-        'icon': '🍰'
+    'Ice Cream': {
+        'name': 'Ice Cream',
+        'description': 'Ice cream shops, gelato, frozen desserts',
+        'keywords': ['ice cream', 'gelato', 'frozen yogurt', 'sorbet', 'froyo', 'soft serve'],
+        'icon': '🍨'
     },
     'Cafe': {
         'name': 'Cafe',
-        'description': 'Coffee shops, cafes, casual spots',
-        'keywords': ['cafe', 'coffee', 'espresso', 'latte', 'tea', 'casual'],
+        'description': 'Coffee shops, cafes, bakeries, casual spots',
+        'keywords': ['cafe', 'coffee', 'espresso', 'latte', 'tea', 'bakery', 'pastry', 'casual'],
         'icon': '☕'
     }
 }
