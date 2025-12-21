@@ -117,6 +117,9 @@ class RestaurantHandler(DomainHandler):
             cache_key = f"restaurants_{query.cuisine or 'any'}_{lat:.4f}_{lon:.4f}_{query.price_range or 'any'}"
             cached = self.cache.get(cache_key)
             if cached:
+                # Convert dicts back to Restaurant objects
+                if cached and isinstance(cached[0], dict):
+                    return [Restaurant(**r) for r in cached]
                 return cached
 
         # Fetch from each provider
@@ -148,24 +151,25 @@ class RestaurantHandler(DomainHandler):
 
         return restaurants
 
-    def compare_options(self, options: List[Restaurant], priority: str = "balanced") -> str:
+    def compare_options(self, options: List[Restaurant], priority: str = "balanced", use_ai: bool = False) -> str:    
         """
-        Use AI to compare restaurant options and provide recommendation.
-
+        Compare restaurant options and provide recommendation.
+        
         Args:
             options: List of Restaurant objects
             priority: Comparison priority (rating, price, distance, balanced)
-
+            use_ai: If True, use AI (slower, detailed). If False, use fast fallback.
+        
         Returns:
             Natural language comparison and recommendation
-
-        Example:
-            compare_options([rest1, rest2], priority="rating")
-            → "I recommend Carbone from Yelp with 4.5 stars..."
         """
-        # Use existing comparator
-        comparison = self.comparator.compare_restaurants(options, priority)
-
+        if use_ai:
+            # AI-powered (2-4 seconds, detailed analysis)
+            comparison = self.comparator.compare_restaurants(options, priority)
+        else:
+            # Fast fallback (instant, simple recommendation)
+            comparison = self.comparator._fallback_comparison(options, priority)
+        
         return comparison
 
     def format_results(
@@ -212,7 +216,8 @@ class RestaurantHandler(DomainHandler):
         self,
         raw_query: str,
         context: Dict = None,
-        priority: str = "balanced"
+        priority: str = "balanced",
+        use_ai: bool = False
     ) -> Dict:
         """
         Main processing pipeline - calls all steps in order.
@@ -223,6 +228,7 @@ class RestaurantHandler(DomainHandler):
             raw_query: User's query
             context: Optional context (user_location, etc.)
             priority: Comparison priority (rating, price, distance, balanced)
+            use_ai: If True, use AI (slower, detailed). If False, use fast fallback.
 
         Returns:
             Complete results ready for display
@@ -238,7 +244,7 @@ class RestaurantHandler(DomainHandler):
         options = self.fetch_options(query)
 
         # Step 3: Compare options
-        comparison = self.compare_options(options, priority)
+        comparison = self.compare_options(options, priority, use_ai=use_ai)
 
         # Step 4: Format results
         results = self.format_results(options, comparison, priority)

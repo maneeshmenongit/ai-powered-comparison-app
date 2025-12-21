@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hopwise - Every stop matters. Hop smarter! Compare rides, restaurants, activities & hotels in one intelligent travel platform.">
+    <meta name="keywords" content="travel, ride comparison, restaurant finder, activities, hotels, tourist app">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Hopwise - Every stop matters. Hop smarter!">
+    <meta property="og:description" content="Compare rides, restaurants, activities & hotels. Your AI-powered travel companion.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hopwise.app">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Hopwise - Hop smarter!">
+    <meta name="twitter:description" content="Every stop matters. Compare rides, dining, activities & hotels in one place.">
+    
+    <title>Hopwise - Every stop matters. Hop smarter!</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="logo-mark">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                        <circle cx="15" cy="30" r="8" fill="currentColor" opacity="0.3"/>
+                        <circle cx="30" cy="20" r="10" fill="currentColor" opacity="0.6"/>
+                        <circle cx="45" cy="30" r="8" fill="currentColor"/>
+                        <path d="M15 30 Q20 15 30 20 T45 30" stroke="currentColor" stroke-width="2" fill="none" opacity="0.4"/>
+                    </svg>
+                </div>
+                <h1 class="hero-title">
+                    <span class="title-line">Every stop</span>
+                    <span class="title-line">matters.</span>
+                </h1>
+                <p class="hero-tagline">Hop smarter!</p>
+                <p class="hero-description">
+                    Compare rides, restaurants, activities & hotels—all in one intelligent platform. 
+                    Make every stop count on your journey.
+                </p>
+                
+                <!-- Waitlist Form -->
+                <form class="waitlist-form" id="waitlistForm" action="https://formspree.io/f/xrbnlzoa" method="POST">
+                    <div class="form-wrapper">
+                        <input 
+                            type="email" 
+                            name="email"
+                            placeholder="your@email.com" 
+                            required 
+                            class="email-input"
+                            id="emailInput"
+                        >
+                        <button type="submit" class="submit-btn">
+                            <span class="btn-text">Join Waitlist</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                    </div>
+                    <p class="form-note">Be the first to hop smarter. Launching Q1 2026.</p>
+                </form>
+                
+                <div class="success-message" id="successMessage">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Thanks! We'll let you know when we launch.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚗</div>
+                    <h3 class="feature-title">Smart Rides</h3>
+                    <p class="feature-text">Compare Uber, Lyft & Via in real-time. Find the best price and fastest pickup.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🍽️</div>
+                    <h3 class="feature-title">Perfect Dining</h3>
+                    <p class="feature-text">Discover restaurants that match your taste, budget, and location.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎡</div>
+                    <h3 class="feature-title">Amazing Activities</h3>
+                    <p class="feature-text">Book experiences and tours that make your trip unforgettable.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🏨</div>
+                    <h3 class="feature-title">Great Stays</h3>
+                    <p class="feature-text">Compare hotels and find the perfect place to rest between adventures.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Proposition -->
+    <section class="value-prop">
+        <div class="container">
+            <div class="value-content">
+                <h2 class="value-title">
+                    One app.<br>
+                    Every decision.<br>
+                    <span class="highlight">Smarter.</span>
+                </h2>
+                <div class="value-points">
+                    <div class="value-point">
+                        <div class="point-number">01</div>
+                        <div class="point-content">
+                            <h4>AI-Powered Planning</h4>
+                            <p>Our intelligent system learns your preferences and suggests the perfect combination of rides, dining, and activities.</p>
+                        </div>
+                    </div>
+                    <div class="value-point">
+                        <div class="point-number">02</div>
+                        <div class="point-content">
+                            <h4>Real-Time Comparison</h4>
+                            <p>See live prices and availability across all services. No more switching between apps.</p>
+                        </div>
+                    </div>
+                    <div class="value-point">
+                        <div class="point-number">03</div>
+                        <div class="point-content">
+                            <h4>Context-Aware</h4>
+                            <p>We connect your journey. Get ride suggestions to your restaurant, activities near your hotel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof / Stats -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">12+</div>
+                    <div class="stat-label">Services Integrated</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Travel Domains</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Q2</div>
+                    <div class="stat-label">2025 Launch</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section class="footer-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to hop smarter?</h2>
+                <p class="cta-text">Join our waitlist and be among the first to experience travel planning reimagined.</p>
+                <a href="#waitlistForm" class="cta-button">Get Early Access</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <svg width="40" height="40" viewBox="0 0 60 60" fill="none">
+                            <circle cx="15" cy="30" r="8" fill="currentColor" opacity="0.3"/>
+                            <circle cx="30" cy="20" r="10" fill="currentColor" opacity="0.6"/>
+                            <circle cx="45" cy="30" r="8" fill="currentColor"/>
+                        </svg>
+                        <span>Hopwise</span>
+                    </div>
+                    <p class="footer-tagline">Every stop matters. Hop smarter!</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <ul>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#waitlistForm">Waitlist</a></li>
+                            <li><a href="#about">About</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <ul>
+                            <li><a href="mailto:hello@hopwise.app">Email</a></li>
+                            <li><a href="https://twitter.com/hopwise">Twitter</a></li>
+                            <li><a href="https://instagram.com/hopwise">Instagram</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Hopwise. Every stop matters.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

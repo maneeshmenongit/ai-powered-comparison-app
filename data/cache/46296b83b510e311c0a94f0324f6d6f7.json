@@ -1,0 +1,228 @@
+{
+  "key": "restaurants_Ice Cream_40.6526_-73.9497_any",
+  "value": [
+    {
+      "provider": "yelp",
+      "name": "Blue Hill",
+      "cuisine": "Ice Cream",
+      "rating": 4.7,
+      "review_count": 890,
+      "price_range": "$$$$",
+      "address": "507 Broadway (near 42nd St), New York, NY 10001",
+      "distance_miles": 0.4,
+      "phone": "(212) 546-8881",
+      "website": "https://www.yelp.com/biz/blue-hill",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.653185681765486,
+        -73.94998051224394
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Blue+Hill",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-20T06:44:03.323916"
+    },
+    {
+      "provider": "yelp",
+      "name": "Gramercy Tavern",
+      "cuisine": "Ice Cream",
+      "rating": 4.6,
+      "review_count": 2100,
+      "price_range": "$$$$",
+      "address": "327 Amsterdam Ave (near 42nd St), New York, NY 10001",
+      "distance_miles": 2.6,
+      "phone": "(347) 440-8418",
+      "website": "https://www.yelp.com/biz/gramercy-tavern",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.656664749822625,
+        -73.94194104053464
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Gramercy+Tavern",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-20T06:44:03.323901"
+    },
+    {
+      "provider": "google_places",
+      "name": "Peter Luger",
+      "cuisine": "Ice Cream",
+      "rating": 4.6,
+      "review_count": 4200,
+      "price_range": "$$$$",
+      "address": "132 Bleecker St, West Village, NY 10012",
+      "distance_miles": 2.2,
+      "phone": "(646) 885-4767",
+      "website": "https://www.google.com/maps/search/Peter+Luger",
+      "hours": "Hours vary",
+      "is_open_now": true,
+      "coordinates": [
+        40.65945184318632,
+        -73.94563551315841
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Peter+Luger",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-20T06:44:03.324027"
+    },
+    {
+      "provider": "google_places",
+      "name": "Union Square Caf\u00e9",
+      "cuisine": "Ice Cream",
+      "rating": 4.5,
+      "review_count": 2100,
+      "price_range": "$$$",
+      "address": "388 6th Ave, Chelsea, NY 10012",
+      "distance_miles": 1.4,
+      "phone": "(212) 676-6485",
+      "website": "https://www.google.com/maps/search/Union+Square+Caf\u00e9",
+      "hours": "Hours vary",
+      "is_open_now": true,
+      "coordinates": [
+        40.64325126606197,
+        -73.9535154346533
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Union+Square+Caf\u00e9",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-20T06:44:03.323985"
+    },
+    {
+      "provider": "google_places",
+      "name": "Minetta Tavern",
+      "cuisine": "Ice Cream",
+      "rating": 4.4,
+      "review_count": 1890,
+      "price_range": "$$$",
+      "address": "479 Bleecker St, Chelsea, NY 10012",
+      "distance_miles": 1.1,
+      "phone": "(917) 431-4841",
+      "website": "https://www.google.com/maps/search/Minetta+Tavern",
+      "hours": "Hours vary",
+      "is_open_now": true,
+      "coordinates": [
+        40.65700223653024,
+        -73.94273286675023
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Minetta+Tavern",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-20T06:44:03.324013"
+    },
+    {
+      "provider": "yelp",
+      "name": "Shake Shack",
+      "cuisine": "Ice Cream",
+      "rating": 4.3,
+      "review_count": 8900,
+      "price_range": "$",
+      "address": "643 3rd Ave (near 50th St), New York, NY 10001",
+      "distance_miles": 0.5,
+      "phone": "(347) 360-6557",
+      "website": "https://www.yelp.com/biz/shake-shack",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.65872616719636,
+        -73.94343511394037
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Shake+Shack",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-20T06:44:03.323929"
+    },
+    {
+      "provider": "google_places",
+      "name": "The Spotted Pig",
+      "cuisine": "Ice Cream",
+      "rating": 4.3,
+      "review_count": 3400,
+      "price_range": "$$",
+      "address": "384 Houston St, Tribeca, NY 10012",
+      "distance_miles": 1.0,
+      "phone": "(212) 337-1112",
+      "website": "https://www.google.com/maps/search/The+Spotted+Pig",
+      "hours": "Hours vary",
+      "is_open_now": true,
+      "coordinates": [
+        40.65691566810996,
+        -73.94987011181888
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=The+Spotted+Pig",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-20T06:44:03.324000"
+    },
+    {
+      "provider": "yelp",
+      "name": "The Smith",
+      "cuisine": "Ice Cream",
+      "rating": 4.2,
+      "review_count": 4200,
+      "price_range": "$$",
+      "address": "574 Madison Ave (near 14th St), New York, NY 10001",
+      "distance_miles": 1.4,
+      "phone": "(347) 693-4711",
+      "website": "https://www.yelp.com/biz/the-smith",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.66163368275428,
+        -73.94657281080167
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=The+Smith",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-20T06:44:03.323861"
+    },
+    {
+      "provider": "yelp",
+      "name": "Five Guys",
+      "cuisine": "Ice Cream",
+      "rating": 4.1,
+      "review_count": 3400,
+      "price_range": "$",
+      "address": "993 3rd Ave (near 50th St), New York, NY 10001",
+      "distance_miles": 1.7,
+      "phone": "(646) 593-4236",
+      "website": "https://www.yelp.com/biz/five-guys",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.64768271864637,
+        -73.95614855058956
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Five+Guys",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-20T06:44:03.323943"
+    }
+  ],
+  "created_at": 1766231043.324075,
+  "ttl": 3600
+}

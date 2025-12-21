@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hopwise - Connected to Backend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sunset-red: #FF6B6B;
+            --sunset-orange: #FF8E53;
+            --sunset-gold: #FFA500;
+            --sky-blue: #87CEEB;
+            --dark: #1E1E2E;
+            --gray-50: #F8F9FA;
+            --white: #FFFFFF;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--gray-50);
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 18px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .section h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-50);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--sunset-orange);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .results {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            min-height: 100px;
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--sunset-orange);
+            padding: 40px;
+        }
+        
+        .error {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #EF4444;
+            padding: 40px;
+        }
+        
+        .recommendation {
+            background: #E8F5E9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+        
+        .recommendation h4 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #2E7D32;
+            margin-bottom: 8px;
+        }
+        
+        .recommendation p {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1B5E20;
+            line-height: 1.6;
+        }
+        
+        .ride-card, .restaurant-card {
+            background: var(--white);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        
+        .ride-card div, .restaurant-card div {
+            font-size: 13px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌍 Hopwise</h1>
+            <p>Every stop matters! Hop smarter!</p>
+        </div>
+
+        <!-- Rides Section -->
+        <div class="section">
+            <h2>🚗 Compare Rides</h2>
+            
+            <div class="form-group">
+                <label>Origin</label>
+                <input type="text" id="ride-origin" value="Times Square, New York, NY" placeholder="Enter origin">
+            </div>
+            
+            <div class="form-group">
+                <label>Destination</label>
+                <input type="text" id="ride-destination" value="Central Park, New York, NY" placeholder="Enter destination">
+            </div>
+            
+            <button class="btn" onclick="searchRides()">🔍 Compare Rides</button>
+            
+            <div id="ride-results" class="results"></div>
+        </div>
+
+        <!-- Restaurants Section -->
+        <div class="section">
+            <h2>🍽️ Find Restaurants</h2>
+            
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="restaurant-location" value="Times Square, New York, NY" placeholder="Enter location">
+            </div>
+            
+            <div class="form-group">
+                <label>What are you looking for?</label>
+                <input type="text" id="restaurant-query" value="Italian food" placeholder="e.g., Italian food, sushi, coffee">
+            </div>
+            
+            <div class="form-group">
+                <label>Filter Category</label>
+                <select id="restaurant-filter">
+                    <option value="Food">🍽️ Food</option>
+                    <option value="Drinks">🍸 Drinks</option>
+                    <option value="Ice Cream">🍨 Ice Cream</option>
+                    <option value="Cafe">☕ Cafe</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="restaurant-priority">
+                    <option value="balanced">⚖️ Balanced</option>
+                    <option value="rating">⭐ Highest Rated</option>
+                    <option value="price">💰 Best Value</option>
+                    <option value="distance">📍 Closest</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="searchRestaurants()">🔍 Search Restaurants</button>
+            
+            <div id="restaurant-results" class="results"></div>
+        </div>
+    </div>
+
+    <!-- Include our API client -->
+    <script src="hopwise-api.js"></script>
+
+</body>
+</html>

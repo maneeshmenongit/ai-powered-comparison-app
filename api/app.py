@@ -128,10 +128,13 @@ def search_restaurants():
         full_query = f"{query} near {location}"
         
         # Process
+        use_ai = data.get('use_ai', False)  # Default to fast mode
+
         results = restaurant_handler.process(
             full_query,
             context={'user_location': location},
-            priority=priority
+            priority=priority,
+            use_ai=use_ai
         )
         
         return jsonify({

@@ -1,0 +1,228 @@
+{
+  "key": "restaurants_any_40.7580_-73.9855_any",
+  "value": [
+    {
+      "provider": "yelp",
+      "name": "Blue Hill",
+      "cuisine": "American",
+      "rating": 4.7,
+      "review_count": 890,
+      "price_range": "$$$$",
+      "address": "741 Amsterdam Ave (near 34th St), New York, NY 10001",
+      "distance_miles": 0.3,
+      "phone": "(347) 598-3850",
+      "website": "https://www.yelp.com/biz/blue-hill",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.75385779672809,
+        -73.97885036369766
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Blue+Hill",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573050"
+    },
+    {
+      "provider": "yelp",
+      "name": "Gramercy Tavern",
+      "cuisine": "American",
+      "rating": 4.6,
+      "review_count": 2100,
+      "price_range": "$$$$",
+      "address": "656 Madison Ave (near 50th St), New York, NY 10001",
+      "distance_miles": 2.1,
+      "phone": "(347) 409-2023",
+      "website": "https://www.yelp.com/biz/gramercy-tavern",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.7582112214109,
+        -73.97924328125038
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Gramercy+Tavern",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573035"
+    },
+    {
+      "provider": "google_places",
+      "name": "Peter Luger",
+      "cuisine": "American",
+      "rating": 4.6,
+      "review_count": 4200,
+      "price_range": "$$$$",
+      "address": "140 7th Ave, West Village, NY 10012",
+      "distance_miles": 0.8,
+      "phone": "(212) 283-8957",
+      "website": "https://www.google.com/maps/search/Peter+Luger",
+      "hours": "Hours vary",
+      "is_open_now": true,
+      "coordinates": [
+        40.76791422586071,
+        -73.99271947473623
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Peter+Luger",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573141"
+    },
+    {
+      "provider": "google_places",
+      "name": "Union Square Caf\u00e9",
+      "cuisine": "American",
+      "rating": 4.5,
+      "review_count": 2100,
+      "price_range": "$$$",
+      "address": "296 Prince St, Greenwich Village, NY 10012",
+      "distance_miles": 1.2,
+      "phone": "(212) 820-4977",
+      "website": "https://www.google.com/maps/search/Union+Square+Caf\u00e9",
+      "hours": "Hours vary",
+      "is_open_now": false,
+      "coordinates": [
+        40.75783590758467,
+        -73.98255223680296
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Union+Square+Caf\u00e9",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573102"
+    },
+    {
+      "provider": "google_places",
+      "name": "Minetta Tavern",
+      "cuisine": "American",
+      "rating": 4.4,
+      "review_count": 1890,
+      "price_range": "$$$",
+      "address": "29 Spring St, Tribeca, NY 10012",
+      "distance_miles": 2.0,
+      "phone": "(646) 506-1513",
+      "website": "https://www.google.com/maps/search/Minetta+Tavern",
+      "hours": "Hours vary",
+      "is_open_now": true,
+      "coordinates": [
+        40.76445750540271,
+        -73.9876972507785
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Minetta+Tavern",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573129"
+    },
+    {
+      "provider": "yelp",
+      "name": "Shake Shack",
+      "cuisine": "American",
+      "rating": 4.3,
+      "review_count": 8900,
+      "price_range": "$",
+      "address": "950 3rd Ave (near 50th St), New York, NY 10001",
+      "distance_miles": 2.4,
+      "phone": "(212) 539-9090",
+      "website": "https://www.yelp.com/biz/shake-shack",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.75721834537598,
+        -73.98949229902033
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Shake+Shack",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573064"
+    },
+    {
+      "provider": "google_places",
+      "name": "The Spotted Pig",
+      "cuisine": "American",
+      "rating": 4.3,
+      "review_count": 3400,
+      "price_range": "$$",
+      "address": "158 7th Ave, SoHo, NY 10012",
+      "distance_miles": 2.2,
+      "phone": "(646) 880-8286",
+      "website": "https://www.google.com/maps/search/The+Spotted+Pig",
+      "hours": "Hours vary",
+      "is_open_now": true,
+      "coordinates": [
+        40.75168441167546,
+        -73.99477591225788
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=The+Spotted+Pig",
+      "categories": [
+        "American",
+        "Restaurant"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573116"
+    },
+    {
+      "provider": "yelp",
+      "name": "The Smith",
+      "cuisine": "American",
+      "rating": 4.2,
+      "review_count": 4200,
+      "price_range": "$$",
+      "address": "573 Amsterdam Ave (near 34th St), New York, NY 10001",
+      "distance_miles": 0.1,
+      "phone": "(646) 428-5611",
+      "website": "https://www.yelp.com/biz/the-smith",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": true,
+      "coordinates": [
+        40.762563426939266,
+        -73.99166466215695
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=The+Smith",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573003"
+    },
+    {
+      "provider": "yelp",
+      "name": "Five Guys",
+      "cuisine": "American",
+      "rating": 4.1,
+      "review_count": 3400,
+      "price_range": "$",
+      "address": "199 Madison Ave (near 42nd St), New York, NY 10001",
+      "distance_miles": 0.5,
+      "phone": "(917) 994-6852",
+      "website": "https://www.yelp.com/biz/five-guys",
+      "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
+      "is_open_now": false,
+      "coordinates": [
+        40.75601151421884,
+        -73.99362145731027
+      ],
+      "image_url": "https://via.placeholder.com/400x300?text=Five+Guys",
+      "categories": [
+        "American",
+        "Restaurant",
+        "Dining"
+      ],
+      "last_updated": "2025-12-13T21:34:19.573077"
+    }
+  ],
+  "created_at": 1765679659.573167,
+  "ttl": 3600
+}

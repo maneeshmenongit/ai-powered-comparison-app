@@ -24,13 +24,16 @@ class MockUberClient:
         )
     """
 
-    def __init__(self, deterministic: bool = False):
+    def __init__(self, deterministic: bool = False, rate_limiter=None):
         """
         Initialize mock Uber client.
 
         Args:
             deterministic: If True, uses fixed seed for reproducible results
+            rate_limiter: Optional rate limiter service
         """
+        self.rate_limiter = rate_limiter
+
         # Pricing parameters
         self.base_fare = 5.00
         self.per_mile = 2.00
@@ -74,6 +77,10 @@ class MockUberClient:
         Example:
             estimates = client.get_price_estimates(40.758, -73.986, 40.641, -73.778)
         """
+        # Rate limit check (if limiter provided)
+        if self.rate_limiter:
+            self.rate_limiter.acquire('uber')
+
         # Calculate trip distance and duration
         distance_miles = self._haversine_distance(
             pickup_lat, pickup_lng,

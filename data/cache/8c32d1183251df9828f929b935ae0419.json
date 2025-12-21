@@ -1,0 +1,8 @@
+{
+  "key": "test_key",
+  "value": {
+    "data": "test_value"
+  },
+  "created_at": 1765278618.4276211,
+  "ttl": 300
+}
