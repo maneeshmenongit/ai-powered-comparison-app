@@ -36,7 +36,16 @@ restaurant_handler = RestaurantHandler(
     rate_limiter=rate_limiter
 )
 
-
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "http://localhost:8000",
+            "https://hopwise*.netlify.app",
+            "https://hopwise.app",
+            "https://*.hopwise.app"
+        ]
+    }
+})
 # ============================================================================
 # ROUTES
 # ============================================================================
