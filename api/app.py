@@ -177,13 +177,27 @@ def get_stats():
 # RUN
 # ============================================================================
 
+# Add to the end of api/app.py, replace the if __name__ section:
+
 if __name__ == '__main__':
+    import os
+    
+    # Get port from environment (for Railway/Render)
+    port = int(os.environ.get('PORT', 5001))
+    
+    # Get environment
+    env = os.environ.get('ENVIRONMENT', 'development')
+    debug = env == 'development'
+    
     print("🌍 Hopwise API starting...")
+    print(f"📡 Environment: {env}")
+    print(f"🔧 Debug mode: {debug}")
+    print(f"🚀 Port: {port}")
     print("📡 Endpoints available:")
     print("   GET  /api/health")
     print("   POST /api/rides")
     print("   POST /api/restaurants")
     print("   GET  /api/stats")
-    print("\n✅ Server running on http://localhost:5001\n")
-
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    print(f"\n✅ Server running on port {port}\n")
+    
+    app.run(host='0.0.0.0', port=port, debug=debug)
