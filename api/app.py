@@ -5,11 +5,21 @@ Provides ride and restaurant comparison endpoints.
 """
 
 import sys
+import os
 sys.path.insert(0, 'src')
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import traceback
+
+# Check for required environment variables
+print("🔍 Checking environment variables...")
+openai_key = os.getenv('OPENAI_API_KEY')
+if openai_key:
+    print(f"✅ OPENAI_API_KEY found (length: {len(openai_key)})")
+else:
+    print("❌ OPENAI_API_KEY not found!")
+    print(f"Available env vars: {[k for k in os.environ.keys() if 'API' in k or 'KEY' in k]}")
 
 from domains.rideshare.handler import RideShareHandler
 from domains.restaurants.handler import RestaurantHandler
@@ -19,11 +29,12 @@ from core import GeocodingService, CacheService, RateLimiter
 app = Flask(__name__)
 
 # Configure CORS for frontend - allow all origins for now to debug
-CORS(app,
-     resources={r"/api/*": {"origins": "*"}},
-     allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-     supports_credentials=False)
+# CORS(app,
+#      resources={r"/api/*": {"origins": "*"}},
+#      allow_headers=["Content-Type", "Authorization"],
+#      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+#      supports_credentials=False)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Initialize services (singleton pattern)
 geocoder = GeocodingService()
