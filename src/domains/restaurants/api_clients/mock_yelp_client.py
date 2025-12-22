@@ -169,7 +169,7 @@ class MockYelpClient:
                 address=address,
                 distance_miles=distance,
                 phone=self._generate_phone(),
-                website=f'https://www.yelp.com/biz/{name.lower().replace(" ", "-").replace("\'", "")}',
+                website=f"https://www.yelp.com/biz/{name.lower().replace(' ', '-').replace(chr(39), '')}",
                 hours="Mon-Sun: 11:00 AM - 10:00 PM",
                 is_open_now=random.choice([True, True, True, False]),  # 75% open
                 coordinates=(rest_lat, rest_lon),
