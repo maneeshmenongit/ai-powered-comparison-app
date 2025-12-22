@@ -18,19 +18,12 @@ from core import GeocodingService, CacheService, RateLimiter
 # Initialize Flask app
 app = Flask(__name__)
 
-# Configure CORS for frontend
-CORS(app, resources={
-    r"/api/*": {
-        "origins": [
-            "http://localhost:8000",
-            "https://hopwise-app.netlify.app",
-            "https://hopwise.app",
-            "https://*.hopwise.app"
-        ],
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+# Configure CORS for frontend - allow all origins for now to debug
+CORS(app,
+     resources={r"/api/*": {"origins": "*"}},
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     supports_credentials=False)
 
 # Initialize services (singleton pattern)
 geocoder = GeocodingService()
