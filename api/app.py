@@ -14,6 +14,8 @@ import traceback
 
 # Check for required environment variables
 print("🔍 Checking environment variables...")
+print(f"PORT: {os.getenv('PORT', 'not set')}")
+print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT', 'not set')}")
 openai_key = os.getenv('OPENAI_API_KEY')
 if openai_key:
     print(f"✅ OPENAI_API_KEY found (length: {len(openai_key)})")
@@ -21,37 +23,48 @@ else:
     print("❌ OPENAI_API_KEY not found!")
     print(f"Available env vars: {[k for k in os.environ.keys() if 'API' in k or 'KEY' in k]}")
 
+print("\n🚀 Starting Flask app initialization...")
+
 from domains.rideshare.handler import RideShareHandler
 from domains.restaurants.handler import RestaurantHandler
 from core import GeocodingService, CacheService, RateLimiter
 
+print("✅ Imports successful")
+
 # Initialize Flask app
+print("📦 Creating Flask app...")
 app = Flask(__name__)
+print("✅ Flask app created")
 
 # Configure CORS for frontend - allow all origins for now to debug
-# CORS(app,
-#      resources={r"/api/*": {"origins": "*"}},
-#      allow_headers=["Content-Type", "Authorization"],
-#      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-#      supports_credentials=False)
+print("🌐 Configuring CORS...")
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+print("✅ CORS configured")
 
 # Initialize services (singleton pattern)
+print("⚙️  Initializing services...")
 geocoder = GeocodingService()
 cache = CacheService()
 rate_limiter = RateLimiter()
+print("✅ Services initialized")
 
+print("🚗 Initializing rideshare handler...")
 rideshare_handler = RideShareHandler(
     geocoding_service=geocoder,
     cache_service=cache,
     rate_limiter=rate_limiter
 )
+print("✅ Rideshare handler initialized")
 
+print("🍽️  Initializing restaurant handler...")
 restaurant_handler = RestaurantHandler(
     geocoding_service=geocoder,
     cache_service=cache,
     rate_limiter=rate_limiter
 )
+print("✅ Restaurant handler initialized")
+
+print("\n✨ All initialization complete! App is ready.")
 # ============================================================================
 # ROUTES
 # ============================================================================
