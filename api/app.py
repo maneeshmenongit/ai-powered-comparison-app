@@ -17,7 +17,20 @@ from core import GeocodingService, CacheService, RateLimiter
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend
+
+# Configure CORS for frontend
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "http://localhost:8000",
+            "https://hopwise-app.netlify.app",
+            "https://hopwise.app",
+            "https://*.hopwise.app"
+        ],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Initialize services (singleton pattern)
 geocoder = GeocodingService()
@@ -35,17 +48,6 @@ restaurant_handler = RestaurantHandler(
     cache_service=cache,
     rate_limiter=rate_limiter
 )
-
-CORS(app, resources={
-    r"/api/*": {
-        "origins": [
-            "http://localhost:8000",
-            "https://hopwise*.netlify.app",
-            "https://hopwise.app",
-            "https://*.hopwise.app"
-        ]
-    }
-})
 # ============================================================================
 # ROUTES
 # ============================================================================
