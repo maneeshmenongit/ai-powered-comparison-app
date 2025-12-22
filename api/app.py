@@ -69,6 +69,16 @@ print("\n✨ All initialization complete! App is ready.")
 # ROUTES
 # ============================================================================
 
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint for Railway health check."""
+    return jsonify({
+        'status': 'healthy',
+        'service': 'hopwise-api',
+        'version': '1.0.0',
+        'message': 'API is running. Use /api/* endpoints.'
+    })
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint."""
