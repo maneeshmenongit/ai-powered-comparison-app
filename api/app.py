@@ -5,66 +5,38 @@ Provides ride and restaurant comparison endpoints.
 """
 
 import sys
-import os
 sys.path.insert(0, 'src')
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import traceback
 
-# Check for required environment variables
-print("🔍 Checking environment variables...")
-print(f"PORT: {os.getenv('PORT', 'not set')}")
-print(f"ENVIRONMENT: {os.getenv('ENVIRONMENT', 'not set')}")
-openai_key = os.getenv('OPENAI_API_KEY')
-if openai_key:
-    print(f"✅ OPENAI_API_KEY found (length: {len(openai_key)})")
-else:
-    print("❌ OPENAI_API_KEY not found!")
-    print(f"Available env vars: {[k for k in os.environ.keys() if 'API' in k or 'KEY' in k]}")
-
-print("\n🚀 Starting Flask app initialization...")
-
 from domains.rideshare.handler import RideShareHandler
 from domains.restaurants.handler import RestaurantHandler
 from core import GeocodingService, CacheService, RateLimiter
 
-print("✅ Imports successful")
-
 # Initialize Flask app
-print("📦 Creating Flask app...")
 app = Flask(__name__)
-print("✅ Flask app created")
 
-# Configure CORS for frontend - allow all origins for now to debug
-print("🌐 Configuring CORS...")
+# Configure CORS for frontend
 CORS(app, resources={r"/api/*": {"origins": "*"}})
-print("✅ CORS configured")
 
 # Initialize services (singleton pattern)
-print("⚙️  Initializing services...")
 geocoder = GeocodingService()
 cache = CacheService()
 rate_limiter = RateLimiter()
-print("✅ Services initialized")
 
-print("🚗 Initializing rideshare handler...")
 rideshare_handler = RideShareHandler(
     geocoding_service=geocoder,
     cache_service=cache,
     rate_limiter=rate_limiter
 )
-print("✅ Rideshare handler initialized")
 
-print("🍽️  Initializing restaurant handler...")
 restaurant_handler = RestaurantHandler(
     geocoding_service=geocoder,
     cache_service=cache,
     rate_limiter=rate_limiter
 )
-print("✅ Restaurant handler initialized")
-
-print("\n✨ All initialization complete! App is ready.")
 # ============================================================================
 # ROUTES
 # ============================================================================
@@ -82,18 +54,11 @@ def root():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint."""
-    print("🏥 /api/health called", flush=True)
     return jsonify({
         'status': 'healthy',
         'service': 'hopwise-api',
         'version': '1.0.0'
     })
-
-@app.route('/test', methods=['GET'])
-def test():
-    """Simple test endpoint."""
-    print("🧪 /test called", flush=True)
-    return "OK"
 
 
 @app.route('/api/rides', methods=['POST'])
@@ -155,16 +120,11 @@ def search_restaurants():
         "priority": "balanced"       // balanced, rating, price, distance
     }
     """
-    import sys
-    print(f"🚨 /api/restaurants ENDPOINT HIT!", file=sys.stderr, flush=True)
     try:
-        print(f"📥 /api/restaurants request received", flush=True)
         data = request.get_json()
-        print(f"📦 Request data: {data}")
 
         # Validate input
         if not data or 'location' not in data:
-            print(f"❌ Missing location field")
             return jsonify({
                 'error': 'Missing required field: location'
             }), 400
@@ -173,36 +133,31 @@ def search_restaurants():
         query = data.get('query', 'restaurants')
         filter_category = data.get('filter_category', 'Food')
         priority = data.get('priority', 'balanced')
-        use_ai = data.get('use_ai', False)
-
-        print(f"🔍 Processing: query='{query}', location='{location}', priority='{priority}', use_ai={use_ai}")
 
         # Build full query
         full_query = f"{query} near {location}"
 
         # Process
-        print(f"⚙️  Calling restaurant_handler.process...")
+        use_ai = data.get('use_ai', False)  # Default to fast mode
+
         results = restaurant_handler.process(
             full_query,
             context={'user_location': location},
             priority=priority,
             use_ai=use_ai
         )
-        print(f"✅ Processing complete, {results.get('total_results', 0)} results")
-        
+
         return jsonify({
             'success': True,
             'data': results
         })
-        
+
     except Exception as e:
-        print(f"❌ ERROR in /api/restaurants: {str(e)}")
-        print(f"❌ Error type: {type(e).__name__}")
+        print(f"Error in /api/restaurants: {str(e)}")
         traceback.print_exc()
         return jsonify({
             'success': False,
-            'error': str(e),
-            'error_type': type(e).__name__
+            'error': str(e)
         }), 500
 
 
@@ -232,24 +187,13 @@ def get_stats():
 # RUN
 # ============================================================================
 
-# Add to the end of api/app.py, replace the if __name__ section:
-
 if __name__ == '__main__':
     import os
     from waitress import serve
 
-    # Get port from environment (for Railway/Render)
     port = int(os.environ.get('PORT', 5001))
 
-    print("🌍 Hopwise API starting with Waitress...")
-    print(f"🚀 Port: {port}")
-    print("📡 Endpoints available:")
-    print("   GET  /")
-    print("   GET  /api/health")
-    print("   POST /api/rides")
-    print("   POST /api/restaurants")
-    print("   GET  /api/stats")
-    print(f"\n✅ Starting production WSGI server on 0.0.0.0:{port}\n")
+    print(f"Starting Hopwise API on port {port}...")
 
     # Use waitress production WSGI server
     serve(app, host='0.0.0.0', port=port, threads=4, channel_timeout=300)
