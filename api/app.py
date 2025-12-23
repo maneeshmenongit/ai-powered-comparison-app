@@ -82,11 +82,18 @@ def root():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint."""
+    print("🏥 /api/health called", flush=True)
     return jsonify({
         'status': 'healthy',
         'service': 'hopwise-api',
         'version': '1.0.0'
     })
+
+@app.route('/test', methods=['GET'])
+def test():
+    """Simple test endpoint."""
+    print("🧪 /test called", flush=True)
+    return "OK"
 
 
 @app.route('/api/rides', methods=['POST'])
