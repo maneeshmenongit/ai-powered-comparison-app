@@ -229,17 +229,12 @@ def get_stats():
 
 if __name__ == '__main__':
     import os
-    
+    from waitress import serve
+
     # Get port from environment (for Railway/Render)
     port = int(os.environ.get('PORT', 5001))
-    
-    # Get environment - force production mode on Railway
-    env = os.environ.get('ENVIRONMENT', 'production')
-    debug = False  # Disable debug mode for Railway compatibility
 
-    print("🌍 Hopwise API starting...")
-    print(f"📡 Environment: {env}")
-    print(f"🔧 Debug mode: {debug}")
+    print("🌍 Hopwise API starting with Waitress...")
     print(f"🚀 Port: {port}")
     print("📡 Endpoints available:")
     print("   GET  /")
@@ -247,7 +242,7 @@ if __name__ == '__main__':
     print("   POST /api/rides")
     print("   POST /api/restaurants")
     print("   GET  /api/stats")
-    print(f"\n✅ Server starting on 0.0.0.0:{port}\n")
+    print(f"\n✅ Starting production WSGI server on 0.0.0.0:{port}\n")
 
-    # Use threaded mode, disable debug for Railway proxy compatibility
-    app.run(host='0.0.0.0', port=port, debug=False, threaded=True, use_reloader=False)
+    # Use waitress production WSGI server
+    serve(app, host='0.0.0.0', port=port, threads=4, channel_timeout=300)
