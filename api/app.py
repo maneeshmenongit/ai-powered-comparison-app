@@ -233,10 +233,10 @@ if __name__ == '__main__':
     # Get port from environment (for Railway/Render)
     port = int(os.environ.get('PORT', 5001))
     
-    # Get environment
-    env = os.environ.get('ENVIRONMENT', 'development')
-    debug = env == 'development'
-    
+    # Get environment - force production mode on Railway
+    env = os.environ.get('ENVIRONMENT', 'production')
+    debug = False  # Disable debug mode for Railway compatibility
+
     print("🌍 Hopwise API starting...")
     print(f"📡 Environment: {env}")
     print(f"🔧 Debug mode: {debug}")
@@ -249,5 +249,5 @@ if __name__ == '__main__':
     print("   GET  /api/stats")
     print(f"\n✅ Server starting on 0.0.0.0:{port}\n")
 
-    # Use threaded mode for better concurrency
-    app.run(host='0.0.0.0', port=port, debug=debug, threaded=True, use_reloader=False)
+    # Use threaded mode, disable debug for Railway proxy compatibility
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True, use_reloader=False)
