@@ -149,31 +149,37 @@ def search_restaurants():
     }
     """
     try:
+        print(f"📥 /api/restaurants request received")
         data = request.get_json()
-        
+        print(f"📦 Request data: {data}")
+
         # Validate input
         if not data or 'location' not in data:
+            print(f"❌ Missing location field")
             return jsonify({
                 'error': 'Missing required field: location'
             }), 400
-        
+
         location = data['location']
         query = data.get('query', 'restaurants')
         filter_category = data.get('filter_category', 'Food')
         priority = data.get('priority', 'balanced')
-        
+        use_ai = data.get('use_ai', False)
+
+        print(f"🔍 Processing: query='{query}', location='{location}', priority='{priority}', use_ai={use_ai}")
+
         # Build full query
         full_query = f"{query} near {location}"
-        
-        # Process
-        use_ai = data.get('use_ai', False)  # Default to fast mode
 
+        # Process
+        print(f"⚙️  Calling restaurant_handler.process...")
         results = restaurant_handler.process(
             full_query,
             context={'user_location': location},
             priority=priority,
             use_ai=use_ai
         )
+        print(f"✅ Processing complete, {results.get('total_results', 0)} results")
         
         return jsonify({
             'success': True,
@@ -181,11 +187,13 @@ def search_restaurants():
         })
         
     except Exception as e:
-        print(f"Error in /api/restaurants: {str(e)}")
+        print(f"❌ ERROR in /api/restaurants: {str(e)}")
+        print(f"❌ Error type: {type(e).__name__}")
         traceback.print_exc()
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': str(e),
+            'error_type': type(e).__name__
         }), 500
 
 
