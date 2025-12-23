@@ -139,7 +139,7 @@ def compare_rides():
 def search_restaurants():
     """
     Search restaurants with filters.
-    
+
     Request body:
     {
         "query": "Italian food",
@@ -148,8 +148,10 @@ def search_restaurants():
         "priority": "balanced"       // balanced, rating, price, distance
     }
     """
+    import sys
+    print(f"🚨 /api/restaurants ENDPOINT HIT!", file=sys.stderr, flush=True)
     try:
-        print(f"📥 /api/restaurants request received")
+        print(f"📥 /api/restaurants request received", flush=True)
         data = request.get_json()
         print(f"📦 Request data: {data}")
 
