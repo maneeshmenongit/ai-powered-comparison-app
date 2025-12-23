@@ -242,10 +242,12 @@ if __name__ == '__main__':
     print(f"🔧 Debug mode: {debug}")
     print(f"🚀 Port: {port}")
     print("📡 Endpoints available:")
+    print("   GET  /")
     print("   GET  /api/health")
     print("   POST /api/rides")
     print("   POST /api/restaurants")
     print("   GET  /api/stats")
-    print(f"\n✅ Server running on port {port}\n")
-    
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    print(f"\n✅ Server starting on 0.0.0.0:{port}\n")
+
+    # Use threaded mode for better concurrency
+    app.run(host='0.0.0.0', port=port, debug=debug, threaded=True, use_reloader=False)
