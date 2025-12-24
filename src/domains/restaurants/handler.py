@@ -10,6 +10,7 @@ from domains.restaurants.intent_parser import RestaurantIntentParser
 from domains.restaurants.comparator import RestaurantComparator
 from domains.restaurants.api_clients.mock_yelp_client import MockYelpClient
 from domains.restaurants.api_clients.mock_google_places_client import MockGooglePlacesClient
+from domains.restaurants.api_clients.google_places_client import GooglePlacesClient
 
 
 class RestaurantHandler(DomainHandler):
@@ -66,7 +67,7 @@ class RestaurantHandler(DomainHandler):
         # Initialize API clients (mock for now)
         self.clients = {
             'yelp': MockYelpClient(rate_limiter=rate_limiter),
-            'google_places': MockGooglePlacesClient(rate_limiter=rate_limiter)
+            'google_places': GooglePlacesClient(rate_limiter=rate_limiter)
         }
 
     def parse_query(self, raw_query: str, context: Dict = None) -> RestaurantQuery:
