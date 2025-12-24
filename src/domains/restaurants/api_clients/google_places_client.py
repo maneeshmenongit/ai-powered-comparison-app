@@ -34,7 +34,7 @@ class GooglePlacesClient:
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": self.api_key,
-            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location"
+            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location,places.nationalPhoneNumber,places.websiteUri,places.regularOpeningHours"
         }
         
         body = {
@@ -63,6 +63,9 @@ class GooglePlacesClient:
                 if rating < rating_min:
                     continue
                 
+                place_lat = place.get('location', {}).get('latitude', latitude)
+                place_lon = place.get('location', {}).get('longitude', longitude)
+
                 restaurant = Restaurant(
                     provider='google_places',
                     name=place.get('displayName', {}).get('text', 'Unknown'),
@@ -71,15 +74,12 @@ class GooglePlacesClient:
                     review_count=place.get('userRatingCount', 0),
                     price_range=self._convert_price_level(place.get('priceLevel')),
                     address=place.get('formattedAddress', ''),
-                    distance_miles=self._calculate_distance(
-                        latitude, longitude,
-                        place.get('location', {}).get('latitude', latitude),
-                        place.get('location', {}).get('longitude', longitude)
-                    ),
-                    coordinates=(
-                        place.get('location', {}).get('latitude'),
-                        place.get('location', {}).get('longitude')
-                    )
+                    distance_miles=self._calculate_distance(latitude, longitude, place_lat, place_lon),
+                    phone=place.get('nationalPhoneNumber'),
+                    website=place.get('websiteUri'),
+                    hours=self._format_hours(place.get('regularOpeningHours')),
+                    is_open_now=place.get('regularOpeningHours', {}).get('openNow', False),
+                    coordinates=(place_lat, place_lon)
                 )
                 restaurants.append(restaurant)
             
@@ -89,6 +89,12 @@ class GooglePlacesClient:
             print(f"Google Places API error: {e}")
             return []
     
+    def _format_hours(self, hours_data):
+        """Format opening hours."""
+        if not hours_data:
+            return None
+        return hours_data.get('weekdayDescriptions', [])
+
     def _convert_price_level(self, level: str) -> str:
         """Convert Google price level to $ format."""
         mapping = {
