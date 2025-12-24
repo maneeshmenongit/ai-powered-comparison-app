@@ -2,6 +2,7 @@
 
 import os
 import requests
+from math import radians, sin, cos, sqrt, atan2
 from typing import List, Optional
 from ..models import Restaurant
 
@@ -70,7 +71,11 @@ class GooglePlacesClient:
                     review_count=place.get('userRatingCount', 0),
                     price_range=self._convert_price_level(place.get('priceLevel')),
                     address=place.get('formattedAddress', ''),
-                    distance_miles=0.0,  # Calculate if needed
+                    distance_miles=self._calculate_distance(
+                        latitude, longitude,
+                        place.get('location', {}).get('latitude', latitude),
+                        place.get('location', {}).get('longitude', longitude)
+                    ),
                     coordinates=(
                         place.get('location', {}).get('latitude'),
                         place.get('location', {}).get('longitude')
@@ -93,3 +98,16 @@ class GooglePlacesClient:
             'PRICE_LEVEL_VERY_EXPENSIVE': '$$$$'
         }
         return mapping.get(level, '$$')
+    
+    def _calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        """Calculate distance in miles using Haversine formula."""
+        R = 3959  # Earth radius in miles
+        
+        lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+        
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1-a))
+        
+        return R * c
