@@ -34,7 +34,7 @@ class GooglePlacesClient:
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": self.api_key,
-            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location,places.nationalPhoneNumber,places.websiteUri,places.regularOpeningHours,places.photos"
+            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location,places.nationalPhoneNumber,places.websiteUri,places.regularOpeningHours"
         }
         
         body = {
@@ -66,9 +66,9 @@ class GooglePlacesClient:
                 place_lat = place.get('location', {}).get('latitude', latitude)
                 place_lon = place.get('location', {}).get('longitude', longitude)
 
-                # Get photo URL if available
-                # Note: We skip photos for now as they require complex auth handling
-                # Photos would need to be proxied through backend to avoid CORS/API key exposure
+                # Photos are disabled - Google Places (New) API photos require
+                # special handling and the direct media URLs return 404
+                # The gradient backgrounds in the UI look great as an alternative
                 image_url = None
 
                 restaurant = Restaurant(
