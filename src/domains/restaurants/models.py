@@ -128,6 +128,12 @@ class Restaurant:
     image_url: Optional[str] = None
     categories: List[str] = field(default_factory=list)
     last_updated: str = field(default_factory=lambda: datetime.now().isoformat())
+    id: str = ""  # Unique identifier
+    subcategory: Optional[str] = None  # e.g., "Pizza", "Sushi"
+    tags: List[str] = field(default_factory=list)  # ["🔥 Trending", "💥 Popular"]
+    badge: Optional[str] = None  # "#1", "New", etc.
+    gradient: str = "linear-gradient(135deg, #FFE5B4, #FFB347)"  # Fallback gradient
+    photos: List[str] = field(default_factory=list) 
 
     def to_dict(self) -> Dict:
         """Convert to dictionary for caching/serialization."""
@@ -147,7 +153,13 @@ class Restaurant:
             'coordinates': self.coordinates,
             'image_url': self.image_url,
             'categories': self.categories,
-            'last_updated': self.last_updated
+            'last_updated': self.last_updated,
+            'id': self.id,
+            'subcategory': self.subcategory,
+            'tags': self.tags,
+            'badge': self.badge,
+            'gradient': self.gradient,
+            'photos': self.photos
         }
 
     def __repr__(self) -> str:

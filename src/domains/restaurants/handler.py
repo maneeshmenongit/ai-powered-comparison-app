@@ -177,40 +177,43 @@ class RestaurantHandler(DomainHandler):
         self,
         options: List[Restaurant],
         comparison: str,
-        priority: str = "balanced"
+        priority: str = "balanced",
+        search_time: float = 0.0,
+        query_text: str = ""
     ) -> Dict:
         """
-        Format results for display.
+        Format results for display in UI-expected format.
 
         Args:
             options: List of Restaurant objects
             comparison: AI-generated comparison text
             priority: Priority used for comparison
+            search_time: Time taken for search in seconds
+            query_text: Original query text
 
         Returns:
-            Dictionary with formatted results
+            Dictionary with formatted results matching UI expectations
         """
+        # Find best restaurant (highest rating, then most reviews)
+        best_restaurant = None
+        if options:
+            best_restaurant = max(options, key=lambda r: (r.rating, r.review_count))
+
         return {
-            'domain': 'restaurants',
-            'restaurants': [
-                {
-                    'provider': opt.provider,
-                    'name': opt.name,
-                    'cuisine': opt.cuisine,
-                    'rating': opt.rating,
-                    'review_count': opt.review_count,
-                    'price_range': opt.price_range,
-                    'distance': opt.distance_miles,
-                    'address': opt.address,
-                    'phone': opt.phone,
-                    'is_open': opt.is_open_now,
-                    'coordinates': opt.coordinates
-                }
-                for opt in options
-            ],
-            'comparison': comparison,
-            'priority': priority,
-            'total_results': len(options)
+            'success': True,
+            'data': {
+                'results': [opt.to_dict() for opt in options],
+                'total': len(options),
+                'aiRecommendation': {
+                    'placeId': best_restaurant.id if best_restaurant else None,
+                    'reason': comparison
+                } if comparison else None
+            },
+            'meta': {
+                'searchTime': round(search_time, 2),
+                'query': query_text,
+                'priority': priority
+            }
         }
 
     def process(
@@ -236,19 +239,66 @@ class RestaurantHandler(DomainHandler):
 
         Example:
             process("Find Italian food near Times Square")
-            → {'domain': 'restaurants', 'restaurants': [...], 'comparison': '...'}
+            → {'success': True, 'data': {'results': [...], ...}, 'meta': {...}}
         """
+        import time
+        import hashlib
+
+        start_time = time.time()
+
         # Step 1: Parse query
         query = self.parse_query(raw_query, context)
 
         # Step 2: Fetch options
         options = self.fetch_options(query)
 
-        # Step 3: Compare options
+        # Step 3: Enrich restaurant data with UI fields
+        for i, restaurant in enumerate(options):
+            # Generate unique ID from provider + name
+            id_string = f"{restaurant.provider}_{restaurant.name}".lower()
+            restaurant.id = hashlib.md5(id_string.encode()).hexdigest()[:12]
+
+            # Add tags based on rating
+            tags = []
+            if restaurant.rating >= 4.5:
+                tags.append("🔥 Trending")
+            elif restaurant.rating >= 4.0:
+                tags.append("💥 Popular")
+
+            # Add "Open Now" tag if applicable
+            if restaurant.is_open_now:
+                tags.append("Open Now")
+
+            restaurant.tags = tags
+
+            # Add badge for top result
+            if i == 0:
+                restaurant.badge = "#1"
+
+            # Add gradient fallback if no image
+            if not restaurant.image_url:
+                gradients = [
+                    "linear-gradient(135deg, #FFE5B4, #FFB347)",  # Peach
+                    "linear-gradient(135deg, #E0BBE4, #957DAD)",  # Purple
+                    "linear-gradient(135deg, #FFDAB9, #FFA07A)",  # Orange
+                    "linear-gradient(135deg, #B0E0E6, #87CEEB)",  # Blue
+                ]
+                restaurant.gradient = gradients[i % len(gradients)]
+
+        # Step 4: Compare options
         comparison = self.compare_options(options, priority, use_ai=use_ai)
 
-        # Step 4: Format results
-        results = self.format_results(options, comparison, priority)
+        # Step 5: Calculate search time
+        search_time = time.time() - start_time
+
+        # Step 6: Format results
+        results = self.format_results(
+            options,
+            comparison,
+            priority,
+            search_time=search_time,
+            query_text=raw_query
+        )
 
         return results
 
