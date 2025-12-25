@@ -305,7 +305,7 @@ function renderPlaceCard(place) {
             </div>
             <div class="place-card-content">
                 <h3 class="place-card-name">${place.name}</h3>
-                <p class="place-card-meta">${place.category} • ${place.priceLevel} • ${place.distance}</p>
+                <p class="place-card-meta">${place.category} • ${place.price} • ${place.distance}</p>
                 <div class="place-card-tags">
                     ${place.tags.map(tag => `<span class="place-card-tag">${tag}</span>`).join('')}
                 </div>

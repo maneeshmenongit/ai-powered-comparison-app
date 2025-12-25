@@ -67,13 +67,9 @@ class GooglePlacesClient:
                 place_lon = place.get('location', {}).get('longitude', longitude)
 
                 # Get photo URL if available
+                # Note: We skip photos for now as they require complex auth handling
+                # Photos would need to be proxied through backend to avoid CORS/API key exposure
                 image_url = None
-                photos = place.get('photos', [])
-                if photos and len(photos) > 0:
-                    photo_name = photos[0].get('name', '')
-                    if photo_name:
-                        # Construct photo URL
-                        image_url = f"https://places.googleapis.com/v1/{photo_name}/media?key={self.api_key}&maxHeightPx=400&maxWidthPx=400"
 
                 restaurant = Restaurant(
                     provider='google_places',
