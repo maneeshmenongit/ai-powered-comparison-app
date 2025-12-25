@@ -1,6 +1,6 @@
 /**
  * frontend/hopwise-api.js
- * 
+ *
  * JavaScript to connect UI designs to Flask backend
  */
 

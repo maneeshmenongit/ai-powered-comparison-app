@@ -34,7 +34,7 @@ class GooglePlacesClient:
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": self.api_key,
-            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location,places.nationalPhoneNumber,places.websiteUri,places.regularOpeningHours"
+            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location,places.nationalPhoneNumber,places.websiteUri,places.regularOpeningHours,places.photos"
         }
         
         body = {
@@ -66,6 +66,15 @@ class GooglePlacesClient:
                 place_lat = place.get('location', {}).get('latitude', latitude)
                 place_lon = place.get('location', {}).get('longitude', longitude)
 
+                # Get photo URL if available
+                image_url = None
+                photos = place.get('photos', [])
+                if photos and len(photos) > 0:
+                    photo_name = photos[0].get('name', '')
+                    if photo_name:
+                        # Construct photo URL
+                        image_url = f"https://places.googleapis.com/v1/{photo_name}/media?key={self.api_key}&maxHeightPx=400&maxWidthPx=400"
+
                 restaurant = Restaurant(
                     provider='google_places',
                     name=place.get('displayName', {}).get('text', 'Unknown'),
@@ -79,7 +88,8 @@ class GooglePlacesClient:
                     website=place.get('websiteUri'),
                     hours=self._format_hours(place.get('regularOpeningHours')),
                     is_open_now=place.get('regularOpeningHours', {}).get('openNow', False),
-                    coordinates=(place_lat, place_lon)
+                    coordinates=(place_lat, place_lon),
+                    image_url=image_url
                 )
                 restaurants.append(restaurant)
             
