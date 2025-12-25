@@ -1,7 +1,7 @@
 """Data models for rideshare estimates."""
 
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from typing import List, Optional, Dict
 from datetime import datetime
 
 
@@ -42,6 +42,15 @@ class RideEstimate:
     last_updated: datetime = None  # When this estimate was retrieved
     is_available: bool = True  # Whether this ride option is currently available
 
+    # UI-specific fields
+    type: str = "Standard"  # Ride type (Standard, Premium, Shared)
+    seats: int = 4  # Number of seats available
+    rating: float = 4.5  # Driver/service rating
+    surge: Optional[float] = None  # Surge multiplier (UI format)
+    promo_code: Optional[str] = None  # Promo code if available
+    promo_discount: Optional[float] = None  # Discount amount
+    deep_link: str = ""  # Deep link to provider app
+
     def __post_init__(self):
         """Set last_updated to now if not provided."""
         if self.last_updated is None:
@@ -65,13 +74,25 @@ class RideEstimate:
             "price_low": self.price_low,
             "price_high": self.price_high,
             "price_estimate": self.price_estimate,
+            "priceRange": {
+                "min": self.price_low,
+                "max": self.price_high
+            },
             "currency": self.currency,
             "surge_multiplier": self.surge_multiplier,
             "duration_minutes": self.duration_minutes,
             "pickup_eta_minutes": self.pickup_eta_minutes,
+            "pickup": self.pickup_eta_minutes,  # Alias for UI
             "distance_miles": self.distance_miles,
             "origin_coords": self.origin_coords,
             "destination_coords": self.destination_coords,
             "last_updated": self.last_updated.isoformat(),
             "is_available": self.is_available,
+            "type": self.type,
+            "seats": self.seats,
+            "rating": self.rating,
+            "surge": self.surge if self.surge is not None else (self.surge_multiplier if self.surge_multiplier > 1.0 else None),
+            "promoCode": self.promo_code,
+            "promoDiscount": self.promo_discount,
+            "deepLink": self.deep_link
         }

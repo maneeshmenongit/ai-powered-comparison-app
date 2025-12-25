@@ -220,6 +220,32 @@ class RideShareHandler(DomainHandler):
                 print(f"Warning: Failed to fetch from {provider_name}: {e}")
                 continue
 
+        # Enrich estimates with UI fields and deep links
+        for estimate in estimates:
+            # Generate deep link
+            estimate.deep_link = self._generate_deep_link(
+                estimate.provider,
+                estimate.vehicle_type,
+                origin_lat, origin_lng,
+                dest_lat, dest_lng
+            )
+
+            # Set ride type based on vehicle type
+            vehicle_lower = estimate.vehicle_type.lower()
+            if 'xl' in vehicle_lower or 'suv' in vehicle_lower or 'black' in vehicle_lower:
+                estimate.type = "Premium"
+                estimate.seats = 6
+            elif 'pool' in vehicle_lower or 'shared' in vehicle_lower or 'line' in vehicle_lower:
+                estimate.type = "Shared"
+                estimate.seats = 2
+            else:
+                estimate.type = "Standard"
+                estimate.seats = 4
+
+            # Set surge if applicable
+            if estimate.surge_multiplier > 1.0:
+                estimate.surge = estimate.surge_multiplier
+
         # Cache results
         if self.cache and cache_key and estimates:
             self.cache.set(cache_key, estimates)
@@ -278,99 +304,98 @@ class RideShareHandler(DomainHandler):
         comparison: str
     ) -> Dict[str, Any]:
         """
-        Format results for display in the UI.
-
-        Converts raw RideEstimate objects and comparison text into
-        display-ready dictionary format suitable for Rich tables,
-        JSON API responses, or other output formats.
+        Format results for display in the UI (matches UI DATA_STRUCTURE.md format).
 
         Args:
             options: List of RideEstimate objects
             comparison: AI-generated comparison and recommendation text
 
         Returns:
-            Dictionary with formatted results:
-            - domain: "rideshare"
-            - estimates: List of formatted estimate dictionaries
-            - comparison: AI recommendation text
-            - route: Origin and destination coordinates
-            - summary: Statistics (total options, price range, etc.)
-
-        Example:
-            results = handler.format_results(estimates, comparison)
-            # Returns: {
-            #   "domain": "rideshare",
-            #   "estimates": [
-            #     {
-            #       "provider": "Uber",
-            #       "vehicle_type": "UberX",
-            #       "price": 40.16,
-            #       "price_range": "$38.00 - $42.00",
-            #       "duration": 27,
-            #       "pickup_eta": 5,
-            #       "distance": 13.4,
-            #       "surge": None,
-            #       "available": True
-            #     },
-            #     ...
-            #   ],
-            #   "comparison": "Take Uber UberX...",
-            #   "route": {
-            #     "origin": (40.758, -73.986),
-            #     "destination": (40.641, -73.778)
-            #   },
-            #   "summary": {
-            #     "total_options": 6,
-            #     "price_range": "$40-$80",
-            #     "providers": ["Uber", "Lyft"]
-            #   }
-            # }
+            Dictionary with UI-expected structure
         """
-        # Format each estimate
-        formatted_estimates = []
-        for opt in options:
-            formatted_estimates.append({
-                'provider': opt.provider,
-                'vehicle_type': opt.vehicle_type,
-                'price': opt.price_estimate,
-                'price_range': f"${opt.price_low:.2f} - ${opt.price_high:.2f}",
-                'duration_minutes': opt.duration_minutes,
-                'pickup_eta_minutes': opt.pickup_eta_minutes,
-                'distance_miles': opt.distance_miles,
-                'surge_multiplier': opt.surge_multiplier if opt.surge_multiplier > 1.0 else None,
-                'currency': opt.currency,
-                'available': opt.is_available,
-                'last_updated': opt.last_updated.isoformat() if opt.last_updated else None
-            })
-
-        # Calculate summary statistics
-        prices = [opt.price_estimate for opt in options if opt.is_available]
-        providers = list(set(opt.provider for opt in options))
-
-        summary = {
-            'total_options': len(options),
-            'available_options': len([opt for opt in options if opt.is_available]),
-            'price_range': f"${min(prices):.0f}-${max(prices):.0f}" if prices else "N/A",
-            'providers': providers,
-            'has_surge': any(opt.surge_multiplier > 1.0 for opt in options)
-        }
-
-        # Extract route information
-        route = None
+        # Find best ride (cheapest)
+        best_ride = None
         if options:
-            route = {
-                'origin': options[0].origin_coords,
-                'destination': options[0].destination_coords,
-                'distance_miles': options[0].distance_miles
-            }
+            best_ride = min(options, key=lambda r: r.price_estimate)
+
+        # Calculate trip info
+        distance_mi = options[0].distance_miles if options else 0
+        duration_min = options[0].duration_minutes if options else 0
+
+        # Calculate savings (difference between most expensive and cheapest)
+        prices = [opt.price_estimate for opt in options if opt.is_available]
+        savings = max(prices) - min(prices) if len(prices) > 1 else 0
 
         return {
-            'domain': 'rideshare',
-            'estimates': formatted_estimates,
-            'comparison': comparison,
-            'route': route,
-            'summary': summary
+            'success': True,
+            'data': {
+                'rides': [opt.to_dict() for opt in options],
+                'tripInfo': {
+                    'distance': f"{distance_mi:.1f} mi",
+                    'duration': f"{duration_min} min",
+                    'savings': round(savings, 2)
+                },
+                'recommendation': {
+                    'provider': best_ride.provider if best_ride else None,
+                    'reason': comparison
+                } if comparison else None
+            }
         }
+
+    def _generate_deep_link(
+        self,
+        provider: str,
+        vehicle_type: str,
+        origin_lat: float,
+        origin_lng: float,
+        dest_lat: float,
+        dest_lng: float
+    ) -> str:
+        """
+        Generate deep link to open provider app.
+
+        Args:
+            provider: Provider name (Uber, Lyft, etc.)
+            vehicle_type: Vehicle type
+            origin_lat: Origin latitude
+            origin_lng: Origin longitude
+            dest_lat: Destination latitude
+            dest_lng: Destination longitude
+
+        Returns:
+            Deep link URL
+        """
+        import urllib.parse
+
+        provider_lower = provider.lower()
+
+        if 'uber' in provider_lower:
+            # Uber deep link format
+            params = {
+                'action': 'setPickup',
+                'pickup[latitude]': origin_lat,
+                'pickup[longitude]': origin_lng,
+                'dropoff[latitude]': dest_lat,
+                'dropoff[longitude]': dest_lng,
+                'product_id': vehicle_type
+            }
+            query_string = urllib.parse.urlencode(params)
+            return f"uber://?{query_string}"
+
+        elif 'lyft' in provider_lower:
+            # Lyft deep link format
+            params = {
+                'pickup[latitude]': origin_lat,
+                'pickup[longitude]': origin_lng,
+                'destination[latitude]': dest_lat,
+                'destination[longitude]': dest_lng,
+            }
+            query_string = urllib.parse.urlencode(params)
+            return f"lyft://ridetype?{query_string}"
+
+        else:
+            # Generic fallback
+            return f"https://maps.google.com/?saddr={origin_lat},{origin_lng}&daddr={dest_lat},{dest_lng}"
 
     def _generate_cache_key(
         self,
