@@ -14,13 +14,15 @@ class GooglePlacesClient:
 
         # Strip quotes if present (Railway environment variables sometimes include them)
         if self.api_key:
-            self.api_key = self.api_key.strip('"').strip("'")
+            self.api_key = self.api_key.strip().strip('"').strip("'").strip()
 
         self.rate_limiter = rate_limiter
         self.base_url = "https://places.googleapis.com/v1/places:searchText"
 
         if not self.api_key:
-            raise ValueError("GOOGLE_PLACES_API_KEY not set")
+            print("WARNING: GOOGLE_PLACES_API_KEY not set - Google Places search will not work")
+            # Don't raise error to allow app to start even without API key
+            # raise ValueError("GOOGLE_PLACES_API_KEY not set")
     
     def search(
         self,
@@ -32,7 +34,12 @@ class GooglePlacesClient:
         rating_min: float = 0.0
     ) -> List[Restaurant]:
         """Search restaurants via Google Places API."""
-        
+
+        # Return empty list if API key not configured
+        if not self.api_key:
+            print("Google Places API key not configured, skipping search")
+            return []
+
         # Build query
         query = f"{cuisine} restaurant" if cuisine else "restaurant"
         
