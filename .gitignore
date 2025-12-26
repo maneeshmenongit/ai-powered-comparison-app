@@ -49,5 +49,8 @@ htmlcov/
 # Project specific
 code_files.zip
 
+# Cache files (may contain API keys in URLs)
+data/cache/
+
 # Logs
 *.log
