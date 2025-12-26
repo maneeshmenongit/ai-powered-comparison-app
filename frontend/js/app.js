@@ -299,9 +299,9 @@ async function fetchPlaceDetail(placeId) {
  */
 function renderPlaceCard(place) {
     const isSaved = AppState.savedItems.includes(place.id);
-    
+
     return `
-        <div class="place-card" data-id="${place.id}" onclick="openPlaceDetail('${place.id}')">
+        <div class="place-card" data-id="${place.id}">
             <div class="place-card-image">
                 ${place.image ? `<img src="${place.image}" alt="${place.name}">` : ''}
                 ${place.badge ? `<span class="place-card-badge">${place.badge}</span>` : ''}
@@ -315,8 +315,7 @@ function renderPlaceCard(place) {
                 <div class="place-card-footer">
                     <span class="place-card-rating">⭐ ${place.rating}</span>
                     <span class="place-card-distance">${place.distance}</span>
-                    <button class="place-card-save ${isSaved ? 'saved' : ''}" 
-                            onclick="event.stopPropagation(); toggleSave('${place.id}')">
+                    <button class="place-card-save ${isSaved ? 'saved' : ''}" data-save-id="${place.id}">
                         ${isSaved ? '❤️' : '🤍'}
                     </button>
                 </div>
@@ -330,12 +329,12 @@ function renderPlaceCard(place) {
  */
 function renderGridCard(item) {
     const isSaved = AppState.savedItems.includes(item.id);
-    
+
     return `
-        <div class="grid-card" data-id="${item.id}" onclick="openPlaceDetail('${item.id}')">
+        <div class="grid-card" data-id="${item.id}">
             <div class="grid-card-image" style="background: ${item.gradient || 'var(--color-gray-100)'}">
                 ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
-                <button class="grid-card-save" onclick="event.stopPropagation(); toggleSave('${item.id}')">
+                <button class="grid-card-save" data-save-id="${item.id}">
                     ${isSaved ? '❤️' : '🤍'}
                 </button>
                 ${item.category ? `<span class="grid-card-category">${item.categoryIcon} ${item.category}</span>` : ''}
@@ -980,15 +979,37 @@ function setupEventListeners() {
             if (page) navigateTo(page);
         });
     });
-    
+
     // Search form
     document.querySelectorAll('.search-form').forEach(form => {
         form.addEventListener('submit', handleSearch);
     });
-    
+
     // Filter chips
     document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.addEventListener('click', () => handleFilterClick(chip.dataset.filter));
+    });
+
+    // Event delegation for place cards and grid cards
+    document.body.addEventListener('click', (e) => {
+        // Handle place card clicks
+        const placeCard = e.target.closest('.place-card, .grid-card');
+        if (placeCard) {
+            const placeId = placeCard.dataset.id;
+            if (placeId) {
+                openPlaceDetail(placeId);
+            }
+        }
+
+        // Handle save button clicks
+        const saveButton = e.target.closest('.place-card-save, .grid-card-save');
+        if (saveButton) {
+            e.stopPropagation();
+            const saveId = saveButton.dataset.saveId;
+            if (saveId) {
+                toggleSave(saveId);
+            }
+        }
     });
 }
 
