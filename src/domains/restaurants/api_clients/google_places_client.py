@@ -11,9 +11,14 @@ class GooglePlacesClient:
     
     def __init__(self, api_key: str = None, rate_limiter=None):
         self.api_key = api_key or os.environ.get('GOOGLE_PLACES_API_KEY')
+
+        # Strip quotes if present (Railway environment variables sometimes include them)
+        if self.api_key:
+            self.api_key = self.api_key.strip('"').strip("'")
+
         self.rate_limiter = rate_limiter
         self.base_url = "https://places.googleapis.com/v1/places:searchText"
-        
+
         if not self.api_key:
             raise ValueError("GOOGLE_PLACES_API_KEY not set")
     
