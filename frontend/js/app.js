@@ -268,19 +268,20 @@ async function fetchRides(params = {}) {
  */
 async function fetchPlaceDetail(placeId) {
     setLoading(true);
-    
+
     try {
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/api/places/${placeId}`);
-        // const data = await response.json();
-        
-        await delay(500);
-        
-        const mockData = getMockPlaceDetail(placeId);
-        
+        // Find the place in search results by ID
+        const place = AppState.searchResults.find(p => p.id === placeId);
+
+        if (place) {
+            setLoading(false);
+            return place;
+        }
+
+        // If not in search results, return null (could implement API call here if needed)
         setLoading(false);
-        return mockData;
-        
+        return null;
+
     } catch (error) {
         setLoading(false);
         setError('Failed to load details. Please try again.');
