@@ -163,7 +163,7 @@ class MockGooglePlacesClient:
                 hours="Hours vary",
                 is_open_now=random.choice([True, True, False]),  # 67% open
                 coordinates=(rest_lat, rest_lon),
-                image_url=f"https://via.placeholder.com/400x300?text={name.replace(' ', '+')}",
+                image_url=None,  # Use gradient backgrounds instead of placeholder URLs
                 categories=[cuisine_key, "Restaurant"]
             )
 

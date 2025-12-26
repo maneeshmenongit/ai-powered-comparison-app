@@ -173,7 +173,7 @@ class MockYelpClient:
                 hours="Mon-Sun: 11:00 AM - 10:00 PM",
                 is_open_now=random.choice([True, True, True, False]),  # 75% open
                 coordinates=(rest_lat, rest_lon),
-                image_url=f"https://via.placeholder.com/400x300?text={name.replace(' ', '+')}",
+                image_url=None,  # Use gradient backgrounds instead of placeholder URLs
                 categories=[cuisine_key, "Restaurant", "Dining"]
             )
 
