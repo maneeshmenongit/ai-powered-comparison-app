@@ -96,12 +96,19 @@ class DomainRouter:
         # First try simple keyword matching (fast, no API call)
         keyword_match = self._keyword_match(query)
 
+        print(f"[DomainRouter] Query: '{query}'")
+        print(f"[DomainRouter] Keyword matches: {keyword_match}")
+
         # If only one domain matched, return it
         if len(keyword_match) == 1:
+            print(f"[DomainRouter] Single match, using: {keyword_match}")
             return keyword_match
 
         # For ambiguous or multi-domain, use AI
-        return self._ai_route(query, context)
+        print(f"[DomainRouter] Multiple/no matches, using AI routing...")
+        ai_result = self._ai_route(query, context)
+        print(f"[DomainRouter] AI routing result: {ai_result}")
+        return ai_result
 
     def _keyword_match(self, query: str) -> List[str]:
         """

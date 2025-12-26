@@ -2,21 +2,56 @@
   "key": "restaurants_Pizza_40.7573_-73.9859_any",
   "value": [
     {
+      "provider": "google_places",
+      "name": "Quality Pizza Co. Midtown",
+      "cuisine": "Pizza",
+      "rating": 4.8,
+      "review_count": 1470,
+      "price_range": "$",
+      "address": "888 6th Ave, New York, NY 10001, USA",
+      "distance_miles": 0.6460035126291005,
+      "phone": "(646) 858-0048",
+      "website": "http://orderqualitypizzaco.com/",
+      "hours": [
+        "Monday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Tuesday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Wednesday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Thursday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Friday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Saturday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Sunday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM"
+      ],
+      "is_open_now": true,
+      "coordinates": [
+        40.748154299999996,
+        -73.9886899
+      ],
+      "image_url": "https://places.googleapis.com/v1/places/ChIJgW-n6g1ZwokRwPVvsDWxpMo/photos/AZLasHq9o6yFYT6to79qU8VNoYAGGD9POy-Jfqe9bVSWDuGCCP-UNZsJtsZCvafhmLls_kMr0C8eMxBIMwQB5e0I9Q6byiB_naRjuogW4YZhd_85H3cUP7aaovuJCaPTQaXX9BjfdhnoKcUPL6ErB1W11hh5wG4oSTtegoWQVfYjfit2sqHUeitx__IvpxLoMkZMyQ5raJfWSkvr1J-klg7UbFtl3RwxcFYKpoR4ioYZcizWKdDZdz5a2mVjBxzNCdH99JoqL-a5-s2z37_wAMgBohPCJbXfUpzq0iYRIXSYtm2r0g/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:48:08.477838",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
+    },
+    {
       "provider": "yelp",
       "name": "Blue Hill",
       "cuisine": "Pizza",
       "rating": 4.7,
       "review_count": 890,
       "price_range": "$$$$",
-      "address": "164 Madison Ave (near 72nd St), New York, NY 10001",
-      "distance_miles": 1.8,
-      "phone": "(212) 617-5579",
+      "address": "990 Park Ave (near 14th St), New York, NY 10001",
+      "distance_miles": 0.9,
+      "phone": "(212) 207-4930",
       "website": "https://www.yelp.com/biz/blue-hill",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
       "is_open_now": true,
       "coordinates": [
-        40.74984274517195,
-        -73.98922943379927
+        40.765844185056324,
+        -73.9882270052937
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Blue+Hill",
       "categories": [
@@ -24,7 +59,83 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-23T05:34:04.663731"
+      "last_updated": "2025-12-25T17:48:07.862886",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
+    },
+    {
+      "provider": "google_places",
+      "name": "Roma Pizza & restaurant",
+      "cuisine": "Pizza",
+      "rating": 4.7,
+      "review_count": 1241,
+      "price_range": "$$",
+      "address": "980 6th Ave, New York, NY 10018, USA",
+      "distance_miles": 0.41883013365538907,
+      "phone": "(212) 457-8555",
+      "website": "http://romapizzaon6thave.com/",
+      "hours": [
+        "Monday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Tuesday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Wednesday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Thursday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Friday: 10:00\u202fAM\u2009\u2013\u20095:00\u202fAM",
+        "Saturday: 10:00\u202fAM\u2009\u2013\u20095:00\u202fAM",
+        "Sunday: 10:00\u202fAM\u2009\u2013\u20092:00\u202fAM"
+      ],
+      "is_open_now": true,
+      "coordinates": [
+        40.7512109,
+        -73.98638009999999
+      ],
+      "image_url": "https://places.googleapis.com/v1/places/ChIJ5y1KDFhZwokR5GHmHxnyrms/photos/AZLasHqc7JVJJrolyRRZ-K0IcsO7kUoXujs4NcYjwd1-pkBxfFOEpYoWNG8EnifH4chzxPMDFpYSW2_kIZ3US1DsVoXAHCK1ItyL6_FyYRAVA6esfTgUlhSRxRqxiJEk5Zd1E4XO80w9BPHLTNfgVCpgKpqpk5YA2uGFx7XSk2k3sYK0q0FHJZ3FyqiWTY-as0tiiMAB7Gvb2-p9adz-Qd3OS1foELjg_92X77bssqSBmezCilvoXJ1420MBjc7O0wEnDipO_x9_z6nl9RmZYPfw1kapMXur-HYzqNxOYfss0e6etw/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:48:08.477806",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
+    },
+    {
+      "provider": "google_places",
+      "name": "Napoli Pizza",
+      "cuisine": "Pizza",
+      "rating": 4.7,
+      "review_count": 572,
+      "price_range": "$$",
+      "address": "1032 6th Ave, New York, NY 10018, USA",
+      "distance_miles": 0.3140742291227098,
+      "phone": "(646) 448-4922",
+      "website": "https://www.tripadvisor.com/Restaurant_Review-g60763-d33037387-Reviews-Napoli_Pizza-New_York_City_New_York.html",
+      "hours": [
+        "Monday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Tuesday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Wednesday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Thursday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Friday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Saturday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Sunday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM"
+      ],
+      "is_open_now": true,
+      "coordinates": [
+        40.752730899999996,
+        -73.9854148
+      ],
+      "image_url": "https://places.googleapis.com/v1/places/ChIJnZ8gW5pZwokRSEEMuUY65rU/photos/AZLasHoOVuz4gwJxHZe51KgLkj95vIjmBnzWzI-hJe7UF8iTtDExiulayYttsqFf0JOa11pHP0713aywWji02kO9oum98o5tbP3tSOQ142_nKK_gyZD5SIYaFjY3pF-E6XX8nKYj5PkGLNRdkoM75qmizJsOnSDF205BQLLxE_5-MgxhfDMF_XDAlYjsYkdNyhqtnFJEKHU45UJksl48UqicjcmF5w31tggUVTXublvreVFCQVsa7suygz477iacY6BJcQ6yTXQWV2XeLStUBAd6wqco_ks02dHuJsKVuAzDBz8knBLTBqASI_TSveaEon7jZduEiV5OUjk3wjQXj8rGbGIZgAunArTK7ZJSwKocJl0RQ5aU29Hsq0QdzlOz39J1z9pxf1RGyf881hEFuqIMf2E-BCaGKxjn4JP4AgK0rhGFZ232fanrxXMv-4Us-g/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:48:08.477822",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -33,15 +144,15 @@
       "rating": 4.6,
       "review_count": 2100,
       "price_range": "$$$$",
-      "address": "821 Park Ave (near 42nd St), New York, NY 10001",
-      "distance_miles": 1.0,
-      "phone": "(212) 945-7411",
+      "address": "417 Park Ave (near 34th St), New York, NY 10001",
+      "distance_miles": 2.5,
+      "phone": "(646) 677-6805",
       "website": "https://www.yelp.com/biz/gramercy-tavern",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
       "is_open_now": true,
       "coordinates": [
-        40.766715039049465,
-        -73.97668728517667
+        40.763529573591,
+        -73.9930978286483
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Gramercy+Tavern",
       "categories": [
@@ -49,79 +160,83 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-23T05:34:04.663539"
+      "last_updated": "2025-12-25T17:48:07.862861",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "google_places",
-      "name": "Peter Luger",
+      "name": "Carnegie Pizza",
       "cuisine": "Pizza",
       "rating": 4.6,
-      "review_count": 4200,
-      "price_range": "$$$$",
-      "address": "412 7th Ave, East Village, NY 10012",
-      "distance_miles": 1.9,
-      "phone": "(646) 979-2868",
-      "website": "https://www.google.com/maps/search/Peter+Luger",
-      "hours": "Hours vary",
+      "review_count": 1802,
+      "price_range": "$",
+      "address": "200 W 41st St, New York, NY 10036, USA",
+      "distance_miles": 0.16278092160785207,
+      "phone": "(212) 777-4141",
+      "website": "https://www.carnegiepizza.com/",
+      "hours": [
+        "Monday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Tuesday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Wednesday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Thursday: 11:00\u202fAM\u2009\u2013\u20091:00\u202fAM",
+        "Friday: 11:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Saturday: 11:00\u202fAM\u2009\u2013\u20092:00\u202fAM",
+        "Sunday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM"
+      ],
       "is_open_now": true,
       "coordinates": [
-        40.76120244418322,
-        -73.9847491518512
+        40.755413499999996,
+        -73.9878288
       ],
-      "image_url": "https://via.placeholder.com/400x300?text=Peter+Luger",
-      "categories": [
-        "American",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-23T05:34:04.664879"
+      "image_url": "https://places.googleapis.com/v1/places/ChIJLxR6enFZwokRKCjzHCDzAIo/photos/AZLasHqh4Mlf4LqoNqIv0i-O8RjVSyAtg76jTNcrsELDi22GtCac4cgS97J46pbMMZEoNoVDOIBXo-gnRPqWBKtDtRhaU5pvdr6MI_NrZpfSuMzuFpNxQ9WwojQqnq_9k--L2cwu8x-oimImVzDEjTLKeo4tauSXWC6Dgp1YcXJMZc_3P00kKGnACmXz2LwbCl47oVdtVWQ8LCaVY2KljWHXvPvRkMxduKO49QbMWg8Hildr8mwx7b4KE8ZWQX-JA37J6HISOWEfBZowORe7Md4m4B4SNaqngTnB6PPaHmJ8oYE/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:48:08.477790",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "google_places",
-      "name": "Union Square Caf\u00e9",
+      "name": "Joe's Pizza Broadway",
       "cuisine": "Pizza",
       "rating": 4.5,
-      "review_count": 2100,
-      "price_range": "$$$",
-      "address": "487 7th Ave, Chelsea, NY 10012",
-      "distance_miles": 1.3,
-      "phone": "(646) 418-5621",
-      "website": "https://www.google.com/maps/search/Union+Square+Caf\u00e9",
-      "hours": "Hours vary",
+      "review_count": 24033,
+      "price_range": "$",
+      "address": "1435 Broadway, New York, NY 10018, USA",
+      "distance_miles": 0.18794019133233056,
+      "phone": "(646) 559-4878",
+      "website": "https://www.joespizzanyc.com/",
+      "hours": [
+        "Monday: 10:00\u202fAM\u2009\u2013\u20093:00\u202fAM",
+        "Tuesday: 10:00\u202fAM\u2009\u2013\u20093:00\u202fAM",
+        "Wednesday: 10:00\u202fAM\u2009\u2013\u20093:00\u202fAM",
+        "Thursday: 10:00\u202fAM\u2009\u2013\u20094:00\u202fAM",
+        "Friday: 10:00\u202fAM\u2009\u2013\u20095:00\u202fAM",
+        "Saturday: 10:00\u202fAM\u2009\u2013\u20095:00\u202fAM",
+        "Sunday: 10:00\u202fAM\u2009\u2013\u20093:00\u202fAM"
+      ],
       "is_open_now": true,
       "coordinates": [
-        40.74951239221386,
-        -73.99066440903195
+        40.754679499999995,
+        -73.9870291
       ],
-      "image_url": "https://via.placeholder.com/400x300?text=Union+Square+Caf\u00e9",
-      "categories": [
-        "American",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-23T05:34:04.664311"
-    },
-    {
-      "provider": "google_places",
-      "name": "Minetta Tavern",
-      "cuisine": "Pizza",
-      "rating": 4.4,
-      "review_count": 1890,
-      "price_range": "$$$",
-      "address": "37 Bleecker St, Chelsea, NY 10012",
-      "distance_miles": 0.8,
-      "phone": "(917) 487-6518",
-      "website": "https://www.google.com/maps/search/Minetta+Tavern",
-      "hours": "Hours vary",
-      "is_open_now": true,
-      "coordinates": [
-        40.753034950752344,
-        -73.98813056293832
-      ],
-      "image_url": "https://via.placeholder.com/400x300?text=Minetta+Tavern",
-      "categories": [
-        "American",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-23T05:34:04.664694"
+      "image_url": "https://places.googleapis.com/v1/places/ChIJifIePKtZwokRVZ-UdRGkZzs/photos/AZLasHoJHChH8KhwCuk6BfVXnohQsfQzUM0Z0SzEt5SI9MH5qkYWZKMFO0bNhLyfbR9qmmkuSeLhSh-tOuv4CW6UpU6V1dphzF47UZO0nI7yH07wfwIMyEjsOd8E2Jt-9JROVgzMyjLAryZuGHo8jjBdLReuInT72fgdmCLhQ3Eiv7vD5aXRrzEo6pmuFmeexaST5h-v6-YsjbjypKjZPOUhNTSTCFNwmZWXhjPAMK6r323GfGnKbebGg3q0OJqxCwdPP-6JcWhAqoG4IFP_IHm7hBvUdTvbMDZHjA5w3Q0ouvIf8CaNuvwJjYMhoVUPI_rtmZ5cdlSK1JPuGxcLAW3Z9kt8O9rmp_rWxMMEsYXJkAgsWLjlTRB07i0dFbxa9qASG-NhdwE4bqN8zYfZWtP9ELoBBf6nk6IIX8XU6t4EQbNsVg/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:48:08.477735",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -130,15 +245,15 @@
       "rating": 4.3,
       "review_count": 8900,
       "price_range": "$",
-      "address": "780 Park Ave (near 23rd St), New York, NY 10001",
-      "distance_miles": 0.7,
-      "phone": "(646) 941-1844",
+      "address": "503 3rd Ave (near 72nd St), New York, NY 10001",
+      "distance_miles": 2.6,
+      "phone": "(212) 683-8896",
       "website": "https://www.yelp.com/biz/shake-shack",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
-      "is_open_now": true,
+      "is_open_now": false,
       "coordinates": [
-        40.75713186087793,
-        -73.98119319930679
+        40.7574866148611,
+        -73.97877982310357
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Shake+Shack",
       "categories": [
@@ -146,31 +261,13 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-23T05:34:04.663917"
-    },
-    {
-      "provider": "google_places",
-      "name": "The Spotted Pig",
-      "cuisine": "Pizza",
-      "rating": 4.3,
-      "review_count": 3400,
-      "price_range": "$$",
-      "address": "225 6th Ave, Tribeca, NY 10012",
-      "distance_miles": 1.8,
-      "phone": "(212) 536-5044",
-      "website": "https://www.google.com/maps/search/The+Spotted+Pig",
-      "hours": "Hours vary",
-      "is_open_now": true,
-      "coordinates": [
-        40.76639432337926,
-        -73.98450902399419
-      ],
-      "image_url": "https://via.placeholder.com/400x300?text=The+Spotted+Pig",
-      "categories": [
-        "American",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-23T05:34:04.664508"
+      "last_updated": "2025-12-25T17:48:07.862908",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -179,15 +276,15 @@
       "rating": 4.2,
       "review_count": 4200,
       "price_range": "$$",
-      "address": "223 Broadway (near 50th St), New York, NY 10001",
-      "distance_miles": 1.3,
-      "phone": "(917) 869-1113",
+      "address": "693 Broadway (near 34th St), New York, NY 10001",
+      "distance_miles": 1.2,
+      "phone": "(917) 911-3355",
       "website": "https://www.yelp.com/biz/the-smith",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
       "is_open_now": true,
       "coordinates": [
-        40.76479039130069,
-        -73.98204230830376
+        40.75798962411604,
+        -73.97642557598176
       ],
       "image_url": "https://via.placeholder.com/400x300?text=The+Smith",
       "categories": [
@@ -195,7 +292,13 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-23T05:34:04.663281"
+      "last_updated": "2025-12-25T17:48:07.862804",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -204,15 +307,15 @@
       "rating": 4.1,
       "review_count": 3400,
       "price_range": "$",
-      "address": "809 5th Ave (near 34th St), New York, NY 10001",
-      "distance_miles": 0.3,
-      "phone": "(917) 947-4728",
+      "address": "581 5th Ave (near 34th St), New York, NY 10001",
+      "distance_miles": 0.6,
+      "phone": "(212) 274-3838",
       "website": "https://www.yelp.com/biz/five-guys",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
-      "is_open_now": true,
+      "is_open_now": false,
       "coordinates": [
-        40.76209486846234,
-        -73.99159050950362
+        40.76662013397509,
+        -73.97801091448999
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Five+Guys",
       "categories": [
@@ -220,9 +323,15 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-23T05:34:04.664109"
+      "last_updated": "2025-12-25T17:48:07.862926",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     }
   ],
-  "created_at": 1766486044.66508,
+  "created_at": 1766702888.4807072,
   "ttl": 3600
 }

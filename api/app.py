@@ -14,6 +14,7 @@ import traceback
 from domains.rideshare.handler import RideShareHandler
 from domains.restaurants.handler import RestaurantHandler
 from core import GeocodingService, CacheService, RateLimiter
+from src.orchestration.domain_router import DomainRouter
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -37,6 +38,9 @@ restaurant_handler = RestaurantHandler(
     cache_service=cache,
     rate_limiter=rate_limiter
 )
+
+# Initialize domain router
+domain_router = DomainRouter()
 # ============================================================================
 # ROUTES
 # ============================================================================
@@ -154,6 +158,123 @@ def search_restaurants():
 
     except Exception as e:
         print(f"Error in /api/restaurants: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/search', methods=['POST'])
+def unified_search():
+    """
+    Unified search endpoint that uses domain routing.
+
+    Analyzes the query and routes to appropriate domain(s).
+
+    Request body:
+    {
+        "query": "need a ride to times square",
+        "location": "Central Park, NYC"  // optional, defaults to query location
+    }
+
+    Response:
+    {
+        "success": true,
+        "domain": "rideshare",  // or "restaurants"
+        "data": {...}  // domain-specific results
+    }
+    """
+    try:
+        data = request.get_json()
+
+        # Validate input
+        if not data or 'query' not in data:
+            return jsonify({
+                'error': 'Missing required field: query'
+            }), 400
+
+        query = data['query']
+        location = data.get('location', '')
+
+        # Route query to appropriate domain(s)
+        domains = domain_router.route(query)
+
+        print(f"Query: '{query}' routed to domains: {domains}")
+
+        if not domains:
+            return jsonify({
+                'success': False,
+                'error': 'Could not determine domain for query'
+            }), 400
+
+        # For now, handle single domain (first match)
+        primary_domain = domains[0]
+
+        # Route to appropriate handler
+        if primary_domain == 'rideshare':
+            # Parse origin/destination from query
+            origin = location if location else "Times Square, NYC"
+            destination = "Central Park, NYC"  # Default
+
+            # Simple destination extraction (can be improved with NLP)
+            query_lower = query.lower()
+            if ' to ' in query_lower:
+                parts = query_lower.split(' to ')
+                if len(parts) == 2:
+                    destination = parts[1].strip().title()
+                    # Check if origin is specified
+                    first_part = parts[0].strip()
+                    if 'from ' in first_part:
+                        origin = first_part.split('from ')[-1].strip().title()
+                    elif location:
+                        origin = location
+
+            # Build rideshare query
+            ride_query = f"ride from {origin} to {destination}"
+
+            results = rideshare_handler.process(
+                ride_query,
+                context={'user_location': origin}
+            )
+
+            return jsonify({
+                'success': True,
+                'domain': 'rideshare',
+                'query_parsed': {
+                    'origin': origin,
+                    'destination': destination
+                },
+                'data': results
+            })
+
+        elif primary_domain == 'restaurants':
+            # Use restaurant handler
+            full_query = f"{query} near {location}" if location else query
+
+            results = restaurant_handler.process(
+                full_query,
+                context={
+                    'user_location': location,
+                    'filter_category': 'Food',
+                    'priority': 'balanced'
+                }
+            )
+
+            return jsonify({
+                'success': True,
+                'domain': 'restaurants',
+                'data': results
+            })
+
+        else:
+            return jsonify({
+                'success': False,
+                'error': f'Domain {primary_domain} not yet implemented'
+            }), 501
+
+    except Exception as e:
+        print(f"Error in /api/search: {str(e)}")
         traceback.print_exc()
         return jsonify({
             'success': False,

@@ -2,21 +2,91 @@
   "key": "restaurants_Italian_40.7570_-73.9860_any",
   "value": [
     {
+      "provider": "google_places",
+      "name": "Osteria La Baia",
+      "cuisine": "Italian",
+      "rating": 4.8,
+      "review_count": 4039,
+      "price_range": "$$$$",
+      "address": "129 W 52nd St, New York, NY 10019, USA",
+      "distance_miles": 0.4266914356867076,
+      "phone": "(917) 671-9898",
+      "website": "https://www.labaianyc.com/?y_source=1_MTAwNTA2Mjg0My03MTUtbG9jYXRpb24ud2Vic2l0ZQ%3D%3D",
+      "hours": [
+        "Monday: 11:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Tuesday: 11:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Wednesday: 11:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Thursday: 11:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Friday: 11:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Saturday: 11:30\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Sunday: 11:30\u202fAM\u2009\u2013\u200911:00\u202fPM"
+      ],
+      "is_open_now": true,
+      "coordinates": [
+        40.7618131,
+        -73.9808493
+      ],
+      "image_url": "https://places.googleapis.com/v1/places/ChIJo9FTvDBZwokRFAZ0i4jbLuk/photos/AZLasHpz_IerZnnpChU1MH0Q6jyeh6-bBANqgVUUzffxtuZ3FE8lH2uujm6EKOlKGVS7_I_t2RI3G4i4JXX_73WBZGwFwpKyv3IVi2huF08G4YCXL_L1YXxxV_Xl9LF5zPiEwi2CnXw3QsIAIq6JXeElZdEGI7mMZsieczA8zBWOtx4iRUKZMKosFqtd2J4PBKe-bGLQhTQJFZLd6otIvAdHy-Dji26pqSh8TGw3LYVuwcu2qX_u2D9WhnZ1shSJqdALt2yMkMM84OjalU6bUy3gnHRyA3VPuI1HcjCrCq1FW3axtQ/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:01:51.645381",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
+    },
+    {
+      "provider": "google_places",
+      "name": "La Pecora Bianca Bryant Park",
+      "cuisine": "Italian",
+      "rating": 4.8,
+      "review_count": 5752,
+      "price_range": "$$$",
+      "address": "20 W 40th St, New York, NY 10018, USA",
+      "distance_miles": 0.3436784508724026,
+      "phone": "(212) 924-4040",
+      "website": "https://www.lapecorabianca.com/",
+      "hours": [
+        "Monday: 7:00\u202fAM\u2009\u2013\u200910:00\u202fPM",
+        "Tuesday: 7:00\u202fAM\u2009\u2013\u200910:00\u202fPM",
+        "Wednesday: 7:00\u202fAM\u2009\u2013\u200910:00\u202fPM",
+        "Thursday: 7:00\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Friday: 7:00\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Saturday: 8:00\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Sunday: 8:00\u202fAM\u2009\u2013\u200910:00\u202fPM"
+      ],
+      "is_open_now": true,
+      "coordinates": [
+        40.7525176,
+        -73.9831529
+      ],
+      "image_url": "https://places.googleapis.com/v1/places/ChIJKykw-aZZwokRW7K0ykZUxNo/photos/AZLasHoN6eDLSOv3mm9hbVPOgSlkO5S6HGeI4Q_AfFbOph5QtR4LICvWTw7qO8IXr7MH4pcxK2VOhWd1Ga0AATtFZcUCZZIVAgfeXlo0al7NdTVx0DduZ4yQGCaxojGJpZIUY2eqouOW25X5J2AT06L7mmTo_3ellzIiSv6Fw0EWTWA0fLiDF4tUALZjRBIy7RsmNsw64I4pDMc-2GikyfRMHTIR6xO7GrC6h_-pZR60xE9GXoyrQsdQUnFj8ZPHcLyQZvVJibMUizIgpUZWJM4qFgl65fpyW2C8DgNDj6sLVd_sNw/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:01:51.645408",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
+    },
+    {
       "provider": "yelp",
       "name": "Lilia",
       "cuisine": "Italian",
       "rating": 4.6,
       "review_count": 890,
       "price_range": "$$$",
-      "address": "704 Amsterdam Ave (near 23rd St), New York, NY 10001",
-      "distance_miles": 2.9,
-      "phone": "(917) 890-9368",
+      "address": "518 5th Ave (near 50th St), New York, NY 10001",
+      "distance_miles": 0.7,
+      "phone": "(347) 754-9902",
       "website": "https://www.yelp.com/biz/lilia",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
       "is_open_now": true,
       "coordinates": [
-        40.75095414444011,
-        -73.98816152549686
+        40.754290010515234,
+        -73.98066611342253
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Lilia",
       "categories": [
@@ -24,31 +94,83 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-13T21:34:15.094468"
+      "last_updated": "2025-12-25T17:01:51.131080",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "google_places",
-      "name": "Torrisi",
+      "name": "Tony's Di Napoli",
       "cuisine": "Italian",
       "rating": 4.6,
-      "review_count": 450,
-      "price_range": "$$$$",
-      "address": "163 6th Ave, Greenwich Village, NY 10012",
-      "distance_miles": 1.2,
-      "phone": "(917) 349-1944",
-      "website": "https://www.google.com/maps/search/Torrisi",
-      "hours": "Hours vary",
-      "is_open_now": false,
+      "review_count": 7938,
+      "price_range": "$$",
+      "address": "147 W 43rd St, New York, NY 10036, USA",
+      "distance_miles": 0.04771039686652923,
+      "phone": "(212) 221-0100",
+      "website": "https://www.tonysnyc.com/",
+      "hours": [
+        "Monday: 11:30\u202fAM\u2009\u2013\u200910:00\u202fPM",
+        "Tuesday: 11:30\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Wednesday: 11:30\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Thursday: 11:30\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Friday: 11:30\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Saturday: 11:30\u202fAM\u2009\u2013\u200911:00\u202fPM",
+        "Sunday: 11:30\u202fAM\u2009\u2013\u200910:00\u202fPM"
+      ],
+      "is_open_now": true,
       "coordinates": [
-        40.756185786172765,
-        -73.99392020230428
+        40.756484199999996,
+        -73.9853808
       ],
-      "image_url": "https://via.placeholder.com/400x300?text=Torrisi",
-      "categories": [
-        "Italian",
-        "Restaurant"
+      "image_url": "https://places.googleapis.com/v1/places/ChIJVS2qI1VYwokRFo18YsKvHYM/photos/AZLasHrugf7sJ1Ok5sFKNU0dsqxVDKQJNjZXNELOllBtKA9KVoRJDzxQcYiwrl8uYEcumG3fAm-w2DTtSI1WUigxAbREkbvm2Eq8skrf8Mv3_4iZaMp3Er2Xdn8e8rTTxU9uVm0YizQIwytDytgNvLuNCVYa_aNTQiHN7VOG4bsjPrRGUfs1E30_wU_ELRWE_jQa_nxZsTVoV8hRS6_Ojp_qBL4W0HiW42JBX7ewYZnwtyIQZ0eLkzsHHjBLtN4ZzfmBNSaiDpDqBfZrZD4DvjaJldMXCQ0yNpzemkV8evLT1zCgwkLUX0wlZyCTPKMpNgPd32DzUbEgs36k0Gl964yJYvnGIbcZ5PGNKdquAx_WQPQQhP0RuO_-69x7ba98JlGYvxiFutW99eBUabc2pux6MtpyZSwsu10vf9hSTiMW6BMCEw/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:01:51.645303",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
+    },
+    {
+      "provider": "google_places",
+      "name": "Sicily Osteria",
+      "cuisine": "Italian",
+      "rating": 4.6,
+      "review_count": 2854,
+      "price_range": "$$",
+      "address": "328-330 W 46th St, New York, NY 10036, USA",
+      "distance_miles": 0.27511513327376136,
+      "phone": "(646) 609-3417",
+      "website": "http://sicilynyc.com/",
+      "hours": [
+        "Monday: 12:00\u2009\u2013\u200910:00\u202fPM",
+        "Tuesday: 12:00\u2009\u2013\u200911:00\u202fPM",
+        "Wednesday: 12:00\u2009\u2013\u200911:00\u202fPM",
+        "Thursday: 12:00\u2009\u2013\u200911:00\u202fPM",
+        "Friday: 12:00\u2009\u2013\u200911:00\u202fPM",
+        "Saturday: 12:00\u2009\u2013\u200911:00\u202fPM",
+        "Sunday: 12:00\u2009\u2013\u200910:00\u202fPM"
       ],
-      "last_updated": "2025-12-13T21:34:15.094704"
+      "is_open_now": true,
+      "coordinates": [
+        40.7601601,
+        -73.9891863
+      ],
+      "image_url": "https://places.googleapis.com/v1/places/ChIJ03krMjJZwokRYRF15upaCHw/photos/AZLasHo7ye0-9_KPv7JVztfl6FWQ7NTvW8tlxw54-LqmjEB8bfrTypAqtsSyUz-wS5LLxIR8KAYVNne3UjzcUKw7t7TV55XQw1kwodX7WkBBp9SiiZGmGOZ2S-kY_sh82stXdIjQxrWT3BNGycQAPlJs4t3AMqVrJIlsJyD4Z5hmq5g1kqt5FjNEpq0a0KvsdjQkREvMOBzEd95dWPPxbmqrJg-5VaRYUdPTWsbNtdZANAZxVxHTOXO4RXBVv9W_vvUsyuII0TCrMsrtODBf6hZat9TlDqEITZkCRx1sIt5KLN1eMA/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:01:51.645395",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -57,15 +179,15 @@
       "rating": 4.5,
       "review_count": 1200,
       "price_range": "$$$$",
-      "address": "516 Madison Ave (near 50th St), New York, NY 10001",
-      "distance_miles": 1.8,
-      "phone": "(212) 775-7916",
+      "address": "148 3rd Ave (near 50th St), New York, NY 10001",
+      "distance_miles": 0.4,
+      "phone": "(212) 347-4354",
       "website": "https://www.yelp.com/biz/carbone",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
       "is_open_now": false,
       "coordinates": [
-        40.76314979915206,
-        -73.98992136467702
+        40.756093297503114,
+        -73.98632217241618
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Carbone",
       "categories": [
@@ -73,7 +195,13 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-13T21:34:15.094409"
+      "last_updated": "2025-12-25T17:01:51.131029",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -82,15 +210,15 @@
       "rating": 4.5,
       "review_count": 2100,
       "price_range": "$$",
-      "address": "884 Madison Ave (near 72nd St), New York, NY 10001",
-      "distance_miles": 0.5,
-      "phone": "(646) 206-6552",
+      "address": "787 Park Ave (near 23rd St), New York, NY 10001",
+      "distance_miles": 0.9,
+      "phone": "(646) 826-8692",
       "website": "https://www.yelp.com/biz/rubirosa",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
-      "is_open_now": false,
+      "is_open_now": true,
       "coordinates": [
-        40.75067373604831,
-        -73.99157341384921
+        40.76621112816094,
+        -73.98978546994924
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Rubirosa",
       "categories": [
@@ -98,31 +226,48 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-13T21:34:15.094546"
+      "last_updated": "2025-12-25T17:01:51.131137",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "google_places",
-      "name": "Babbo",
+      "name": "Carmine's - Time Square",
       "cuisine": "Italian",
       "rating": 4.5,
-      "review_count": 1100,
-      "price_range": "$$$$",
-      "address": "407 Broadway, Greenwich Village, NY 10012",
-      "distance_miles": 0.9,
-      "phone": "(212) 433-3034",
-      "website": "https://www.google.com/maps/search/Babbo",
-      "hours": "Hours vary",
-      "is_open_now": false,
+      "review_count": 18347,
+      "price_range": "$$",
+      "address": "200 W 44th St, New York, NY 10036, USA",
+      "distance_miles": 0.0491126804730644,
+      "phone": "(212) 221-3800",
+      "website": "https://carminesnyc.com/locations/times-square",
+      "hours": [
+        "Monday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Tuesday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Wednesday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Thursday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM",
+        "Friday: 11:00\u202fAM\u2009\u2013\u200912:30\u202fAM",
+        "Saturday: 11:00\u202fAM\u2009\u2013\u200912:30\u202fAM",
+        "Sunday: 11:00\u202fAM\u2009\u2013\u200912:00\u202fAM"
+      ],
+      "is_open_now": true,
       "coordinates": [
-        40.75451793971334,
-        -73.98370029421659
+        40.757498,
+        -73.986654
       ],
-      "image_url": "https://via.placeholder.com/400x300?text=Babbo",
-      "categories": [
-        "Italian",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-13T21:34:15.094670"
+      "image_url": "https://places.googleapis.com/v1/places/ChIJR9So-lRYwokRX1xEjA0rChA/photos/AZLasHqkIy4t_HUimHP4MUEbqkECJwP9vI2zj1RjJZTereGwBbNpx8BoZzDreFAxHuJWfhjRHZVup7disH3YSi2vSJomtoaqWWhGu8QSROVHutK7GC5zDrNekRg72BIElledGPPygfVsg8VXgLL9SiOaLQQ8UbtzuARIK-oauVcXoCG7iVFyslNWWJa9LQyxMqRxUENX3-TJmhvJSTDI6fBjWy-iEwqFqtLgKN08BlDDzc1L2ms2mgf_uxiRVLco_5QgzKblIA3SP6caFJsS0RseqoJm6xH8Rb3kUkwqb8wqLvgl_w/media?key=REMOVED&maxHeightPx=400&maxWidthPx=400",
+      "categories": [],
+      "last_updated": "2025-12-25T17:01:51.645363",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -131,15 +276,15 @@
       "rating": 4.4,
       "review_count": 1450,
       "price_range": "$$$",
-      "address": "294 Lexington Ave (near 14th St), New York, NY 10001",
-      "distance_miles": 0.6,
-      "phone": "(212) 563-3251",
+      "address": "948 Lexington Ave (near 23rd St), New York, NY 10001",
+      "distance_miles": 1.5,
+      "phone": "(212) 517-9440",
       "website": "https://www.yelp.com/biz/via-carota",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
       "is_open_now": true,
       "coordinates": [
-        40.76510375808766,
-        -73.97771857932887
+        40.750090928304,
+        -73.99550908745432
       ],
       "image_url": "https://via.placeholder.com/400x300?text=Via+Carota",
       "categories": [
@@ -147,55 +292,13 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-13T21:34:15.094504"
-    },
-    {
-      "provider": "google_places",
-      "name": "Il Buco",
-      "cuisine": "Italian",
-      "rating": 4.4,
-      "review_count": 890,
-      "price_range": "$$$",
-      "address": "60 Spring St, Greenwich Village, NY 10012",
-      "distance_miles": 1.5,
-      "phone": "(646) 368-2621",
-      "website": "https://www.google.com/maps/search/Il+Buco",
-      "hours": "Hours vary",
-      "is_open_now": false,
-      "coordinates": [
-        40.75415396122565,
-        -73.9795777621594
-      ],
-      "image_url": "https://via.placeholder.com/400x300?text=Il+Buco",
-      "categories": [
-        "Italian",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-13T21:34:15.094626"
-    },
-    {
-      "provider": "google_places",
-      "name": "Locanda Verde",
-      "cuisine": "Italian",
-      "rating": 4.4,
-      "review_count": 1450,
-      "price_range": "$$$",
-      "address": "466 Prince St, East Village, NY 10012",
-      "distance_miles": 1.2,
-      "phone": "(917) 877-9588",
-      "website": "https://www.google.com/maps/search/Locanda+Verde",
-      "hours": "Hours vary",
-      "is_open_now": true,
-      "coordinates": [
-        40.752290412888826,
-        -73.99016922020013
-      ],
-      "image_url": "https://via.placeholder.com/400x300?text=Locanda+Verde",
-      "categories": [
-        "Italian",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-13T21:34:15.094687"
+      "last_updated": "2025-12-25T17:01:51.131104",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     },
     {
       "provider": "yelp",
@@ -204,15 +307,15 @@
       "rating": 4.3,
       "review_count": 980,
       "price_range": "$$$",
-      "address": "309 Amsterdam Ave (near 72nd St), New York, NY 10001",
-      "distance_miles": 1.3,
-      "phone": "(347) 308-5480",
+      "address": "463 3rd Ave (near 23rd St), New York, NY 10001",
+      "distance_miles": 1.9,
+      "phone": "(212) 217-3419",
       "website": "https://www.yelp.com/biz/lartusi",
       "hours": "Mon-Sun: 11:00 AM - 10:00 PM",
       "is_open_now": true,
       "coordinates": [
-        40.75608028557879,
-        -73.99383163335726
+        40.75292097688648,
+        -73.98521827762626
       ],
       "image_url": "https://via.placeholder.com/400x300?text=L'Artusi",
       "categories": [
@@ -220,33 +323,15 @@
         "Restaurant",
         "Dining"
       ],
-      "last_updated": "2025-12-13T21:34:15.094527"
-    },
-    {
-      "provider": "google_places",
-      "name": "Peasant",
-      "cuisine": "Italian",
-      "rating": 4.3,
-      "review_count": 670,
-      "price_range": "$$$",
-      "address": "478 7th Ave, SoHo, NY 10012",
-      "distance_miles": 0.5,
-      "phone": "(917) 722-5044",
-      "website": "https://www.google.com/maps/search/Peasant",
-      "hours": "Hours vary",
-      "is_open_now": true,
-      "coordinates": [
-        40.7493990767465,
-        -73.98788149643501
-      ],
-      "image_url": "https://via.placeholder.com/400x300?text=Peasant",
-      "categories": [
-        "Italian",
-        "Restaurant"
-      ],
-      "last_updated": "2025-12-13T21:34:15.094652"
+      "last_updated": "2025-12-25T17:01:51.131121",
+      "id": "",
+      "subcategory": null,
+      "tags": [],
+      "badge": null,
+      "gradient": "linear-gradient(135deg, #FFE5B4, #FFB347)",
+      "photos": []
     }
   ],
-  "created_at": 1765679655.094761,
+  "created_at": 1766700111.6487901,
   "ttl": 3600
 }
