@@ -53,6 +53,12 @@ class GooglePlacesClient:
         
         try:
             response = requests.post(self.base_url, json=body, headers=headers)
+
+            # Log the full error response for debugging
+            if response.status_code != 200:
+                print(f"Google Places API Error {response.status_code}:")
+                print(f"Response: {response.text}")
+
             response.raise_for_status()
             data = response.json()
             
