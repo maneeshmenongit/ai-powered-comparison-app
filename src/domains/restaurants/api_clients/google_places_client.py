@@ -34,7 +34,7 @@ class GooglePlacesClient:
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": self.api_key,
-            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location,places.nationalPhoneNumber,places.websiteUri,places.regularOpeningHours"
+            "X-Goog-FieldMask": "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.formattedAddress,places.location,places.nationalPhoneNumber,places.websiteUri,places.regularOpeningHours,places.photos"
         }
         
         body = {
@@ -66,10 +66,28 @@ class GooglePlacesClient:
                 place_lat = place.get('location', {}).get('latitude', latitude)
                 place_lon = place.get('location', {}).get('longitude', longitude)
 
-                # Photos are disabled - Google Places (New) API photos require
-                # special handling and the direct media URLs return 404
-                # The gradient backgrounds in the UI look great as an alternative
+                # Extract photo resource names and construct media URLs
+                photos = place.get('photos', [])
+                photo_urls = []
                 image_url = None
+
+                if photos and len(photos) > 0:
+                    # Get the first photo's resource name
+                    first_photo = photos[0]
+                    photo_name = first_photo.get('name', '')
+
+                    if photo_name:
+                        # Construct the media URL with API key
+                        # Use maxHeightPx to control image size (400px height)
+                        image_url = f"https://places.googleapis.com/v1/{photo_name}/media?maxHeightPx=400&key={self.api_key}"
+                        photo_urls.append(image_url)
+
+                        # Add additional photos (up to 5 total)
+                        for photo in photos[1:5]:
+                            photo_name = photo.get('name', '')
+                            if photo_name:
+                                photo_url = f"https://places.googleapis.com/v1/{photo_name}/media?maxHeightPx=400&key={self.api_key}"
+                                photo_urls.append(photo_url)
 
                 restaurant = Restaurant(
                     provider='google_places',
@@ -85,7 +103,8 @@ class GooglePlacesClient:
                     hours=self._format_hours(place.get('regularOpeningHours')),
                     is_open_now=place.get('regularOpeningHours', {}).get('openNow', False),
                     coordinates=(place_lat, place_lon),
-                    image_url=image_url
+                    image_url=image_url,
+                    photos=photo_urls
                 )
                 restaurants.append(restaurant)
             
