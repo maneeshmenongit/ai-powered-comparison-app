@@ -58,10 +58,22 @@ def root():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint."""
+    import os
+    google_key = os.getenv('GOOGLE_PLACES_API_KEY', '')
+
+    # Check for quotes in the key
+    has_quotes = google_key.startswith('"') or google_key.startswith("'")
+    key_length = len(google_key)
+    key_preview = f"{google_key[:10]}...{google_key[-4:]}" if len(google_key) > 14 else "NOT_SET"
+
     return jsonify({
         'status': 'healthy',
         'service': 'hopwise-api',
-        'version': '1.0.0'
+        'version': '1.0.0',
+        'google_api_key_configured': bool(google_key),
+        'google_api_key_length': key_length,
+        'google_api_key_preview': key_preview,
+        'google_api_key_has_quotes': has_quotes
     })
 
 
