@@ -5,6 +5,16 @@ Provides ride and restaurant comparison endpoints.
 """
 
 import sys
+import os
+
+# Load .env file for local development
+if os.path.exists('.env'):
+    with open('.env', 'r') as f:
+        for line in f:
+            if line.strip() and not line.startswith('#') and '=' in line:
+                key, value = line.strip().split('=', 1)
+                os.environ[key] = value
+
 sys.path.insert(0, 'src')
 
 from flask import Flask, request, jsonify
@@ -14,7 +24,7 @@ import traceback
 from domains.rideshare.handler import RideShareHandler
 from domains.restaurants.handler import RestaurantHandler
 from core import GeocodingService, CacheService, RateLimiter
-from src.orchestration.domain_router import DomainRouter
+from orchestration.domain_router import DomainRouter
 
 # Initialize Flask app
 app = Flask(__name__)

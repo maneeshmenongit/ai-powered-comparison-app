@@ -204,18 +204,22 @@
         </div>
         
         <!-- Trip Stats -->
-        <div class="flex justify-center gap-6 p-4" style="background: var(--color-white);">
-            <div class="text-center">
-                <div class="font-black text-lg" id="ride-distance">18.5 mi</div>
-                <div class="text-xs text-gray">Distance</div>
-            </div>
-            <div class="text-center">
-                <div class="font-black text-lg" id="ride-time">42 min</div>
-                <div class="text-xs text-gray">Est. Time</div>
-            </div>
-            <div class="text-center">
-                <div class="font-black text-lg text-success" id="ride-savings">$7</div>
-                <div class="text-xs text-gray">You Save</div>
+        <div class="section" style="padding-top: 8px; padding-bottom: 8px;">
+            <div style="display: flex; justify-content: space-around; gap: 12px; background: linear-gradient(135deg, #FFF5EB 0%, #FFF9F0 100%); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(255, 142, 83, 0.1);">
+                <div class="text-center" style="flex: 1;">
+                    <div class="font-black text-2xl" id="ride-distance" style="color: var(--color-sunset-orange);">18.5 mi</div>
+                    <div class="text-xs text-gray" style="margin-top: 4px; font-weight: 600;">Distance</div>
+                </div>
+                <div style="width: 1px; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.1), transparent);"></div>
+                <div class="text-center" style="flex: 1;">
+                    <div class="font-black text-2xl" id="ride-time" style="color: var(--color-sunset-orange);">42 min</div>
+                    <div class="text-xs text-gray" style="margin-top: 4px; font-weight: 600;">Est. Time</div>
+                </div>
+                <div style="width: 1px; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.1), transparent);"></div>
+                <div class="text-center" style="flex: 1;">
+                    <div class="font-black text-2xl text-success" id="ride-savings">$7</div>
+                    <div class="text-xs text-gray" style="margin-top: 4px; font-weight: 600;">You Save</div>
+                </div>
             </div>
         </div>
         
@@ -247,7 +251,7 @@
         </div>
         
         <!-- Bottom CTA (Fixed) -->
-        <div style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; padding: 16px; background: white; border-top: 1px solid var(--color-gray-200); z-index: 100;">
+        <div style="position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; padding: 16px; background: white; border-top: 1px solid var(--color-gray-200); z-index: 150; box-shadow: 0 -4px 12px rgba(0,0,0,0.08);">
             <button id="book-ride-btn" class="btn btn-primary btn-lg btn-block">Book Uber X • $45</button>
             <p class="text-center text-xs text-gray mt-2">Opens Uber app to complete booking</p>
         </div>

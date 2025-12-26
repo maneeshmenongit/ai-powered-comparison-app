@@ -12,6 +12,7 @@ const AppState = {
     user: { name: 'Alex' },
     savedItems: [],
     searchResults: [],
+    placesCache: {}, // Cache all fetched places by ID for detail page
     filters: {
         category: 'all',
         priceRange: null,
@@ -236,7 +237,7 @@ async function fetchRides(params = {}) {
         const rides = ridesData.map(ride => ({
             id: `${ride.provider}-${ride.vehicle_type}`,
             provider: ride.provider,
-            name: `${ride.provider} ${ride.vehicle_type}`,
+            name: ride.vehicle_type, // Use vehicle_type directly (e.g., "Uber X", "Lyft Lux")
             type: ride.type,
             vehicle: ride.vehicle_type,
             price: ride.price_estimate,
@@ -270,15 +271,23 @@ async function fetchPlaceDetail(placeId) {
     setLoading(true);
 
     try {
-        // Find the place in search results by ID
+        // First check the places cache
+        if (AppState.placesCache[placeId]) {
+            setLoading(false);
+            return AppState.placesCache[placeId];
+        }
+
+        // Then check search results
         const place = AppState.searchResults.find(p => p.id === placeId);
 
         if (place) {
+            // Cache it for next time
+            AppState.placesCache[placeId] = place;
             setLoading(false);
             return place;
         }
 
-        // If not in search results, return null (could implement API call here if needed)
+        // If not found anywhere, return null
         setLoading(false);
         return null;
 
@@ -299,23 +308,25 @@ async function fetchPlaceDetail(placeId) {
  */
 function renderPlaceCard(place) {
     const isSaved = AppState.savedItems.includes(place.id);
+    const imageUrl = place.image || place.image_url;
+    const tags = Array.isArray(place.tags) ? place.tags : [];
 
     return `
-        <div class="place-card" data-id="${place.id}">
+        <div class="place-card" data-id="${place.id}" onclick="openPlaceDetail('${place.id}')">
             <div class="place-card-image">
-                ${place.image ? `<img src="${place.image}" alt="${place.name}">` : ''}
+                ${imageUrl ? `<img src="${imageUrl}" alt="${place.name}">` : ''}
                 ${place.badge ? `<span class="place-card-badge">${place.badge}</span>` : ''}
             </div>
             <div class="place-card-content">
                 <h3 class="place-card-name">${place.name}</h3>
                 <p class="place-card-meta">${place.category} • ${place.price} • ${place.distance}</p>
                 <div class="place-card-tags">
-                    ${place.tags.map(tag => `<span class="place-card-tag">${tag}</span>`).join('')}
+                    ${tags.map(tag => `<span class="place-card-tag">${tag}</span>`).join('')}
                 </div>
                 <div class="place-card-footer">
                     <span class="place-card-rating">⭐ ${place.rating}</span>
                     <span class="place-card-distance">${place.distance}</span>
-                    <button class="place-card-save ${isSaved ? 'saved' : ''}" data-save-id="${place.id}">
+                    <button class="place-card-save ${isSaved ? 'saved' : ''}" data-save-id="${place.id}" onclick="event.stopPropagation(); toggleSave('${place.id}')">
                         ${isSaved ? '❤️' : '🤍'}
                     </button>
                 </div>
@@ -329,12 +340,15 @@ function renderPlaceCard(place) {
  */
 function renderGridCard(item) {
     const isSaved = AppState.savedItems.includes(item.id);
+    const imageUrl = item.image || item.image_url;
+    const backgroundStyle = imageUrl
+        ? `background-image: url('${imageUrl}'); background-size: cover; background-position: center;`
+        : `background: ${item.gradient || 'var(--color-gray-100)'}`;
 
     return `
-        <div class="grid-card" data-id="${item.id}">
-            <div class="grid-card-image" style="background: ${item.gradient || 'var(--color-gray-100)'}">
-                ${item.image ? `<img src="${item.image}" alt="${item.name}">` : ''}
-                <button class="grid-card-save" data-save-id="${item.id}">
+        <div class="grid-card" data-id="${item.id}" onclick="openPlaceDetail('${item.id}')">
+            <div class="grid-card-image" style="${backgroundStyle}">
+                <button class="grid-card-save" data-save-id="${item.id}" onclick="event.stopPropagation(); toggleSave('${item.id}')">
                     ${isSaved ? '❤️' : '🤍'}
                 </button>
                 ${item.category ? `<span class="grid-card-category">${item.categoryIcon} ${item.category}</span>` : ''}
@@ -505,9 +519,43 @@ async function initDetailPage(placeId) {
 async function initRidesPage(params = {}) {
     if (!DOM.ridesContainer) return;
 
-    // Get origin and destination from page or use defaults
-    const origin = params.origin || document.getElementById('ride-pickup')?.textContent || 'Times Square, NYC';
-    const destination = params.destination || document.getElementById('ride-destination')?.textContent || 'JFK Airport Terminal 4';
+    // Get UI elements first
+    const pickupElement = document.getElementById('ride-pickup');
+    const destinationElement = document.getElementById('ride-destination');
+
+    // Get destination (from params or default)
+    const destination = params.destination || destinationElement?.textContent || 'JFK Airport Terminal 4';
+
+    // Get origin - try user's current location first
+    let origin = params.origin;
+    let displayOrigin = origin;
+
+    if (!origin) {
+        // Try to get user's current location
+        try {
+            const position = await new Promise((resolve, reject) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                } else {
+                    reject(new Error('Geolocation not supported'));
+                }
+            });
+
+            // Use coordinates as origin (format: "lat,lng")
+            // This will be more accurate for the ride API
+            origin = `${position.coords.latitude},${position.coords.longitude}`;
+            displayOrigin = 'Current Location';
+
+        } catch (error) {
+            // Geolocation failed or denied, use default
+            origin = pickupElement?.textContent || 'Times Square, NYC';
+            displayOrigin = origin;
+        }
+    }
+
+    // Update UI to show origin and destination
+    if (pickupElement) pickupElement.textContent = displayOrigin;
+    if (destinationElement) destinationElement.textContent = destination;
 
     // Show loading skeletons
     DOM.ridesContainer.innerHTML = Array(3).fill(renderPlaceCardSkeleton()).join('');
@@ -557,29 +605,41 @@ function renderSearchResults(results) {
 
 function renderPlaceDetail(detail) {
     if (!DOM.detailContainer) return;
-    
+
+    // Safely handle badges
+    const badges = detail.badges || (detail.badge ? [detail.badge] : []);
+    const badgesHtml = badges.length > 0
+        ? `<div style="position: absolute; bottom: 16px; left: 16px; display: flex; gap: 8px;">
+            ${badges.map(b => `<span class="badge">${b}</span>`).join('')}
+           </div>`
+        : '';
+
+    // Handle hero image
+    const imageUrl = detail.image || detail.image_url;
+    const heroStyle = imageUrl
+        ? `height: 280px; background-image: url('${imageUrl}'); background-size: cover; background-position: center; position: relative;`
+        : `height: 280px; background: ${detail.gradient || 'linear-gradient(135deg, #FFE5B4, #FFB347)'}; position: relative;`;
+
     DOM.detailContainer.innerHTML = `
         <!-- Hero Image -->
-        <div class="detail-hero" style="height: 280px; background: ${detail.gradient || 'linear-gradient(135deg, #FFE5B4, #FFB347)'}; position: relative;">
-            <div class="header" style="position: absolute; top: 0; left: 0; right: 0; background: transparent;">
+        <div class="detail-hero" style="${heroStyle}">
+            <div class="header" style="position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);">
                 <button class="header-back" onclick="goBack()">←</button>
                 <div class="header-actions">
                     <button class="header-action" onclick="toggleSave('${detail.id}')">🤍</button>
                     <button class="header-action" onclick="sharePage()">↗️</button>
                 </div>
             </div>
-            <div style="position: absolute; bottom: 16px; left: 16px; display: flex; gap: 8px;">
-                ${detail.badges.map(b => `<span class="badge">${b}</span>`).join('')}
-            </div>
+            ${badgesHtml}
         </div>
         
         <!-- Content -->
         <div class="section">
             <h1 class="text-2xl font-black mb-2">${detail.name}</h1>
-            <p class="text-gray mb-3">${detail.category} • ${detail.priceLevel} • ${detail.distance}</p>
+            <p class="text-gray mb-3">${detail.category || 'Restaurant'} • ${detail.price || detail.priceLevel || 'N/A'} • ${detail.distance || '0 mi'}</p>
             <div class="flex items-center gap-3 mb-4">
-                <span class="badge badge-warning">⭐ ${detail.rating}</span>
-                <span class="text-sm text-gray">${detail.reviewCount} reviews</span>
+                <span class="badge badge-warning">⭐ ${detail.rating || 0}</span>
+                <span class="text-sm text-gray">${detail.reviews || detail.reviewCount || 0} reviews</span>
             </div>
             
             <!-- Quick Actions -->
@@ -594,7 +654,9 @@ function renderPlaceDetail(detail) {
                     <div class="info-row-icon">🕐</div>
                     <div class="info-row-content">
                         <div class="info-row-label">Hours</div>
-                        <div class="info-row-value ${detail.isOpen ? 'success' : ''}">${detail.hours}</div>
+                        <div class="info-row-value ${detail.isOpen ? 'success' : ''}">
+                            ${Array.isArray(detail.hours) ? detail.hours[0] || 'Hours not available' : detail.hours || 'Hours not available'}
+                        </div>
                     </div>
                     <span class="info-row-action">›</span>
                 </div>
@@ -602,7 +664,7 @@ function renderPlaceDetail(detail) {
                     <div class="info-row-icon">📍</div>
                     <div class="info-row-content">
                         <div class="info-row-label">Address</div>
-                        <div class="info-row-value">${detail.address}</div>
+                        <div class="info-row-value">${detail.address || 'Address not available'}</div>
                     </div>
                     <span class="info-row-action">›</span>
                 </div>
@@ -610,7 +672,7 @@ function renderPlaceDetail(detail) {
                     <div class="info-row-icon">📞</div>
                     <div class="info-row-content">
                         <div class="info-row-label">Phone</div>
-                        <div class="info-row-value">${detail.phone}</div>
+                        <div class="info-row-value">${detail.phone || 'Phone not available'}</div>
                     </div>
                     <span class="info-row-action">›</span>
                 </div>
@@ -630,26 +692,65 @@ function renderPlaceDetail(detail) {
 
 function renderRideResults(rides) {
     if (!DOM.ridesContainer) return;
-    
+
     if (rides.length === 0) {
         DOM.ridesContainer.innerHTML = renderErrorState('No rides available');
         return;
     }
-    
+
     // Find best price and fastest
     const sortedByPrice = [...rides].sort((a, b) => a.price - b.price);
     const sortedByTime = [...rides].sort((a, b) => a.pickup - b.pickup);
-    const bestPriceId = sortedByPrice[0].provider;
-    const fastestId = sortedByTime[0].provider;
-    
+    const bestPriceRide = sortedByPrice[0];
+    const fastestRide = sortedByTime[0];
+    const bestPriceId = bestPriceRide.provider;
+    const fastestId = fastestRide.provider;
+
     DOM.ridesContainer.innerHTML = rides.map(ride => {
         let badge = null;
         if (ride.provider === bestPriceId && ride.provider !== fastestId) badge = 'best';
         else if (ride.provider === fastestId && ride.provider !== bestPriceId) badge = 'fastest';
         else if (ride.provider === bestPriceId) badge = 'best';
-        
+
         return renderRideCard(ride, ride.provider === bestPriceId, badge);
     }).join('');
+
+    // Update trip stats
+    const avgDistance = rides.reduce((sum, r) => sum + (r.distance || 0), 0) / rides.length;
+    const avgDuration = rides.reduce((sum, r) => sum + (r.duration || 0), 0) / rides.length;
+    const maxPrice = Math.max(...rides.map(r => r.price));
+    const minPrice = Math.min(...rides.map(r => r.price));
+    const savings = maxPrice - minPrice;
+
+    const distanceEl = document.getElementById('ride-distance');
+    const timeEl = document.getElementById('ride-time');
+    const savingsEl = document.getElementById('ride-savings');
+
+    if (distanceEl) distanceEl.textContent = `${avgDistance.toFixed(1)} mi`;
+    if (timeEl) timeEl.textContent = `${Math.round(avgDuration)} min`;
+    if (savingsEl) savingsEl.textContent = `$${Math.round(savings)}`;
+
+    // Update CTA button with best price option
+    const ctaBtn = document.getElementById('book-ride-btn');
+    if (ctaBtn) {
+        const providerName = bestPriceRide.name || bestPriceRide.provider;
+        ctaBtn.textContent = `Book ${providerName} • $${bestPriceRide.price.toFixed(2)}`;
+    }
+
+    // Update AI recommendation banner
+    const recommendationEl = document.getElementById('ride-recommendation');
+    if (recommendationEl) {
+        const savingsFromBest = maxPrice - bestPriceRide.price;
+        const savingsText = savingsFromBest > 0 ? `$${Math.round(savingsFromBest)} cheaper than other options` : 'Best price available';
+        const providerDisplayName = bestPriceRide.name || bestPriceRide.provider;
+        recommendationEl.innerHTML = `
+            <span class="banner-icon">💡</span>
+            <div class="banner-content">
+                <div class="banner-title">${providerDisplayName} is your best bet!</div>
+                <div class="banner-text">${savingsText} with ${bestPriceRide.pickup} min pickup time.</div>
+            </div>
+        `;
+    }
 }
 
 function renderSavedItems() {
@@ -668,26 +769,42 @@ function renderSavedItems() {
 
 async function loadTrendingItems() {
     if (!DOM.trendingContainer) return;
-    
+
     const items = await fetchPlaces({ trending: true, limit: 5 });
-    
-    DOM.trendingContainer.innerHTML = items.map(item => `
-        <div class="grid-card" style="min-width: 160px;" onclick="openPlaceDetail('${item.id}')">
-            <div class="grid-card-image" style="background: ${item.gradient}"></div>
-            <div class="grid-card-content">
-                <h3 class="grid-card-name">${item.name}</h3>
-                <p class="grid-card-meta">${item.category}</p>
-                <span class="grid-card-rating">⭐ ${item.rating}</span>
+
+    // Cache items for detail page
+    items.forEach(item => {
+        AppState.placesCache[item.id] = item;
+    });
+
+    DOM.trendingContainer.innerHTML = items.map(item => {
+        const imageUrl = item.image || item.image_url;
+        const backgroundStyle = imageUrl
+            ? `background-image: url('${imageUrl}'); background-size: cover; background-position: center;`
+            : `background: ${item.gradient}`;
+        return `
+            <div class="grid-card" style="min-width: 160px;" onclick="openPlaceDetail('${item.id}')">
+                <div class="grid-card-image" style="${backgroundStyle}"></div>
+                <div class="grid-card-content">
+                    <h3 class="grid-card-name">${item.name}</h3>
+                    <p class="grid-card-meta">${item.category}</p>
+                    <span class="grid-card-rating">⭐ ${item.rating}</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 async function loadActivities() {
     if (!DOM.activitiesContainer) return;
-    
+
     const items = await fetchPlaces({ type: 'activity', limit: 4 });
-    
+
+    // Cache items for detail page
+    items.forEach(item => {
+        AppState.placesCache[item.id] = item;
+    });
+
     DOM.activitiesContainer.innerHTML = items.map(item => renderGridCard(item)).join('');
 }
 

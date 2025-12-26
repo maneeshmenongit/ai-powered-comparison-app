@@ -139,6 +139,8 @@ class RestaurantHandler(DomainHandler):
                 restaurants.extend(results)
             except Exception as e:
                 print(f"Error fetching from {provider_name}: {e}")
+                import traceback
+                traceback.print_exc()
                 continue
 
         # Sort by rating (best first)

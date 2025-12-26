@@ -4,7 +4,10 @@
  * JavaScript to connect UI designs to Flask backend
  */
 
-const API_BASE_URL = 'https://hopwise-api.up.railway.app/api';
+// Switch between local and production
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5001/api'
+    : 'https://hopwise-api.up.railway.app/api';
 
 // ============================================================================
 // API Client
