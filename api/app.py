@@ -30,7 +30,15 @@ from orchestration.domain_router import DomainRouter
 app = Flask(__name__)
 
 # Configure CORS for frontend
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {
+    "origins": [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://hopwise.app",
+        "https://www.hopwise.app",
+        "https://app.hopwise.app"
+    ]
+}})
 
 # Initialize services (singleton pattern)
 geocoder = GeocodingService()
