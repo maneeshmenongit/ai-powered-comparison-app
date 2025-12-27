@@ -106,21 +106,30 @@ function initDOM() {
 // ================================
 
 function navigateTo(pageName, data = null) {
+    // Track page view
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', {
+            page_title: pageName,
+            page_location: window.location.href,
+            page_path: `/${pageName}`
+        });
+    }
+
     // Hide all pages
     DOM.pages.forEach(page => page.classList.remove('active'));
-    
+
     // Show target page
     const targetPage = document.getElementById(`page-${pageName}`);
     if (targetPage) {
         targetPage.classList.add('active');
         AppState.currentPage = pageName;
-        
+
         // Update bottom nav
         updateBottomNav(pageName);
-        
+
         // Page-specific init
         onPageEnter(pageName, data);
-        
+
         // Scroll to top
         window.scrollTo(0, 0);
     }
@@ -844,9 +853,23 @@ function handleSearch(event) {
     const isRideQuery = rideKeywords.some(keyword => query.toLowerCase().includes(keyword));
 
     if (isRideQuery) {
+        // Track ride search event
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'search', {
+                search_term: query,
+                search_type: 'ride'
+            });
+        }
         // Use backend's intelligent parsing via /api/search
         parseAndNavigateToRides(query);
     } else {
+        // Track restaurant search event
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'search', {
+                search_term: query,
+                search_type: 'restaurant'
+            });
+        }
         navigateTo('search', query);
     }
 }
@@ -923,14 +946,26 @@ function handleFilterClick(filter) {
 }
 
 function selectRide(provider) {
+    // Track ride selection event
+    const selectedRide = document.querySelector(`.ride-card[data-provider="${provider}"]`);
+    const price = selectedRide?.querySelector('.ride-card-amount')?.textContent;
+    const vehicleType = selectedRide?.dataset.vehicleType;
+
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'select_content', {
+            content_type: 'ride',
+            item_id: provider,
+            vehicle_type: vehicleType,
+            price: price
+        });
+    }
+
     // Update selection
     document.querySelectorAll('.ride-card').forEach(card => {
         card.classList.toggle('selected', card.dataset.provider === provider);
     });
-    
+
     // Update CTA button
-    const selectedRide = document.querySelector(`.ride-card[data-provider="${provider}"]`);
-    const price = selectedRide?.querySelector('.ride-card-amount')?.textContent;
     const ctaBtn = document.getElementById('book-ride-btn');
     if (ctaBtn && price) {
         ctaBtn.textContent = `Book ${provider} • ${price}`;
@@ -959,6 +994,13 @@ function toggleSave(itemId) {
 }
 
 function openPlaceDetail(placeId) {
+    // Track restaurant click event
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'select_content', {
+            content_type: 'restaurant',
+            item_id: placeId
+        });
+    }
     navigateTo('detail', placeId);
 }
 
