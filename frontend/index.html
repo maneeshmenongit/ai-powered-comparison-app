@@ -7,15 +7,6 @@
     <meta name="description" content="Compare rides, discover food, explore activities. One app for smarter travel.">
     <meta name="theme-color" content="#FF8E53">
 
-    <!-- Google Analytics GA4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N7B9CJR4CD"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-N7B9CJR4CD');
-    </script>
-
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./assets/hopwise-logo-cropped.png">
     <link rel="apple-touch-icon" href="./assets/hopwise-logo-cropped.png">
@@ -455,19 +446,42 @@
 <script src="./js/hopwise-api.js"></script>
 <script src="./js/app.js"></script>
 <script>
-// Load Google Maps API with key from backend
-fetch('http://localhost:5001/api/config')
+// Load configuration from backend (API keys, GA4, etc.)
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5001/api'
+    : 'https://hopwise-api.up.railway.app/api';
+
+fetch(`${API_BASE_URL}/config`)
     .then(res => res.json())
     .then(config => {
+        // Load Google Maps API
         if (config.google_maps_api_key) {
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${config.google_maps_api_key}&libraries=places&callback=initAutocomplete`;
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
+            const mapsScript = document.createElement('script');
+            mapsScript.src = `https://maps.googleapis.com/maps/api/js?key=${config.google_maps_api_key}&libraries=places&callback=initAutocomplete`;
+            mapsScript.async = true;
+            mapsScript.defer = true;
+            document.head.appendChild(mapsScript);
+        }
+
+        // Load Google Analytics GA4
+        if (config.ga_measurement_id) {
+            // Load gtag.js script
+            const gtagScript = document.createElement('script');
+            gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${config.ga_measurement_id}`;
+            gtagScript.async = true;
+            document.head.appendChild(gtagScript);
+
+            // Initialize GA4
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', config.ga_measurement_id);
+
+            // Make gtag globally available
+            window.gtag = gtag;
         }
     })
-    .catch(err => console.error('Failed to load Google Maps API config:', err));
+    .catch(err => console.error('Failed to load API config:', err));
 </script>
 
 </body>

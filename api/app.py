@@ -91,7 +91,8 @@ def get_config():
     """Get frontend configuration including API keys."""
     import os
     return jsonify({
-        'google_maps_api_key': os.getenv('GOOGLE_PLACES_API_KEY', '')
+        'google_maps_api_key': os.getenv('GOOGLE_PLACES_API_KEY', ''),
+        'ga_measurement_id': os.getenv('GA_MEASUREMENT_ID', '')
     })
 
 
