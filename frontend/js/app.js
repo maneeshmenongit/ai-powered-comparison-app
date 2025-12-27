@@ -20,7 +20,14 @@ const AppState = {
         distance: null
     },
     loading: false,
-    error: null
+    error: null,
+    // Google Places Autocomplete
+    autocomplete: {
+        service: null,
+        sessionToken: null,
+        activeInput: null,
+        debounceTimer: null
+    }
 };
 
 // ================================
@@ -547,9 +554,10 @@ async function initRidesPage(params = {}) {
             displayOrigin = 'Current Location';
 
         } catch (error) {
-            // Geolocation failed or denied, use default
-            origin = pickupElement?.textContent || 'Times Square, NYC';
-            displayOrigin = origin;
+            // Geolocation failed or denied
+            // Use a default NYC location (Empire State Building)
+            origin = '40.748817,-73.985428'; // Empire State Building coordinates
+            displayOrigin = 'Empire State Building, NYC';
         }
     }
 
@@ -770,7 +778,22 @@ function renderSavedItems() {
 async function loadTrendingItems() {
     if (!DOM.trendingContainer) return;
 
-    const items = await fetchPlaces({ trending: true, limit: 5 });
+    // Get user's current location
+    let location = 'Times Square, NYC'; // Default fallback
+
+    try {
+        if (navigator.geolocation) {
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+            });
+            const { latitude, longitude } = position.coords;
+            location = `${latitude},${longitude}`;
+        }
+    } catch (error) {
+        console.log('Using default location for trending items:', error.message);
+    }
+
+    const items = await fetchPlaces({ trending: true, limit: 5, location });
 
     // Cache items for detail page
     items.forEach(item => {
@@ -815,7 +838,69 @@ async function loadActivities() {
 function handleSearch(event) {
     event.preventDefault();
     const query = DOM.homeSearchInput?.value || DOM.searchInput?.value || '';
-    navigateTo('search', query);
+
+    // Check if query is about rides
+    const rideKeywords = ['ride', 'uber', 'lyft', 'taxi', 'cab', 'drive', 'pick up', 'pickup', 'drop off', 'drop-off'];
+    const isRideQuery = rideKeywords.some(keyword => query.toLowerCase().includes(keyword));
+
+    if (isRideQuery) {
+        // Use backend's intelligent parsing via /api/search
+        parseAndNavigateToRides(query);
+    } else {
+        navigateTo('search', query);
+    }
+}
+
+async function parseAndNavigateToRides(query) {
+    // Use frontend parsing directly (backend /api/search has geocoding timeout issues)
+    const { origin, destination } = parseRideQuerySimple(query);
+    navigateTo('rides', { origin, destination });
+}
+
+function parseRideQuerySimple(query) {
+    const queryLower = query.toLowerCase();
+    let origin = null;
+    let destination = 'Times Square, NYC';
+
+    // Remove common filler words that appear before the destination "to"
+    // This handles patterns like "need to take ride to X" or "need to go to X"
+    let cleaned = queryLower;
+    cleaned = cleaned.replace(/\b(need|want|like)\s+(to|a)\s+(take|get|book|find|have)\s+(a|an|the)?\s*(ride|uber|lyft|taxi|cab)\s+to\s+/gi, 'to ');
+    cleaned = cleaned.replace(/\b(need|want|like)\s+to\s+(go|head|travel)\s+to\s+/gi, 'to ');
+
+    // Now extract destination after "to"
+    const toMatch = cleaned.match(/\bto\s+([a-z][a-z\s,]+?)(?:\s*$|\.)/i);
+    if (toMatch) {
+        let dest = toMatch[1].trim();
+
+        // Capitalize each word
+        dest = dest.split(' ').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+
+        // Add ", NYC" if not present and no state/city mentioned
+        if (!dest.includes(',') && !dest.toLowerCase().includes('nyc') && !dest.toLowerCase().includes('new york')) {
+            dest = `${dest}, NYC`;
+        }
+
+        destination = dest;
+    }
+
+    // Try to extract origin - look for "from" pattern
+    const fromMatch = queryLower.match(/\bfrom\s+([a-z\s,]+?)\s+to\s+/i);
+    if (fromMatch) {
+        let orig = fromMatch[1].trim();
+        // Capitalize
+        orig = orig.split(' ').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+        if (!orig.includes(',')) {
+            orig = `${orig}, NYC`;
+        }
+        origin = orig;
+    }
+
+    return { origin, destination };
 }
 
 function handleFilterClick(filter) {
@@ -875,6 +960,251 @@ function toggleSave(itemId) {
 
 function openPlaceDetail(placeId) {
     navigateTo('detail', placeId);
+}
+
+function editRideLocation(type) {
+    const elementId = type === 'pickup' ? 'ride-pickup' : 'ride-destination';
+    const element = document.getElementById(elementId);
+    const currentValue = element.textContent;
+
+    // Create an input field to replace the text
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentValue;
+    input.className = 'info-row-value';
+    input.style.cssText = 'border: none; border-bottom: 2px solid var(--color-sunset-orange); background: transparent; padding: 4px 0; font-size: inherit; width: 100%; outline: none;';
+
+    // Replace element with input
+    element.replaceWith(input);
+    input.focus();
+    input.select();
+
+    // Add autocomplete on input
+    input.addEventListener('input', (e) => {
+        const value = e.target.value;
+
+        // Get autocomplete predictions
+        getAutocompletePredictions(value, (predictions) => {
+            if (predictions.length > 0) {
+                showAutocompleteDropdown(input, predictions);
+            } else {
+                hideAutocompleteDropdown();
+            }
+        });
+    });
+
+    // Hide dropdown on Escape
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            hideAutocompleteDropdown();
+        }
+    });
+
+    // Handle when user finishes editing
+    const finishEditing = async () => {
+        // Hide autocomplete dropdown
+        hideAutocompleteDropdown();
+        const newValue = input.value.trim();
+
+        // Create text element to replace input
+        const textElement = document.createElement('div');
+        textElement.id = elementId;
+        textElement.className = 'info-row-value';
+        textElement.textContent = newValue || currentValue;
+
+        input.replaceWith(textElement);
+
+        // If value changed, re-fetch rides
+        if (newValue && newValue !== currentValue) {
+            const pickup = document.getElementById('ride-pickup').textContent;
+            const destination = document.getElementById('ride-destination').textContent;
+
+            // Convert "Current Location" or "Empire State Building, NYC" to coordinates
+            let origin = pickup;
+            if (pickup.includes('Current Location') || pickup === 'Empire State Building, NYC') {
+                origin = '40.748817,-73.985428';
+            }
+
+            // Re-fetch rides with new locations
+            await initRidesPage({ origin, destination });
+        }
+    };
+
+    // Finish on blur or Enter key
+    input.addEventListener('blur', finishEditing);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            finishEditing();
+        } else if (e.key === 'Escape') {
+            const textElement = document.createElement('div');
+            textElement.id = elementId;
+            textElement.className = 'info-row-value';
+            textElement.textContent = currentValue;
+            input.replaceWith(textElement);
+        }
+    });
+}
+
+// ================================
+// GOOGLE PLACES AUTOCOMPLETE
+// ================================
+
+// Initialize Google Places Autocomplete (called when Maps API loads)
+function initAutocomplete() {
+    if (typeof google === 'undefined' || !google.maps) {
+        console.warn('Google Maps API not loaded yet');
+        return;
+    }
+
+    // Initialize autocomplete service
+    AppState.autocomplete.service = new google.maps.places.AutocompleteService();
+    console.log('✓ Google Places Autocomplete initialized');
+}
+
+// Create a new session token for autocomplete
+function createSessionToken() {
+    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+        AppState.autocomplete.sessionToken = new google.maps.places.AutocompleteSessionToken();
+    }
+}
+
+// Get autocomplete predictions with debouncing and session token
+function getAutocompletePredictions(input, callback) {
+    // Don't trigger if less than 3 characters
+    if (!input || input.trim().length < 3) {
+        callback([]);
+        return;
+    }
+
+    // Clear previous debounce timer
+    if (AppState.autocomplete.debounceTimer) {
+        clearTimeout(AppState.autocomplete.debounceTimer);
+    }
+
+    // Debounce: wait 300ms before making API call
+    AppState.autocomplete.debounceTimer = setTimeout(() => {
+        if (!AppState.autocomplete.service) {
+            console.warn('Autocomplete service not initialized');
+            callback([]);
+            return;
+        }
+
+        // Create session token if not exists
+        if (!AppState.autocomplete.sessionToken) {
+            createSessionToken();
+        }
+
+        const request = {
+            input: input.trim(),
+            sessionToken: AppState.autocomplete.sessionToken,
+            // Restrict to NYC area
+            location: new google.maps.LatLng(40.7128, -74.0060), // NYC coordinates
+            radius: 50000, // 50km radius around NYC
+            componentRestrictions: { country: 'us' }
+        };
+
+        AppState.autocomplete.service.getPlacePredictions(request, (predictions, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                callback(predictions);
+            } else {
+                console.warn('Autocomplete failed:', status);
+                callback([]);
+            }
+        });
+    }, 300); // 300ms debounce
+}
+
+// Show autocomplete dropdown
+function showAutocompleteDropdown(inputElement, predictions) {
+    // Remove existing dropdown
+    hideAutocompleteDropdown();
+
+    if (!predictions || predictions.length === 0) {
+        return;
+    }
+
+    const dropdown = document.createElement('div');
+    dropdown.id = 'autocomplete-dropdown';
+    dropdown.className = 'autocomplete-dropdown';
+
+    predictions.forEach(prediction => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        item.textContent = prediction.description;
+        item.onclick = () => selectAutocompletePlace(inputElement, prediction);
+        dropdown.appendChild(item);
+    });
+
+    // Position dropdown below input
+    const rect = inputElement.getBoundingClientRect();
+    dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+    dropdown.style.left = `${rect.left}px`;
+    dropdown.style.width = `${rect.width}px`;
+
+    document.body.appendChild(dropdown);
+    AppState.autocomplete.activeInput = inputElement;
+}
+
+// Hide autocomplete dropdown
+function hideAutocompleteDropdown() {
+    const dropdown = document.getElementById('autocomplete-dropdown');
+    if (dropdown) {
+        dropdown.remove();
+    }
+    AppState.autocomplete.activeInput = null;
+}
+
+// Select a place from autocomplete
+function selectAutocompletePlace(inputElement, prediction) {
+    // Update input value
+    inputElement.value = prediction.description;
+
+    // Hide dropdown
+    hideAutocompleteDropdown();
+
+    // Clear session token (session complete)
+    createSessionToken();
+
+    // Trigger blur to save the location
+    inputElement.blur();
+}
+
+// Use current location for pickup
+function useCurrentLocation() {
+    if (!navigator.geolocation) {
+        showToast('Geolocation not supported by your browser', 'error');
+        return;
+    }
+
+    setLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const { latitude, longitude } = position.coords;
+            const origin = `${latitude},${longitude}`;
+
+            // Update pickup display
+            const pickupElement = document.getElementById('ride-pickup');
+            if (pickupElement) {
+                pickupElement.textContent = 'Current Location';
+            }
+
+            // Get current destination
+            const destinationElement = document.getElementById('ride-destination');
+            const destination = destinationElement ? destinationElement.textContent : 'Times Square, NYC';
+
+            // Re-fetch rides with current location
+            await initRidesPage({ origin, destination });
+
+            showToast('Using your current location', 'success');
+            setLoading(false);
+        },
+        (error) => {
+            console.error('Geolocation error:', error);
+            showToast('Unable to get your location', 'error');
+            setLoading(false);
+        }
+    );
 }
 
 function clearFilters() {
@@ -1145,5 +1475,10 @@ window.Hopwise = {
     selectRide,
     handleSearch,
     showToast,
+    editRideLocation,
+    useCurrentLocation,
     AppState
 };
+
+// Export autocomplete init function globally (called by Google Maps API)
+window.initAutocomplete = initAutocomplete;

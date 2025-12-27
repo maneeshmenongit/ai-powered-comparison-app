@@ -184,15 +184,16 @@
         <!-- Route Card -->
         <div class="section" style="padding-top: 0;">
             <div class="info-card">
-                <div class="info-row">
+                <div class="info-row" style="cursor: pointer; position: relative;">
                     <div class="info-row-icon" style="background: #D1FAE5;">📍</div>
-                    <div class="info-row-content">
+                    <div class="info-row-content" onclick="editRideLocation('pickup')" style="flex: 1;">
                         <div class="info-row-label">Pickup</div>
                         <div class="info-row-value" id="ride-pickup">Times Square, NYC</div>
                     </div>
-                    <span class="info-row-action">✎</span>
+                    <button onclick="useCurrentLocation()" class="current-location-btn" title="Use my current location" style="background: var(--color-sunset-orange); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600; cursor: pointer; margin-right: 8px;">📍 Current</button>
+                    <span class="info-row-action" onclick="editRideLocation('pickup')" style="cursor: pointer;">✎</span>
                 </div>
-                <div class="info-row">
+                <div class="info-row" onclick="editRideLocation('destination')" style="cursor: pointer;">
                     <div class="info-row-icon" style="background: #FEE2E2;">🎯</div>
                     <div class="info-row-content">
                         <div class="info-row-label">Destination</div>
@@ -444,6 +445,21 @@
 <!-- Scripts -->
 <script src="./js/hopwise-api.js"></script>
 <script src="./js/app.js"></script>
+<script>
+// Load Google Maps API with key from backend
+fetch('http://localhost:5001/api/config')
+    .then(res => res.json())
+    .then(config => {
+        if (config.google_maps_api_key) {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${config.google_maps_api_key}&libraries=places&callback=initAutocomplete`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+    })
+    .catch(err => console.error('Failed to load Google Maps API config:', err));
+</script>
 
 </body>
 </html>
