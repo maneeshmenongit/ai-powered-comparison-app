@@ -52,5 +52,8 @@ code_files.zip
 # Cache files (may contain API keys in URLs)
 data/cache/
 
+# Cost tracking data
+cost_data/
+
 # Logs
 *.log

@@ -8,7 +8,7 @@ from ..models import Restaurant
 
 class GooglePlacesClient:
     """Real Google Places API client."""
-    
+
     def __init__(self, api_key: str = None, rate_limiter=None):
         self.api_key = api_key or os.environ.get('GOOGLE_PLACES_API_KEY')
 
@@ -21,6 +21,22 @@ class GooglePlacesClient:
 
         if not self.api_key:
             raise ValueError("GOOGLE_PLACES_API_KEY not set")
+
+    def _log_api_call(self, api_type: str, endpoint: str, details: dict = None):
+        """Log API call to cost tracker."""
+        try:
+            from flask import current_app
+            tracker = current_app.config.get('COST_TRACKER')
+            if tracker:
+                tracker.log_api_call(
+                    api_type=api_type,
+                    endpoint=endpoint,
+                    request_count=1,
+                    details=details or {}
+                )
+        except Exception as e:
+            # Don't fail the API call if logging fails
+            print(f"Cost tracking error: {e}")
     
     def search(
         self,
@@ -66,7 +82,19 @@ class GooglePlacesClient:
 
             response.raise_for_status()
             data = response.json()
-            
+
+            # Log API call for cost tracking
+            self._log_api_call(
+                api_type="text_search_pro",
+                endpoint="places:searchText",
+                details={
+                    "query": query,
+                    "location": f"{latitude},{longitude}",
+                    "limit": limit,
+                    "results_count": len(data.get('places', []))
+                }
+            )
+
             restaurants = []
             for place in data.get('places', []):
                 # Convert Google data to our format

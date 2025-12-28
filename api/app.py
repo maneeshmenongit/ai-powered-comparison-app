@@ -25,6 +25,7 @@ from domains.rideshare.handler import RideShareHandler
 from domains.restaurants.handler import RestaurantHandler
 from core import GeocodingService, CacheService, RateLimiter
 from orchestration.domain_router import DomainRouter
+from cost_tracker import CostTracker, create_cost_tracker_blueprint
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -44,6 +45,16 @@ CORS(app, resources={r"/api/*": {
 geocoder = GeocodingService()
 cache = CacheService()
 rate_limiter = RateLimiter()
+
+# Initialize cost tracker
+cost_tracker = CostTracker(data_dir="./cost_data")
+app.config['COST_TRACKER'] = cost_tracker
+
+# Register cost tracker endpoints
+app.register_blueprint(
+    create_cost_tracker_blueprint(cost_tracker),
+    url_prefix='/api/costs'
+)
 
 rideshare_handler = RideShareHandler(
     geocoding_service=geocoder,
