@@ -1,0 +1,42 @@
+# Admin tools (internal only, not for production)
+admin/
+
+# Backend (deployed separately on Railway)
+api/
+src/
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+*.pyc
+
+# Development files
+.env
+.env.local
+cost_data/
+data/
+
+# Test files
+test_*.py
+test_*.js
+test_*.html
+*.test.js
+*.spec.js
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+node_modules/
+.DS_Store
