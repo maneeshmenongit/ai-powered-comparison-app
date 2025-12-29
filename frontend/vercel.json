@@ -1,7 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "echo 'No build needed for static frontend'",
-  "outputDirectory": "frontend",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
@@ -22,6 +20,5 @@
         }
       ]
     }
-  ],
-  "rewrites": []
+  ]
 }
