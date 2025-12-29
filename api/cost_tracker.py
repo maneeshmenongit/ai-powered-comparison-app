@@ -54,7 +54,9 @@ GOOGLE_PLACES_PRICING = {
 STATIC_COSTS = {
     "domain": {"cost": 15.99, "frequency": "annual", "provider": "Hostinger", "description": "hopwise.app"},
     "email": {"cost": 4.20, "frequency": "annual", "provider": "Hostinger", "description": "hello@hopwise.app"},
-    "hosting_netlify": {"cost": 0.00, "frequency": "monthly", "provider": "Netlify", "description": "Free tier"},
+    "hosting_vercel": {"cost": 0.00, "frequency": "monthly", "provider": "Vercel", "description": "Free tier (frontend)"},
+    "hosting_railway": {"cost": 0.00, "frequency": "monthly", "provider": "Railway", "description": "Free tier (backend)"},
+    "hosting_netlify": {"cost": 0.00, "frequency": "monthly", "provider": "Netlify", "description": "Suspended (marketing page)"},
 }
 
 # Monthly credit from Google
@@ -389,13 +391,35 @@ class CostTracker:
             "monthly_amortized": round(annual_total / 12 + monthly_total, 2)
         }
     
+    def get_recent_calls(self, limit: int = 20) -> List[Dict]:
+        """
+        Get recent API calls from today's log.
+
+        Args:
+            limit: Maximum number of calls to return (default 20)
+
+        Returns:
+            List of recent API call records, newest first
+        """
+        day_key = self._get_day_key()
+        log_file = self._get_log_file(day_key)
+
+        if not log_file.exists():
+            return []
+
+        with open(log_file, 'r') as f:
+            logs = json.load(f)
+
+        # Return most recent calls first
+        return logs[-limit:][::-1]
+
     def get_full_report(self) -> Dict:
         """Get complete cost report for dashboard"""
         monthly = self.calculate_monthly_costs()
         budget = self.get_budget_status()
         static = self.get_static_costs()
         today = self.get_daily_summary()
-        
+
         return {
             "generated_at": datetime.now().isoformat(),
             "budget_status": budget,
@@ -462,7 +486,13 @@ def create_cost_tracker_blueprint(tracker: CostTracker):
             "monthly_credit": GOOGLE_MONTHLY_CREDIT,
             "alert_thresholds": ALERT_THRESHOLDS
         })
-    
+
+    @bp.route('/recent', methods=['GET'])
+    def get_recent():
+        """Get recent API calls. Optional: ?limit=N (default 20)"""
+        limit = request.args.get('limit', 20, type=int)
+        return jsonify(tracker.get_recent_calls(limit))
+
     return bp
 
 
