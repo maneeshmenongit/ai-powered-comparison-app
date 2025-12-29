@@ -1,0 +1,23 @@
+[build]
+  publish = "."
+  command = "echo 'No build required - static HTML'"
+
+[[redirects]]
+  from = "/*"
+  to = "/dashboard.html"
+  status = 200
+
+[context.production]
+  environment = { NODE_ENV = "production" }
+
+# Password protection via Netlify Identity + Basic Auth
+# Note: This requires enabling Netlify Identity in the Netlify dashboard
+# and setting up password protection in Site Settings > Identity
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"

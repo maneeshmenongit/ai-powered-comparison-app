@@ -39,6 +39,7 @@ CORS(app, resources={r"/api/*": {
         "https://hopwise.app",
         "https://www.hopwise.app",
         "https://app.hopwise.app",
+        "https://*.netlify.app",  # For admin dashboard on Netlify (including preview deploys)
         "null"  # For file:// protocol (admin dashboard opened directly)
     ]
 }})
