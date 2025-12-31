@@ -67,7 +67,7 @@ class SavedRestaurant(Base):
     """SavedRestaurant model - stores user's saved restaurants."""
     __tablename__ = 'saved_restaurants'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
     restaurant_id = Column(String(255), nullable=False, index=True)
     restaurant_data = Column(JSONB, nullable=False)  # Store full restaurant object as JSON
@@ -79,7 +79,7 @@ class SavedRestaurant(Base):
     def to_dict(self):
         """Convert saved restaurant to dictionary."""
         return {
-            'id': self.id,
+            'id': str(self.id),  # Convert UUID to string for JSON
             'user_id': str(self.user_id),  # Convert UUID to string for JSON
             'restaurant_id': self.restaurant_id,
             'restaurant_data': self.restaurant_data,

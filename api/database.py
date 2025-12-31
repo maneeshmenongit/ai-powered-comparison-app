@@ -4,9 +4,19 @@ SQLAlchemy database setup for PostgreSQL.
 """
 
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session, declarative_base
 from sqlalchemy.pool import NullPool
+
+# Load environment variables
+# Priority: .env.local > .env.staging > .env
+if os.path.exists('.env.local'):
+    load_dotenv('.env.local', override=True)
+elif os.path.exists('.env.staging'):
+    load_dotenv('.env.staging', override=True)
+else:
+    load_dotenv()
 
 # Get database URL from environment
 DATABASE_URL = os.getenv('DATABASE_URL', '')
