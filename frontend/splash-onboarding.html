@@ -1,0 +1,112 @@
+<!-- ====================================================================
+     SPLASH SCREEN & ONBOARDING COMPONENTS
+     ==================================================================== -->
+
+<!-- Splash Screen -->
+<div id="splash-screen" class="splash-screen">
+    <div class="splash-background"></div>
+    <div class="splash-content">
+        <div class="splash-logo">
+            <img src="./assets/hopwise-logo-cropped.png" alt="Hopwise">
+        </div>
+        <div class="splash-brand">Hopwise</div>
+        <div class="splash-tagline">Every stop matters. Hop smarter!</div>
+
+        <div class="splash-loader">
+            <div class="loader-icon">✈️</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="loader-text">Planning your journey...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Onboarding Container -->
+<div id="onboarding-container" class="onboarding-container">
+    <!-- Skip Button (shared across screens) -->
+    <button id="skip-btn" class="onboarding-skip" onclick="window.splashOnboarding.skipOnboarding()">
+        Skip
+    </button>
+
+    <!-- Screen 1: Compare Rides -->
+    <div id="onboarding-screen-1" class="onboarding-screen">
+        <div class="onboarding-background" style="background-image: url('./assets/background/sticker_background_v1.png');"></div>
+        <div class="onboarding-content">
+            <div class="onboarding-icon">🚗</div>
+            <h1 class="onboarding-title">
+                <span class="highlight">Compare Rides</span> Instantly
+            </h1>
+            <p class="onboarding-description">
+                Get real-time prices from Uber and Lyft side-by-side. Save money on every ride.
+            </p>
+
+            <div class="onboarding-dots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+
+            <div class="onboarding-actions">
+                <button class="onboarding-btn onboarding-btn-primary" onclick="window.splashOnboarding.nextScreen()">
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 2: Discover Places -->
+    <div id="onboarding-screen-2" class="onboarding-screen">
+        <div class="onboarding-background" style="background-image: url('./assets/background/sticker_background_v2.png');"></div>
+        <div class="onboarding-content">
+            <div class="onboarding-icon">🍽️</div>
+            <h1 class="onboarding-title">
+                Discover <span class="highlight">Great Places</span>
+            </h1>
+            <p class="onboarding-description">
+                Find top-rated restaurants, cafes, bars, and ice cream spots near you. Filter by cuisine, price, and more.
+            </p>
+
+            <div class="onboarding-dots">
+                <div class="dot"></div>
+                <div class="dot active"></div>
+                <div class="dot"></div>
+            </div>
+
+            <div class="onboarding-actions">
+                <button class="onboarding-btn onboarding-btn-primary" onclick="window.splashOnboarding.nextScreen()">
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 3: Smarter Travel -->
+    <div id="onboarding-screen-3" class="onboarding-screen">
+        <div class="onboarding-background" style="background-image: url('./assets/background/sticker_background_v3.png');"></div>
+        <div class="onboarding-content">
+            <div class="onboarding-icon">🗺️</div>
+            <h1 class="onboarding-title">
+                One App. <span class="highlight">Smarter Travel.</span>
+            </h1>
+            <p class="onboarding-description">
+                Plan your entire journey in one place. Compare rides, discover food, explore activities—all seamlessly integrated.
+            </p>
+
+            <div class="onboarding-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot active"></div>
+            </div>
+
+            <div class="onboarding-actions">
+                <button class="onboarding-btn onboarding-btn-primary" onclick="window.splashOnboarding.finishOnboarding()">
+                    Get Started
+                </button>
+                <button class="onboarding-btn onboarding-btn-secondary" onclick="window.splashOnboarding.showSignIn()">
+                    Sign In
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

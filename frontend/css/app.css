@@ -146,6 +146,7 @@ a {
     background: var(--color-white);
     position: relative;
     overflow-x: hidden;
+    display: none; /* Initially hidden, shown after splash/onboarding */
 }
 
 .app-content {

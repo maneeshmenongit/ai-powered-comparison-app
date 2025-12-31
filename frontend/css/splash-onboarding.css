@@ -1,0 +1,353 @@
+/* ====================================================================
+   SPLASH SCREEN & ONBOARDING STYLES
+   ==================================================================== */
+
+/* Splash Screen */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #FF8E53 0%, #FE6B8B 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease-out;
+}
+
+.splash-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.splash-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../assets/background/sticker_background_v3.png');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.4;
+}
+
+.splash-content {
+    position: relative;
+    text-align: center;
+    color: white;
+    z-index: 1;
+}
+
+.splash-logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.splash-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+}
+
+.splash-brand {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.splash-tagline {
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0.95;
+    margin-bottom: 48px;
+}
+
+.splash-loader {
+    margin-top: 32px;
+}
+
+.loader-icon {
+    font-size: 24px;
+    margin-bottom: 12px;
+    animation: hop 1s ease-in-out infinite;
+}
+
+.progress-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    margin: 0 auto 12px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,1));
+    border-radius: 2px;
+    animation: slide 1.5s ease-in-out infinite;
+}
+
+.loader-text {
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+/* Onboarding Container */
+.onboarding-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998;
+    display: none;
+}
+
+.onboarding-container.active {
+    display: block;
+}
+
+.onboarding-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #FF8E53 0%, #FE6B8B 100%);
+    display: none;
+    flex-direction: column;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.onboarding-screen.active {
+    display: flex;
+}
+
+.onboarding-screen.slide-out-left {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.onboarding-screen.slide-in-right {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.onboarding-screen.slide-in-right.active {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.onboarding-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.35;
+}
+
+.onboarding-skip {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s;
+}
+
+.onboarding-skip:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.onboarding-skip.hidden {
+    display: none;
+}
+
+.onboarding-content {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+    color: white;
+    z-index: 1;
+}
+
+.onboarding-icon {
+    font-size: 80px;
+    margin-bottom: 32px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.onboarding-title {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 16px;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.onboarding-title .highlight {
+    background: linear-gradient(135deg, #FFE5B4, #FFB347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.onboarding-description {
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+    opacity: 0.95;
+    max-width: 300px;
+    margin-bottom: 48px;
+}
+
+.onboarding-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s;
+}
+
+.dot.active {
+    width: 24px;
+    background: white;
+}
+
+.onboarding-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.onboarding-btn {
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.onboarding-btn-primary {
+    background: white;
+    color: #FF8E53;
+}
+
+.onboarding-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.onboarding-btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
+}
+
+.onboarding-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes hop {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-15px) rotate(-5deg);
+    }
+    50% {
+        transform: translateY(0) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-10px) rotate(5deg);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-20px) scale(1.05);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .splash-logo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .splash-brand {
+        font-size: 28px;
+    }
+
+    .splash-tagline {
+        font-size: 14px;
+    }
+
+    .onboarding-icon {
+        font-size: 64px;
+    }
+
+    .onboarding-title {
+        font-size: 24px;
+    }
+
+    .onboarding-description {
+        font-size: 14px;
+    }
+}
