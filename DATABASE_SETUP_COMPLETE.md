@@ -52,12 +52,14 @@ JWT_SECRET_KEY=dev-secret-key-for-testing-only
 
 #### Staging ([.env.staging](.env.staging))
 ```env
-DATABASE_URL=postgresql://...railway.app.../hopwise_staging
-JWT_SECRET_KEY=staging-secret-key
+DATABASE_URL=postgresql://postgres:***@centerbeam.proxy.rlwy.net:56369/railway
+JWT_SECRET_KEY=staging-secret-key-change-this
 ```
 
-**Status:** ⚠️ Database not yet created on Railway
-- TODO: Create `hopwise_staging` database on Railway
+**Status:** ✅ Database created and initialized
+- Host: centerbeam.proxy.rlwy.net:56369
+- Database: `railway` (Railway default name)
+- Tables: users, saved_restaurants (both UUID)
 
 #### Production ([.env](.env))
 ```env
@@ -65,9 +67,11 @@ DATABASE_URL=postgresql://postgres:***@nozomi.proxy.rlwy.net:51066/railway
 JWT_SECRET_KEY=super-secure-production-key-change-this
 ```
 
-**Status:** ✅ Currently using Railway `railway` database
-- TODO: Create dedicated `hopwise_prod` database
-- TODO: Migrate from `railway` to `hopwise_prod`
+**Status:** ✅ Production database migrated to UUID
+- Host: nozomi.proxy.rlwy.net:51066
+- Database: `railway` (Railway default name)
+- Tables: users, saved_restaurants (both UUID)
+- Contains 15 users (10 test users identified for cleanup)
 
 ---
 
@@ -214,12 +218,13 @@ test-device-456  ← Will be cleaned up
 
 ## Database Environments Summary
 
-| Environment | Database | Status | Tables |
-|-------------|----------|--------|--------|
-| **Local Dev** | `hopwise_dev` (localhost) | ✅ Created & Initialized | users, saved_restaurants (UUID) |
-| **Staging** | `hopwise_staging` (Railway) | ⚠️ Not created yet | N/A |
-| **Production** | `railway` (Railway) | ✅ Migrated to UUID | users, saved_restaurants (UUID) |
-| **Future Prod** | `hopwise_prod` (Railway) | ⚠️ Not created yet | N/A |
+**Note:** Railway PostgreSQL databases always use the name `railway` (cannot be renamed). Different environments are distinguished by separate PostgreSQL service instances (different hosts/ports).
+
+| Environment | Host | Database Name | Status | Tables |
+|-------------|------|---------------|--------|--------|
+| **Local Dev** | localhost:5432 | `hopwise_dev` | ✅ Created & Initialized | users, saved_restaurants (UUID) |
+| **Staging** | centerbeam.proxy.rlwy.net:56369 | `railway` | ✅ Created & Initialized | users, saved_restaurants (UUID) |
+| **Production** | nozomi.proxy.rlwy.net:51066 | `railway` | ✅ Migrated to UUID | users, saved_restaurants (UUID) |
 
 ---
 
@@ -235,20 +240,9 @@ test-device-456  ← Will be cleaned up
    - Removes 1 test saved restaurant
    - Keeps only 5 real users with 5 saved restaurants
 
-### Future (When Ready)
+### Future (Optional)
 
-2. **Create Staging Database on Railway:**
-   - Create new PostgreSQL database: `hopwise_staging`
-   - Update `.env.staging` with connection URL
-   - Run: `./venv/bin/python init_database.py`
-
-3. **Create Production Database on Railway:**
-   - Create new PostgreSQL database: `hopwise_prod`
-   - Update `.env` with connection URL
-   - Migrate data from `railway` to `hopwise_prod`
-   - Update deployment to use `hopwise_prod`
-
-4. **Update Backend to Handle UUID Saved Restaurant IDs:**
+2. **Update Backend to Handle UUID Saved Restaurant IDs:**
    - Update any DELETE endpoints that use saved_id parameter
    - Ensure UUID strings are converted properly: `uuid.UUID(saved_id_str)`
 
