@@ -52,7 +52,7 @@
         <div class="onboarding-content">
             <div class="onboarding-icon">🚗</div>
             <h1 class="onboarding-title"><span class="highlight">Compare Rides</span> Instantly</h1>
-            <p class="onboarding-description">Get real-time prices from Uber and Lyft side-by-side. Save money on every ride.</p>
+            <p class="onboarding-description">Compare ride options from Uber and Lyft side-by-side. Find the best option for your trip.</p>
             <div class="onboarding-dots">
                 <div class="dot active"></div>
                 <div class="dot"></div>
@@ -175,7 +175,7 @@
                 </span>
                 <div class="banner-content">
                     <div class="banner-title">Compare Rides Instantly</div>
-                    <div class="banner-text">Uber vs Lyft — find the best price</div>
+                    <div class="banner-text">Uber vs Lyft — compare your options (Demo)</div>
                 </div>
             </div>
         </div>
@@ -265,12 +265,28 @@
     
     <!-- ========== PAGE: RIDES COMPARISON ========== -->
     <div id="page-rides" class="page">
-        
+
         <header class="header">
             <button class="header-back" onclick="Hopwise.goBack()">←</button>
             <h1 class="header-title">Compare Rides</h1>
         </header>
-        
+
+        <!-- DEMO MODE DISCLAIMER -->
+        <div class="section" style="padding-top: 16px; padding-bottom: 0;">
+            <div style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-left: 4px solid #FF9800; border-radius: 12px; padding: 16px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: start; gap: 12px;">
+                    <div style="font-size: 24px; line-height: 1;">🧪</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 800; font-size: 14px; color: #E65100; margin-bottom: 4px;">DEMO MODE</div>
+                        <div style="font-size: 13px; color: #424242; line-height: 1.4;">
+                            Sample pricing shown for demonstration only.<br>
+                            <strong>Real-time Uber & Lyft pricing launching soon!</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Route Card -->
         <div class="section" style="padding-top: 0;">
             <div class="info-card">

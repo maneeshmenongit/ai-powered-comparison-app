@@ -1156,8 +1156,8 @@ function renderRideResults(rides) {
         recommendationEl.innerHTML = `
             <span class="banner-icon">💡</span>
             <div class="banner-content">
-                <div class="banner-title">${providerDisplayName} is your best bet!</div>
-                <div class="banner-text">${savingsText} with ${bestPriceRide.pickup} min pickup time.</div>
+                <div class="banner-title">${providerDisplayName} is your best bet! (Demo)</div>
+                <div class="banner-text">${savingsText} with ${bestPriceRide.pickup} min pickup time. <em>Sample data</em></div>
             </div>
         `;
     }
