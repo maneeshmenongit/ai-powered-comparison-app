@@ -29,7 +29,7 @@ from domains.rideshare.handler import RideShareHandler
 from domains.restaurants.handler import RestaurantHandler
 from core import GeocodingService, CacheService, RateLimiter
 from orchestration.domain_router import DomainRouter
-from cost_tracker import CostTracker, create_cost_tracker_blueprint
+from api.cost_tracker import CostTracker, create_cost_tracker_blueprint
 
 # Database imports
 from api.database import SessionLocal, close_db
