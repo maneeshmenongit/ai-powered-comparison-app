@@ -10,11 +10,13 @@
 const AppState = {
     currentPage: 'home',
     user: { name: 'Alex' },
+    deviceId: null, // UUID for device-based favorites
     savedItems: [],
+    savedRestaurantIds: new Set(), // Quick lookup for saved status
     searchResults: [],
     placesCache: {}, // Cache all fetched places by ID for detail page
     filters: {
-        category: 'all',
+        category: 'Food',
         priceRange: null,
         rating: null,
         distance: null
@@ -29,6 +31,195 @@ const AppState = {
         debounceTimer: null
     }
 };
+
+// ================================
+// 1B. DEVICE ID MANAGEMENT
+// ================================
+
+/**
+ * Get or generate device ID for favorites feature
+ * Stores in localStorage for persistence
+ */
+function getDeviceId() {
+    if (AppState.deviceId) {
+        return AppState.deviceId;
+    }
+
+    // Check localStorage
+    let deviceId = localStorage.getItem('hopwise_device_id');
+
+    if (!deviceId) {
+        // Generate new UUID
+        deviceId = generateUUID();
+        localStorage.setItem('hopwise_device_id', deviceId);
+        console.log('Generated new device ID:', deviceId);
+    }
+
+    AppState.deviceId = deviceId;
+    return deviceId;
+}
+
+/**
+ * Generate a UUID v4
+ */
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+// ================================
+// 1C. FAVORITES MANAGEMENT
+// ================================
+
+/**
+ * Load saved restaurants from API
+ */
+async function loadSavedRestaurants() {
+    try {
+        // Check if user is authenticated
+        if (!window.authManager || !window.authManager.isAuthenticated()) {
+            console.log('User not authenticated, skipping saved restaurants load');
+            return [];
+        }
+
+        const api = new HopwiseAPI();
+        const response = await api.getSavedRestaurants();
+
+        if (response.success && response.data) {
+            AppState.savedItems = response.data;
+            // Update the Set for quick lookup
+            AppState.savedRestaurantIds.clear();
+            response.data.forEach(item => {
+                AppState.savedRestaurantIds.add(item.restaurant_id);
+            });
+
+            console.log(`Loaded ${response.data.length} saved restaurants`);
+            return response.data;
+        }
+        return [];
+    } catch (error) {
+        console.error('Error loading saved restaurants:', error);
+        return [];
+    }
+}
+
+/**
+ * Save a restaurant to favorites
+ * @param {object} restaurant - Restaurant data object
+ */
+async function saveRestaurant(restaurant) {
+    try {
+        // Check if user is authenticated
+        if (!window.authManager || !window.authManager.isAuthenticated()) {
+            showToast('Please login to save restaurants', 'info');
+            navigateTo('login');
+            return false;
+        }
+
+        const api = new HopwiseAPI();
+
+        // Prepare restaurant data
+        const restaurantId = restaurant.place_id || restaurant.id;
+        const restaurantData = {
+            place_id: restaurantId,
+            name: restaurant.name,
+            rating: restaurant.rating,
+            price_level: restaurant.price_level,
+            vicinity: restaurant.vicinity || restaurant.location,
+            image: restaurant.image || restaurant.image_url,
+            category: restaurant.category,
+            tags: restaurant.tags,
+            phone: restaurant.phone,
+            website: restaurant.website,
+            hours: restaurant.hours,
+            distance: restaurant.distance
+        };
+
+        const response = await api.saveRestaurant(restaurantId, restaurantData);
+
+        if (response.success) {
+            // Add to state
+            AppState.savedItems.push(response.data);
+            AppState.savedRestaurantIds.add(restaurantId);
+
+            showToast('Saved to favorites!', 'success');
+            // Don't call updateSaveButtons here - already done optimistically in toggleSave
+            return true;
+        }
+    } catch (error) {
+        if (error.message.includes('already saved')) {
+            showToast('Already in favorites', 'info');
+        } else {
+            console.error('Error saving restaurant:', error);
+            showToast('Failed to save', 'error');
+        }
+        return false;
+    }
+}
+
+/**
+ * Remove a restaurant from favorites
+ * @param {number} savedId - The saved restaurant ID from the database
+ * @param {string} restaurantId - The restaurant place_id for UI updates
+ */
+async function removeSavedRestaurant(savedId, restaurantId) {
+    try {
+        // Check if user is authenticated
+        if (!window.authManager || !window.authManager.isAuthenticated()) {
+            showToast('Please login to manage saved restaurants', 'info');
+            navigateTo('login');
+            return false;
+        }
+
+        const api = new HopwiseAPI();
+
+        const response = await api.removeSavedRestaurant(savedId);
+
+        if (response.success) {
+            // Remove from state
+            AppState.savedItems = AppState.savedItems.filter(item => item.id !== savedId);
+            AppState.savedRestaurantIds.delete(restaurantId);
+
+            showToast('Removed from favorites', 'success');
+            // Don't call updateSaveButtons here - already done optimistically in toggleSave
+
+            // Refresh saved page if we're on it
+            if (AppState.currentPage === 'saved') {
+                await initSavedPage();
+            }
+
+            return true;
+        }
+    } catch (error) {
+        console.error('Error removing saved restaurant:', error);
+        showToast('Failed to remove', 'error');
+        return false;
+    }
+}
+
+/**
+ * Update all save buttons for a restaurant
+ * @param {string} restaurantId - Place ID of the restaurant
+ * @param {boolean} isSaved - Whether the restaurant is saved
+ */
+function updateSaveButtons(restaurantId, isSaved) {
+    document.querySelectorAll(`[data-save-id="${restaurantId}"]`).forEach(btn => {
+        btn.classList.toggle('saved', isSaved);
+        btn.innerHTML = isSaved ? '❤️' : '🤍';
+    });
+}
+
+/**
+ * Check if a restaurant is saved
+ * @param {string} restaurantId - Place ID of the restaurant
+ * @returns {boolean}
+ */
+function isRestaurantSaved(restaurantId) {
+    return AppState.savedRestaurantIds.has(restaurantId);
+}
 
 // ================================
 // 2. DOM ELEMENTS CACHE
@@ -137,12 +328,67 @@ function navigateTo(pageName, data = null) {
 
 function updateBottomNav(activePage) {
     if (!DOM.bottomNav) return;
-    
+
     const navItems = DOM.bottomNav.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         const page = item.dataset.page;
         item.classList.toggle('active', page === activePage);
     });
+}
+
+/**
+ * Update bottom navigation visibility based on auth status
+ * Guests see: Home, Search, Rides (3 tabs)
+ * Authenticated users see: Home, Search, Rides, Saved, Profile (5 tabs)
+ */
+function updateBottomNavForAuthStatus() {
+    if (!DOM.bottomNav) return;
+
+    const isAuth = window.authManager && window.authManager.isAuthenticated();
+    const navItems = DOM.bottomNav.querySelectorAll('.nav-item');
+
+    navItems.forEach(item => {
+        const page = item.dataset.page;
+
+        // Show only Home, Search, and Rides for guests
+        if (!isAuth) {
+            if (page === 'saved' || page === 'profile') {
+                item.style.display = 'none';
+            } else {
+                item.style.display = 'flex';
+            }
+        } else {
+            // Show all tabs for authenticated users
+            item.style.display = 'flex';
+        }
+    });
+}
+
+/**
+ * Update home page header actions based on auth status
+ * Guests see: Sign Up button
+ * Authenticated users see: Notifications and Profile icons
+ */
+function updateHomeHeaderActions() {
+    const headerActions = document.getElementById('home-header-actions');
+    if (!headerActions) return;
+
+    const isAuth = window.authManager && window.authManager.isAuthenticated();
+
+    if (!isAuth) {
+        // Guest user - show Sign Up button
+        headerActions.innerHTML = `
+            <button class="btn btn-primary" onclick="navigateTo('register')" style="padding: 10px 20px; font-weight: 700;">
+                Sign Up
+            </button>
+        `;
+    } else {
+        // Authenticated user - show notifications and profile
+        headerActions.innerHTML = `
+            <button class="header-action">🔔</button>
+            <button class="header-action" onclick="navigateTo('profile')">👤</button>
+        `;
+    }
 }
 
 function onPageEnter(pageName, data) {
@@ -164,6 +410,12 @@ function onPageEnter(pageName, data) {
             break;
         case 'profile':
             initProfilePage();
+            break;
+        case 'login':
+            // No initialization needed for login page
+            break;
+        case 'register':
+            // No initialization needed for register page
             break;
     }
 }
@@ -198,6 +450,9 @@ async function fetchPlaces(params = {}) {
         // Transform API response to match expected format
         // Note: Response has nested structure: response.data.data.results
         const results = response.data?.data?.results || response.data?.results || [];
+        const guestLimited = response.data?.data?.guest_limited || false;
+        const message = response.data?.data?.message || '';
+
         const places = results.map(restaurant => ({
             id: restaurant.id,
             name: restaurant.name,
@@ -221,7 +476,13 @@ async function fetchPlaces(params = {}) {
 
         AppState.searchResults = places;
         setLoading(false);
-        return places;
+
+        // Return object with guest limitation info
+        return {
+            results: places,
+            guestLimited: guestLimited,
+            message: message
+        };
 
     } catch (error) {
         setLoading(false);
@@ -323,12 +584,13 @@ async function fetchPlaceDetail(placeId) {
  * Render place card (search results)
  */
 function renderPlaceCard(place) {
-    const isSaved = AppState.savedItems.includes(place.id);
+    const placeId = place.place_id || place.id;
+    const isSaved = isRestaurantSaved(placeId);
     const imageUrl = place.image || place.image_url;
     const tags = Array.isArray(place.tags) ? place.tags : [];
 
     return `
-        <div class="place-card" data-id="${place.id}" onclick="openPlaceDetail('${place.id}')">
+        <div class="place-card" data-id="${placeId}" onclick="openPlaceDetail('${placeId}')">
             <div class="place-card-image">
                 ${imageUrl ? `<img src="${imageUrl}" alt="${place.name}">` : ''}
                 ${place.badge ? `<span class="place-card-badge">${place.badge}</span>` : ''}
@@ -342,7 +604,7 @@ function renderPlaceCard(place) {
                 <div class="place-card-footer">
                     <span class="place-card-rating">⭐ ${place.rating}</span>
                     <span class="place-card-distance">${place.distance}</span>
-                    <button class="place-card-save ${isSaved ? 'saved' : ''}" data-save-id="${place.id}" onclick="event.stopPropagation(); toggleSave('${place.id}')">
+                    <button class="place-card-save ${isSaved ? 'saved' : ''}" data-save-id="${placeId}" onclick="event.stopPropagation(); toggleSave('${placeId}')">
                         ${isSaved ? '❤️' : '🤍'}
                     </button>
                 </div>
@@ -355,16 +617,17 @@ function renderPlaceCard(place) {
  * Render grid card (saved items, trending)
  */
 function renderGridCard(item) {
-    const isSaved = AppState.savedItems.includes(item.id);
+    const itemId = item.place_id || item.id;
+    const isSaved = isRestaurantSaved(itemId);
     const imageUrl = item.image || item.image_url;
     const backgroundStyle = imageUrl
         ? `background-image: url('${imageUrl}'); background-size: cover; background-position: center;`
         : `background: ${item.gradient || 'var(--color-gray-100)'}`;
 
     return `
-        <div class="grid-card" data-id="${item.id}" onclick="openPlaceDetail('${item.id}')">
+        <div class="grid-card" data-id="${itemId}" onclick="openPlaceDetail('${itemId}')">
             <div class="grid-card-image" style="${backgroundStyle}">
-                <button class="grid-card-save" data-save-id="${item.id}" onclick="event.stopPropagation(); toggleSave('${item.id}')">
+                <button class="grid-card-save ${isSaved ? 'saved' : ''}" data-save-id="${itemId}" onclick="event.stopPropagation(); toggleSave('${itemId}')">
                     ${isSaved ? '❤️' : '🤍'}
                 </button>
                 ${item.category ? `<span class="grid-card-category">${item.categoryIcon} ${item.category}</span>` : ''}
@@ -488,13 +751,26 @@ function initHomePage() {
         if (hour < 12) greeting = 'Good morning';
         else if (hour < 18) greeting = 'Good afternoon';
 
-        const userName = AppState.user?.name || '';
-        DOM.homeGreeting.textContent = `${greeting} ${userName}! 👋`;
+        // Get username from authenticated user or show generic greeting for guests
+        const isAuth = window.authManager && window.authManager.isAuthenticated();
+        const userName = isAuth ? (window.authManager.getUser()?.username || '') : '';
+
+        if (isAuth && userName) {
+            DOM.homeGreeting.textContent = `${greeting}, ${userName}! 👋`;
+        } else {
+            DOM.homeGreeting.textContent = `${greeting}! 👋`;
+        }
     }
-    
+
+    // Update header actions based on auth status
+    updateHomeHeaderActions();
+
+    // Update bottom navigation based on auth status
+    updateBottomNavForAuthStatus();
+
     // Load trending items
     loadTrendingItems();
-    
+
     // Load activities
     loadActivities();
 }
@@ -503,17 +779,22 @@ async function initSearchPage(query = '') {
     if (DOM.searchInput && query) {
         DOM.searchInput.value = query;
     }
-    
+
     // Show loading
     if (DOM.searchResults) {
         DOM.searchResults.innerHTML = Array(4).fill(renderPlaceCardSkeleton()).join('');
     }
-    
+
     // Fetch results
-    const results = await fetchPlaces({ query, ...AppState.filters });
-    
+    const response = await fetchPlaces({ query, ...AppState.filters });
+
+    // Check if results are limited for guests
+    const guestLimited = response.guestLimited || false;
+    const guestMessage = response.message || '';
+    const results = response.results || response;
+
     // Render results
-    renderSearchResults(results);
+    renderSearchResults(results, guestLimited, guestMessage);
 }
 
 async function initDetailPage(placeId) {
@@ -584,39 +865,151 @@ async function initRidesPage(params = {}) {
     renderRideResults(rides);
 }
 
-function initSavedPage() {
+async function initSavedPage() {
     if (!DOM.savedContainer) return;
-    
+
+    // Show loading state
+    DOM.savedContainer.innerHTML = '<div class="loading-overlay"><div class="spinner spinner-lg"></div></div>';
+
+    // Load saved restaurants from API
+    await loadSavedRestaurants();
+
+    // Update category counts
+    updateSavedCategoryCounts();
+
     if (AppState.savedItems.length === 0) {
         DOM.savedContainer.innerHTML = renderEmptyState('saved');
         return;
     }
-    
+
     // Load and render saved items
     renderSavedItems();
 }
 
+/**
+ * Update the category counts in the saved page tabs
+ */
+function updateSavedCategoryCounts() {
+    const savedTabs = document.getElementById('saved-tabs');
+    if (!savedTabs) return;
+
+    // Count items by category
+    const counts = {
+        all: AppState.savedItems.length,
+        food: 0,
+        drinks: 0,
+        activities: 0,
+        routes: 0
+    };
+
+    // Count each category
+    AppState.savedItems.forEach(savedItem => {
+        const category = savedItem.restaurant_data?.category?.toLowerCase() || '';
+
+        if (category.includes('food') || category.includes('restaurant') || category.includes('cuisine')) {
+            counts.food++;
+        } else if (category.includes('drink') || category.includes('bar') || category.includes('cafe')) {
+            counts.drinks++;
+        } else if (category.includes('activity') || category.includes('entertainment')) {
+            counts.activities++;
+        } else if (category.includes('ride') || category.includes('transport')) {
+            counts.routes++;
+        } else {
+            // Default to food category if unclear
+            counts.food++;
+        }
+    });
+
+    // Update the HTML
+    savedTabs.innerHTML = `
+        <button class="filter-chip active">All <span class="count">${counts.all}</span></button>
+        <button class="filter-chip">🍽️ Food <span class="count">${counts.food}</span></button>
+        <button class="filter-chip">🍸 Drinks <span class="count">${counts.drinks}</span></button>
+        <button class="filter-chip">🎡 Activities <span class="count">${counts.activities}</span></button>
+        <button class="filter-chip">🚗 Routes <span class="count">${counts.routes}</span></button>
+    `;
+}
+
 function initProfilePage() {
-    // Profile page initialization
+    // Update saved count stat
+    const statSavedEl = document.getElementById('stat-saved');
+    if (statSavedEl) {
+        statSavedEl.textContent = AppState.savedItems.length;
+    }
+
+    // Update profile info if user is authenticated
+    if (window.authManager && window.authManager.isAuthenticated()) {
+        const user = window.authManager.getUser();
+
+        // Update name
+        const profileNameEl = document.getElementById('profile-name');
+        if (profileNameEl && user.username) {
+            profileNameEl.textContent = user.username;
+        }
+
+        // Update email
+        const profileEmailEl = document.getElementById('profile-email');
+        if (profileEmailEl && user.email) {
+            profileEmailEl.textContent = user.email;
+        }
+
+        // Update avatar initial
+        const profileAvatarEl = document.getElementById('profile-avatar');
+        if (profileAvatarEl && user.username) {
+            profileAvatarEl.textContent = user.username.charAt(0).toUpperCase();
+        }
+    } else {
+        // Show guest info
+        const profileNameEl = document.getElementById('profile-name');
+        if (profileNameEl) {
+            profileNameEl.textContent = 'Guest User';
+        }
+
+        const profileEmailEl = document.getElementById('profile-email');
+        if (profileEmailEl) {
+            profileEmailEl.textContent = 'Not logged in';
+        }
+
+        const profileAvatarEl = document.getElementById('profile-avatar');
+        if (profileAvatarEl) {
+            profileAvatarEl.textContent = '?';
+        }
+    }
 }
 
 // ================================
 // 7. RENDER PAGE CONTENT
 // ================================
 
-function renderSearchResults(results) {
+function renderSearchResults(results, guestLimited = false, guestMessage = '') {
     if (!DOM.searchResults) return;
-    
+
     // Update count
     if (DOM.resultsCount) {
         DOM.resultsCount.textContent = `${results.length} places found`;
     }
-    
+
     // Render results or empty state
     if (results.length === 0) {
         DOM.searchResults.innerHTML = renderEmptyState('search');
     } else {
-        DOM.searchResults.innerHTML = results.map(place => renderPlaceCard(place)).join('');
+        let html = results.map(place => renderPlaceCard(place)).join('');
+
+        // Add signup banner for guest users with limited results
+        if (guestLimited && guestMessage) {
+            html += `
+                <div style="background: linear-gradient(135deg, #FF8E53, #FE6B8B); border-radius: 20px; padding: 24px; margin: 16px 0; color: white; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 12px;">✨</div>
+                    <div style="font-weight: 800; font-size: 18px; margin-bottom: 8px;">Want to see more?</div>
+                    <div style="font-size: 14px; margin-bottom: 16px; opacity: 0.95;">${guestMessage}</div>
+                    <button onclick="navigateTo('register')" class="btn" style="background: white; color: #FF8E53; font-weight: 800; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; width: 100%; max-width: 200px;">
+                        Sign Up Free
+                    </button>
+                </div>
+            `;
+        }
+
+        DOM.searchResults.innerHTML = html;
     }
 }
 
@@ -772,13 +1165,34 @@ function renderRideResults(rides) {
 
 function renderSavedItems() {
     if (!DOM.savedContainer) return;
-    
-    // TODO: Fetch saved items by IDs
+
     DOM.savedContainer.innerHTML = `
-        <div class="grid-2">
-            ${AppState.savedItems.map(id => {
-                const item = getMockPlaceDetail(id);
-                return item ? renderGridCard(item) : '';
+        <div class="list">
+            ${AppState.savedItems.map(savedItem => {
+                const restaurant = savedItem.restaurant_data;
+                const placeId = restaurant.place_id;
+
+                return `
+                    <div class="place-card" data-id="${placeId}" onclick="openPlaceDetail('${placeId}')" style="cursor: pointer;">
+                        <div class="place-card-image">
+                            ${restaurant.image ? `<img src="${restaurant.image}" alt="${restaurant.name}">` : ''}
+                        </div>
+                        <div class="place-card-content">
+                            <h3 class="place-card-name">${restaurant.name}</h3>
+                            <p class="place-card-meta">${restaurant.category || 'Restaurant'} • ${restaurant.vicinity || ''}</p>
+                            <div class="place-card-tags">
+                                ${Array.isArray(restaurant.tags) ? restaurant.tags.map(tag => `<span class="place-card-tag">${tag}</span>`).join('') : ''}
+                            </div>
+                            <div class="place-card-footer">
+                                <span class="place-card-rating">⭐ ${restaurant.rating || 'N/A'}</span>
+                                ${restaurant.distance ? `<span class="place-card-distance">${restaurant.distance}</span>` : ''}
+                                <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); removeSavedRestaurant(${savedItem.id}, '${placeId}')">
+                                    🗑️ Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }).join('')}
         </div>
     `;
@@ -802,7 +1216,8 @@ async function loadTrendingItems() {
         console.log('Using default location for trending items:', error.message);
     }
 
-    const items = await fetchPlaces({ trending: true, limit: 5, location });
+    const response = await fetchPlaces({ trending: true, limit: 5, location });
+    const items = response.results || response; // Handle both object and array response
 
     // Cache items for detail page
     items.forEach(item => {
@@ -830,7 +1245,8 @@ async function loadTrendingItems() {
 async function loadActivities() {
     if (!DOM.activitiesContainer) return;
 
-    const items = await fetchPlaces({ type: 'activity', limit: 4 });
+    const response = await fetchPlaces({ type: 'activity', limit: 4 });
+    const items = response.results || response; // Handle both object and array response
 
     // Cache items for detail page
     items.forEach(item => {
@@ -926,22 +1342,44 @@ function parseRideQuerySimple(query) {
     return { origin, destination };
 }
 
-function handleFilterClick(filter) {
-    // Toggle filter
+function handleCategoryClick(category) {
+    // Toggle category filter
     const chip = event.target.closest('.filter-chip');
     const isActive = chip.classList.contains('active');
-    
+
     // Remove active from all chips in same group
     chip.parentElement.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    
+
     if (!isActive) {
         chip.classList.add('active');
-        AppState.filters.category = filter;
+        AppState.filters.category = category;
     } else {
-        AppState.filters.category = 'all';
+        // If clicking active chip, default to Food
+        chip.classList.add('active');
+        AppState.filters.category = category;
     }
-    
+
     // Re-fetch results
+    initSearchPage(DOM.searchInput?.value || '');
+}
+
+function handleFilterClick(filter) {
+    // Toggle sort filter
+    const chip = event.target.closest('.filter-chip');
+    const isActive = chip.classList.contains('active');
+
+    // Remove active from all chips in same group
+    chip.parentElement.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+
+    if (!isActive) {
+        chip.classList.add('active');
+        // Store filter in AppState for future use with sorting
+        // For now, just re-fetch with same category
+    } else {
+        // Deactivate filter
+    }
+
+    // Re-fetch results (currently filters are applied on backend)
     initSearchPage(DOM.searchInput?.value || '');
 }
 
@@ -972,25 +1410,55 @@ function selectRide(provider) {
     }
 }
 
-function toggleSave(itemId) {
-    const index = AppState.savedItems.indexOf(itemId);
-    
-    if (index > -1) {
-        AppState.savedItems.splice(index, 1);
-        showToast('Removed from saved');
-    } else {
-        AppState.savedItems.push(itemId);
-        showToast('Saved!', 'success');
+async function toggleSave(restaurantId) {
+    // Check if user is authenticated - force signup for guests
+    const isAuth = window.authManager && window.authManager.isAuthenticated();
+
+    if (!isAuth) {
+        // Guest user trying to save - redirect to signup
+        showToast('Sign up to save your favorite places!', 'info');
+        setTimeout(() => {
+            navigateTo('register');
+        }, 1000);
+        return;
     }
-    
-    // Update UI
-    document.querySelectorAll(`[data-id="${itemId}"] .place-card-save, [data-id="${itemId}"] .grid-card-save`).forEach(btn => {
-        btn.classList.toggle('saved');
-        btn.innerHTML = AppState.savedItems.includes(itemId) ? '❤️' : '🤍';
-    });
-    
-    // Persist to localStorage
-    localStorage.setItem('hopwise_saved', JSON.stringify(AppState.savedItems));
+
+    // Find the restaurant in search results or places cache
+    let restaurant = AppState.searchResults.find(r => (r.place_id || r.id) === restaurantId);
+
+    if (!restaurant) {
+        restaurant = AppState.placesCache[restaurantId];
+    }
+
+    if (!restaurant) {
+        console.error('Restaurant not found:', restaurantId);
+        showToast('Could not save restaurant', 'error');
+        return;
+    }
+
+    // Check if already saved
+    const isSaved = isRestaurantSaved(restaurantId);
+
+    // IMMEDIATE UI UPDATE - optimistic update
+    updateSaveButtons(restaurantId, !isSaved);
+
+    if (isSaved) {
+        // Find the saved item to get its database ID
+        const savedItem = AppState.savedItems.find(item => item.restaurant_id === restaurantId);
+        if (savedItem) {
+            const success = await removeSavedRestaurant(savedItem.id, restaurantId);
+            // If failed, revert the UI
+            if (!success) {
+                updateSaveButtons(restaurantId, true);
+            }
+        }
+    } else {
+        const success = await saveRestaurant(restaurant);
+        // If failed, revert the UI
+        if (!success) {
+            updateSaveButtons(restaurantId, false);
+        }
+    }
 }
 
 function openPlaceDetail(placeId) {
@@ -1251,14 +1719,21 @@ function useCurrentLocation() {
 
 function clearFilters() {
     AppState.filters = {
-        category: 'all',
+        category: 'Food',
         priceRange: null,
         rating: null,
         distance: null
     };
-    
+
+    // Remove active from all filter chips
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    
+
+    // Set Food category as active
+    const foodChip = document.querySelector('#category-chips .filter-chip[data-category="Food"]');
+    if (foodChip) {
+        foodChip.classList.add('active');
+    }
+
     initSearchPage(DOM.searchInput?.value || '');
 }
 
@@ -1438,26 +1913,166 @@ function getMockPlaceDetail(placeId) {
 }
 
 // ================================
+// 10. AUTHENTICATION HANDLERS
+// ================================
+
+/**
+ * Handle login form submission
+ */
+async function handleLogin(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const errorDiv = document.getElementById('login-error');
+    const submitBtn = document.getElementById('login-submit-btn');
+
+    // Hide previous errors
+    errorDiv.style.display = 'none';
+
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Logging in...';
+
+    try {
+        await window.authManager.login(email, password);
+
+        // Show success message
+        showToast('Welcome back!', 'success');
+
+        // Reload saved restaurants for this user
+        await loadSavedRestaurants();
+
+        // Update navigation to show all tabs
+        updateBottomNavForAuthStatus();
+
+        // Update home header to show profile/notifications
+        updateHomeHeaderActions();
+
+        // Navigate to home
+        navigateTo('home');
+
+        // Reset form
+        event.target.reset();
+
+    } catch (error) {
+        console.error('Login error:', error);
+        errorDiv.textContent = error.message || 'Login failed. Please check your credentials.';
+        errorDiv.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log In';
+    }
+}
+
+/**
+ * Handle registration form submission
+ */
+async function handleRegister(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('register-username').value;
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    const errorDiv = document.getElementById('register-error');
+    const submitBtn = document.getElementById('register-submit-btn');
+
+    // Hide previous errors
+    errorDiv.style.display = 'none';
+
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating account...';
+
+    try {
+        await window.authManager.register(username, email, password);
+
+        // Show success message
+        showToast('Account created successfully!', 'success');
+
+        // Reload saved restaurants for this user
+        await loadSavedRestaurants();
+
+        // Update navigation to show all tabs
+        updateBottomNavForAuthStatus();
+
+        // Update home header to show profile/notifications
+        updateHomeHeaderActions();
+
+        // Navigate to home
+        navigateTo('home');
+
+        // Reset form
+        event.target.reset();
+
+    } catch (error) {
+        console.error('Registration error:', error);
+        errorDiv.textContent = error.message || 'Registration failed. Please try again.';
+        errorDiv.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+    }
+}
+
+/**
+ * Handle logout
+ */
+async function handleLogout() {
+    try {
+        await window.authManager.logout();
+
+        // Clear saved items from state
+        AppState.savedItems = [];
+        AppState.savedRestaurantIds.clear();
+
+        // Update navigation to show only guest tabs
+        updateBottomNavForAuthStatus();
+
+        // Update home header to show Sign Up button
+        updateHomeHeaderActions();
+
+        // Show success message
+        showToast('Logged out successfully', 'success');
+
+        // Navigate to home
+        navigateTo('home');
+
+    } catch (error) {
+        console.error('Logout error:', error);
+        showToast('Logout failed', 'error');
+    }
+}
+
+// ================================
 // 11. INITIALIZATION
 // ================================
 
-function initApp() {
+async function initApp() {
     // Initialize DOM cache
     initDOM();
-    
-    // Load saved items from localStorage
-    const savedItems = localStorage.getItem('hopwise_saved');
-    if (savedItems) {
-        AppState.savedItems = JSON.parse(savedItems);
+
+    // Initialize device ID for favorites
+    getDeviceId();
+
+    // Load saved restaurants from API (only for authenticated users)
+    if (window.authManager && window.authManager.isAuthenticated()) {
+        await loadSavedRestaurants();
     }
-    
+
     // Set up event listeners
     setupEventListeners();
-    
+
+    // Update bottom navigation based on auth status
+    updateBottomNavForAuthStatus();
+
     // Navigate to initial page
     navigateTo('home');
-    
+
     console.log('🎒 Hopwise App initialized!');
+    console.log('Device ID:', AppState.deviceId);
+    console.log('Authenticated:', window.authManager?.isAuthenticated() || false);
+    console.log('Saved restaurants:', AppState.savedItems.length);
 }
 
 function setupEventListeners() {
@@ -1474,8 +2089,13 @@ function setupEventListeners() {
         form.addEventListener('submit', handleSearch);
     });
 
-    // Filter chips
-    document.querySelectorAll('.filter-chip').forEach(chip => {
+    // Category filter chips (Food, Drinks, Ice Cream, Cafe)
+    document.querySelectorAll('#category-chips .filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => handleCategoryClick(chip.dataset.category));
+    });
+
+    // Sort filter chips (Price, Rating, Distance, Open Now)
+    document.querySelectorAll('#filter-chips .filter-chip').forEach(chip => {
         chip.addEventListener('click', () => handleFilterClick(chip.dataset.filter));
     });
 
@@ -1509,6 +2129,139 @@ document.addEventListener('DOMContentLoaded', initApp);
 // 12. EXPORTS (for module usage)
 // ================================
 
+// ============================================================================
+// PROFILE PAGE FUNCTIONS
+// ============================================================================
+
+/**
+ * Initialize profile page with user data
+ */
+function initProfilePage() {
+    const user = window.authManager?.getUser();
+
+    if (!user) {
+        // Redirect to login if not authenticated
+        navigateTo('login');
+        return;
+    }
+
+    // Update avatar with first letter of username
+    const avatarText = document.getElementById('profile-avatar-text');
+    if (avatarText && user.username) {
+        avatarText.textContent = user.username.charAt(0).toUpperCase();
+    }
+
+    // Update name and email
+    const nameElement = document.getElementById('profile-name');
+    const emailElement = document.getElementById('profile-email');
+
+    if (nameElement) {
+        nameElement.textContent = user.username || 'User';
+    }
+
+    if (emailElement) {
+        emailElement.textContent = user.email || '';
+    }
+
+    // Show premium badge if user is premium
+    const premiumBadge = document.getElementById('profile-badge');
+    const premiumBannerSection = document.getElementById('premium-banner-section');
+
+    if (user.is_premium) {
+        if (premiumBadge) {
+            premiumBadge.style.display = 'inline-flex';
+        }
+        // Hide premium upgrade banner for premium users
+        if (premiumBannerSection) {
+            premiumBannerSection.style.display = 'none';
+        }
+    } else {
+        if (premiumBadge) {
+            premiumBadge.style.display = 'none';
+        }
+        if (premiumBannerSection) {
+            premiumBannerSection.style.display = 'block';
+        }
+    }
+
+    // Update stats
+    updateProfileStats();
+}
+
+/**
+ * Update profile statistics
+ */
+function updateProfileStats() {
+    // Get saved items count
+    const savedCount = AppState.savedItems ? AppState.savedItems.length : 0;
+
+    // Update saved stat
+    const statSaved = document.getElementById('stat-saved');
+    if (statSaved) {
+        statSaved.textContent = savedCount;
+    }
+
+    // TODO: Update trips and savings stats when we track those
+    // For now, they remain at 0
+}
+
+/**
+ * Toggle notifications
+ */
+function toggleNotifications(element) {
+    const toggle = element.querySelector('.toggle-switch');
+    const subtitle = element.querySelector('.menu-item-subtitle');
+
+    if (!toggle) return;
+
+    const isEnabled = toggle.dataset.enabled === 'true';
+    const newState = !isEnabled;
+
+    // Update toggle state
+    toggle.dataset.enabled = newState.toString();
+
+    if (newState) {
+        toggle.classList.add('active');
+        if (subtitle) {
+            subtitle.textContent = 'Push notifications enabled';
+        }
+        showToast('Notifications enabled', 'success');
+    } else {
+        toggle.classList.remove('active');
+        if (subtitle) {
+            subtitle.textContent = 'Push notifications disabled';
+        }
+        showToast('Notifications disabled', 'info');
+    }
+
+    // TODO: Save preference to backend
+}
+
+/**
+ * Toggle dark mode
+ */
+function toggleDarkMode(element) {
+    const toggle = element.querySelector('.toggle-switch');
+
+    if (!toggle) return;
+
+    const isEnabled = toggle.dataset.enabled === 'true';
+    const newState = !isEnabled;
+
+    // Update toggle state
+    toggle.dataset.enabled = newState.toString();
+
+    if (newState) {
+        toggle.classList.add('active');
+        showToast('Dark mode coming soon!', 'info');
+    } else {
+        toggle.classList.remove('active');
+        showToast('Dark mode coming soon!', 'info');
+    }
+
+    // TODO: Implement dark mode
+}
+
 window.Hopwise = {
     navigateTo,
     goBack,
@@ -1521,6 +2274,11 @@ window.Hopwise = {
     useCurrentLocation,
     AppState
 };
+
+// Export profile functions globally
+window.initProfilePage = initProfilePage;
+window.toggleNotifications = toggleNotifications;
+window.toggleDarkMode = toggleDarkMode;
 
 // Export autocomplete init function globally (called by Google Maps API)
 window.initAutocomplete = initAutocomplete;

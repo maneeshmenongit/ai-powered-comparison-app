@@ -114,7 +114,7 @@
                 <img src="./assets/hopwise-logo-cropped.png" alt="Hopwise">
                 <span>Hopwise</span>
             </div>
-            <div class="header-actions">
+            <div class="header-actions" id="home-header-actions">
                 <button class="header-action">🔔</button>
                 <button class="header-action" onclick="Hopwise.navigateTo('profile')">👤</button>
             </div>
@@ -170,7 +170,9 @@
         <!-- Quick Rides Banner -->
         <div class="section">
             <div class="banner banner-ai" onclick="Hopwise.navigateTo('rides')">
-                <span class="banner-icon">🚗</span>
+                <span class="banner-icon banner-icon-img">
+                    <img src="./assets/images/ride_icon_large.png" alt="Compare Rides" class="banner-ride-icon">
+                </span>
                 <div class="banner-content">
                     <div class="banner-title">Compare Rides Instantly</div>
                     <div class="banner-text">Uber vs Lyft — find the best price</div>
@@ -207,9 +209,16 @@
             <button class="header-action">⚙️</button>
         </header>
         
-        <!-- Filters -->
+        <!-- Category Filters -->
+        <div class="filter-scroll" id="category-chips">
+            <button class="filter-chip active" data-category="Food">🍽️ Food</button>
+            <button class="filter-chip" data-category="Drinks">🍸 Drinks</button>
+            <button class="filter-chip" data-category="Ice Cream">🍦 Ice Cream</button>
+            <button class="filter-chip" data-category="Cafe">☕ Cafe</button>
+        </div>
+
+        <!-- Sort Filters -->
         <div class="filter-scroll" id="filter-chips">
-            <button class="filter-chip active" data-filter="all">🍽️ All</button>
             <button class="filter-chip" data-filter="price">💰 Price</button>
             <button class="filter-chip" data-filter="rating">⭐ Rating</button>
             <button class="filter-chip" data-filter="distance">📍 Distance</button>
@@ -366,151 +375,304 @@
     
     <!-- ========== PAGE: PROFILE ========== -->
     <div id="page-profile" class="page">
-        
+
         <!-- Profile Header -->
         <div class="section text-center" style="background: white; padding-bottom: 24px;">
-            <div style="width: 90px; height: 90px; background: var(--gradient-sunset); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; font-weight: 900;" id="profile-avatar">A</div>
-            <h1 class="text-xl font-black" id="profile-name">Alex Johnson</h1>
-            <p class="text-sm text-gray" id="profile-email">alex.johnson@email.com</p>
+            <div class="profile-avatar" id="profile-avatar">
+                <span id="profile-avatar-text">A</span>
+            </div>
+            <h1 class="text-xl font-black" id="profile-name">Loading...</h1>
+            <p class="text-sm text-gray" id="profile-email">Loading...</p>
+            <div class="profile-badge" id="profile-badge" style="display: none;">
+                <span class="badge-icon">👑</span>
+                <span class="badge-text">Premium</span>
+            </div>
         </div>
-        
+
         <!-- Stats -->
-        <div class="flex justify-center gap-8 p-4" style="background: white; border-top: 1px solid var(--color-gray-100);">
-            <div class="text-center">
-                <div class="font-black text-xl" id="stat-trips">12</div>
-                <div class="text-xs text-gray">Trips</div>
+        <div class="profile-stats">
+            <div class="stat-card">
+                <div class="stat-icon">🗺️</div>
+                <div class="stat-value" id="stat-trips">0</div>
+                <div class="stat-label">Trips</div>
             </div>
-            <div class="text-center">
-                <div class="font-black text-xl" id="stat-saved">48</div>
-                <div class="text-xs text-gray">Saved</div>
+            <div class="stat-card">
+                <div class="stat-icon">❤️</div>
+                <div class="stat-value" id="stat-saved">0</div>
+                <div class="stat-label">Saved</div>
             </div>
-            <div class="text-center">
-                <div class="font-black text-xl" id="stat-savings">$127</div>
-                <div class="text-xs text-gray">Saved $</div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="stat-savings">$0</div>
+                <div class="stat-label">Saved</div>
             </div>
         </div>
-        
+
         <!-- Premium Banner -->
-        <div class="section">
-            <div style="background: var(--gradient-sunset); border-radius: 20px; padding: 18px; color: white; display: flex; gap: 14px; align-items: center; cursor: pointer;">
-                <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px;">👑</div>
-                <div style="flex: 1;">
-                    <div style="font-weight: 800;">Upgrade to Premium</div>
-                    <div style="font-size: 12px; opacity: 0.9;">Unlock trip planning & more for $9.99/mo</div>
+        <div class="section" id="premium-banner-section">
+            <div class="premium-banner" onclick="showToast('Premium features coming soon!', 'info')">
+                <div class="premium-icon">
+                    <span>👑</span>
                 </div>
-                <span style="font-size: 20px;">→</span>
+                <div class="premium-content">
+                    <div class="premium-title">Upgrade to Premium</div>
+                    <div class="premium-subtitle">Unlock AI trip planning & unlimited saves</div>
+                </div>
+                <div class="premium-arrow">→</div>
             </div>
         </div>
-        
+
         <!-- Menu: Account -->
         <div class="section" style="padding-top: 0;">
-            <div style="background: white; border-radius: 20px; overflow: hidden;">
-                <div style="padding: 14px 16px 8px; font-size: 12px; font-weight: 800; color: var(--color-gray-500); text-transform: uppercase;">Account</div>
-                
-                <div class="info-row" style="padding: 14px 16px; cursor: pointer;">
-                    <div class="info-row-icon">👤</div>
-                    <div class="info-row-content">
-                        <div class="info-row-value">Edit Profile</div>
+            <div class="profile-menu">
+                <div class="menu-section-title">Account</div>
+
+                <div class="menu-item" onclick="showToast('Edit profile coming soon!', 'info')">
+                    <div class="menu-item-icon">👤</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Edit Profile</div>
+                        <div class="menu-item-subtitle">Update your information</div>
                     </div>
-                    <span class="info-row-action">›</span>
+                    <span class="menu-item-arrow">›</span>
                 </div>
-                
-                <div class="info-row" style="padding: 14px 16px; cursor: pointer;">
-                    <div class="info-row-icon">💳</div>
-                    <div class="info-row-content">
-                        <div class="info-row-value">Payment Methods</div>
-                        <div class="info-row-label">Visa •••• 4242</div>
+
+                <div class="menu-item" onclick="showToast('Payment methods coming soon!', 'info')">
+                    <div class="menu-item-icon">💳</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Payment Methods</div>
+                        <div class="menu-item-subtitle">Manage your cards</div>
                     </div>
-                    <span class="info-row-action">›</span>
+                    <span class="menu-item-arrow">›</span>
                 </div>
-                
-                <div class="info-row" style="padding: 14px 16px; cursor: pointer;">
-                    <div class="info-row-icon">🔔</div>
-                    <div class="info-row-content">
-                        <div class="info-row-value">Notifications</div>
+
+                <div class="menu-item" onclick="toggleNotifications(this)">
+                    <div class="menu-item-icon">🔔</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Notifications</div>
+                        <div class="menu-item-subtitle">Push notifications enabled</div>
                     </div>
-                    <div class="toggle active"></div>
+                    <div class="toggle-switch active" data-enabled="true">
+                        <div class="toggle-slider"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Menu: Preferences -->
         <div class="section" style="padding-top: 0;">
-            <div style="background: white; border-radius: 20px; overflow: hidden;">
-                <div style="padding: 14px 16px 8px; font-size: 12px; font-weight: 800; color: var(--color-gray-500); text-transform: uppercase;">Preferences</div>
-                
-                <div class="info-row" style="padding: 14px 16px; cursor: pointer;">
-                    <div class="info-row-icon">📍</div>
-                    <div class="info-row-content">
-                        <div class="info-row-value">Home Location</div>
-                        <div class="info-row-label">New York, NY</div>
+            <div class="profile-menu">
+                <div class="menu-section-title">Preferences</div>
+
+                <div class="menu-item" onclick="showToast('Location settings coming soon!', 'info')">
+                    <div class="menu-item-icon">📍</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Home Location</div>
+                        <div class="menu-item-subtitle" id="home-location">Not set</div>
                     </div>
-                    <span class="info-row-action">›</span>
+                    <span class="menu-item-arrow">›</span>
                 </div>
-                
-                <div class="info-row" style="padding: 14px 16px; cursor: pointer;">
-                    <div class="info-row-icon">🌙</div>
-                    <div class="info-row-content">
-                        <div class="info-row-value">Dark Mode</div>
+
+                <div class="menu-item" onclick="toggleDarkMode(this)">
+                    <div class="menu-item-icon">🌙</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Dark Mode</div>
+                        <div class="menu-item-subtitle">Coming soon</div>
                     </div>
-                    <div class="toggle"></div>
+                    <div class="toggle-switch" data-enabled="false">
+                        <div class="toggle-slider"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Menu: Support -->
         <div class="section" style="padding-top: 0;">
-            <div style="background: white; border-radius: 20px; overflow: hidden;">
-                <div style="padding: 14px 16px 8px; font-size: 12px; font-weight: 800; color: var(--color-gray-500); text-transform: uppercase;">Support</div>
-                
-                <div class="info-row" style="padding: 14px 16px; cursor: pointer;">
-                    <div class="info-row-icon">❓</div>
-                    <div class="info-row-content">
-                        <div class="info-row-value">Help Center</div>
+            <div class="profile-menu">
+                <div class="menu-section-title">Support</div>
+
+                <div class="menu-item" onclick="window.open('mailto:support@hopwise.app', '_blank')">
+                    <div class="menu-item-icon">❓</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Help Center</div>
+                        <div class="menu-item-subtitle">Get support</div>
                     </div>
-                    <span class="info-row-action">›</span>
+                    <span class="menu-item-arrow">›</span>
                 </div>
-                
-                <div class="info-row" style="padding: 14px 16px; cursor: pointer;">
-                    <div class="info-row-icon">💬</div>
-                    <div class="info-row-content">
-                        <div class="info-row-value">Contact Us</div>
+
+                <div class="menu-item" onclick="window.open('mailto:hello@hopwise.app', '_blank')">
+                    <div class="menu-item-icon">💬</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">Contact Us</div>
+                        <div class="menu-item-subtitle">hello@hopwise.app</div>
                     </div>
-                    <span class="info-row-action">›</span>
+                    <span class="menu-item-arrow">›</span>
+                </div>
+
+                <div class="menu-item" onclick="showToast('Version 1.0.0 - Latest', 'success')">
+                    <div class="menu-item-icon">ℹ️</div>
+                    <div class="menu-item-content">
+                        <div class="menu-item-title">About</div>
+                        <div class="menu-item-subtitle">Version 1.0.0</div>
+                    </div>
+                    <span class="menu-item-arrow">›</span>
                 </div>
             </div>
         </div>
-        
+
         <!-- Logout -->
-        <div class="section" style="padding-top: 0;">
-            <button class="btn btn-block" style="background: white; color: var(--color-sunset-red); border-radius: 16px; padding: 16px;">🚪 Log Out</button>
-            <p class="text-center text-xs text-gray mt-4">Hopwise v1.0.0</p>
+        <div class="section" style="padding-top: 0; padding-bottom: 100px;">
+            <button class="logout-button" onclick="handleLogout()">
+                <span class="logout-icon">🚪</span>
+                <span class="logout-text">Log Out</span>
+            </button>
         </div>
-        
+
     </div>
-    
+
+    <!-- ========== PAGE: LOGIN ========== -->
+    <div id="page-login" class="page">
+
+        <!-- Header -->
+        <header class="header">
+            <button class="header-back" onclick="Hopwise.goBack()">←</button>
+            <h2 class="header-title">Log In</h2>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <!-- Login Form -->
+        <div class="section">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <div class="auth-logo-container">
+                    <img src="./assets/hopwise-logo-cropped.png" alt="Hopwise" class="auth-logo">
+                </div>
+                <h1 class="text-xl font-black mb-2">Welcome back!</h1>
+                <p class="text-gray">Log in to access your saved places and trip plans</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" style="background: white; padding: 24px; border-radius: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="login-email" class="form-input" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required minlength="8">
+                </div>
+
+                <div id="login-error" class="error-message" style="display: none;"></div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">
+                    Log In
+                </button>
+
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" onclick="event.preventDefault(); Hopwise.navigateTo('register')" style="color: var(--color-sunset-red); text-decoration: none; font-weight: 600;">
+                        Don't have an account? Sign up
+                    </a>
+                </div>
+            </form>
+
+            <div style="text-align: center; margin-top: 24px;">
+                <a href="#" onclick="event.preventDefault(); Hopwise.navigateTo('home')" style="color: var(--color-gray-500); text-decoration: none; font-size: 14px;">
+                    Continue as guest →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========== PAGE: REGISTER ========== -->
+    <div id="page-register" class="page">
+
+        <!-- Header -->
+        <header class="header">
+            <button class="header-back" onclick="Hopwise.goBack()">←</button>
+            <h2 class="header-title">Sign Up</h2>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <!-- Registration Form -->
+        <div class="section">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <div class="auth-logo-container">
+                    <img src="./assets/hopwise-logo-cropped.png" alt="Hopwise" class="auth-logo">
+                </div>
+                <h1 class="text-xl font-black mb-2">Join Hopwise!</h1>
+                <p class="text-gray">Create an account to save places and plan trips</p>
+            </div>
+
+            <form id="register-form" onsubmit="handleRegister(event)" style="background: white; padding: 24px; border-radius: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="register-username" class="form-input" placeholder="johndoe" required minlength="3">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="register-email" class="form-input" placeholder="your@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="register-password" class="form-input" placeholder="Min 8 characters" required minlength="8">
+                    <p class="text-xs text-gray" style="margin-top: 4px;">Must be at least 8 characters long</p>
+                </div>
+
+                <div id="register-error" class="error-message" style="display: none;"></div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="register-submit-btn">
+                    Create Account
+                </button>
+
+                <div style="text-align: center; margin-top: 16px;">
+                    <a href="#" onclick="event.preventDefault(); Hopwise.navigateTo('login')" style="color: var(--color-sunset-red); text-decoration: none; font-weight: 600;">
+                        Already have an account? Log in
+                    </a>
+                </div>
+            </form>
+
+            <div style="text-align: center; margin-top: 24px;">
+                <a href="#" onclick="event.preventDefault(); Hopwise.navigateTo('home')" style="color: var(--color-gray-500); text-decoration: none; font-size: 14px;">
+                    Continue as guest →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
     </div><!-- /app-content -->
-    
+
     <!-- ========== BOTTOM NAVIGATION ========== -->
     <nav id="bottom-nav" class="bottom-nav">
         <button class="nav-item active" data-page="home">
-            <img src="./assets/images/home_icon.png" alt="Home" class="nav-icon">
+            <span class="icon icon-img">
+                <img src="./assets/images/home_icon.png" alt="Home" class="nav-icon-image">
+            </span>
             <span>Home</span>
         </button>
         <button class="nav-item" data-page="search">
-            <img src="./assets/images/search_icon.png" alt="Search" class="nav-icon">
+            <span class="icon icon-img">
+                <img src="./assets/images/search_icon.png" alt="Search" class="nav-icon-image">
+            </span>
             <span>Search</span>
         </button>
         <button class="nav-item" data-page="rides">
-            <img src="./assets/images/ride_icon.png" alt="Rides" class="nav-icon">
+            <span class="icon icon-img">
+                <img src="./assets/images/ride_icon.png" alt="Rides" class="nav-icon-image">
+            </span>
             <span>Rides</span>
         </button>
         <button class="nav-item" data-page="saved">
-            <img src="./assets/images/favorite_icon.png" alt="Saved" class="nav-icon">
+            <span class="icon icon-img">
+                <img src="./assets/images/favorite_icon.png" alt="Saved" class="nav-icon-image">
+            </span>
             <span>Saved</span>
         </button>
         <button class="nav-item" data-page="profile">
-            <img src="./assets/images/profile_icon.png" alt="Profile" class="nav-icon">
+            <span class="icon icon-img">
+                <img src="./assets/images/profile_icon.png" alt="Profile" class="nav-icon-image">
+            </span>
             <span>Profile</span>
         </button>
     </nav>

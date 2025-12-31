@@ -20,22 +20,26 @@ class HopwiseAPI {
 
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
-        
+
+        // Get auth token from authManager if available
+        const authHeader = window.authManager?.getAuthHeader();
+
         try {
             const response = await fetch(url, {
                 ...options,
                 headers: {
                     'Content-Type': 'application/json',
                     ...options.headers,
+                    ...(authHeader || {})
                 }
             });
 
             const data = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(data.error || 'Request failed');
             }
-            
+
             return data;
         } catch (error) {
             console.error(`API Error (${endpoint}):`, error);
@@ -77,6 +81,50 @@ class HopwiseAPI {
     // Get statistics
     async getStats() {
         return this.request('/stats');
+    }
+
+    // ========================================
+    // FAVORITES API (Requires JWT Authentication)
+    // ========================================
+
+    /**
+     * Save a restaurant to favorites
+     * Requires user to be logged in (JWT token)
+     * @param {string} restaurantId - Place ID of the restaurant
+     * @param {object} restaurantData - Full restaurant data object
+     * @returns {Promise} API response
+     */
+    async saveRestaurant(restaurantId, restaurantData) {
+        return this.request('/user/saved', {
+            method: 'POST',
+            body: JSON.stringify({
+                restaurant_id: restaurantId,
+                restaurant_data: restaurantData
+            })
+        });
+    }
+
+    /**
+     * Get all saved restaurants for authenticated user
+     * Requires user to be logged in (JWT token)
+     * @returns {Promise} API response with saved restaurants array
+     */
+    async getSavedRestaurants() {
+        return this.request('/user/saved', {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * Remove a saved restaurant
+     * Requires user to be logged in (JWT token)
+     * @param {number} savedId - ID of the saved restaurant record
+     * @returns {Promise} API response
+     */
+    async removeSavedRestaurant(savedId) {
+        return this.request(`/user/saved/${savedId}`, {
+            method: 'DELETE'
+        });
     }
 }
 
