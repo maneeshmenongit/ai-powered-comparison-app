@@ -13,6 +13,8 @@ const AppState = {
     deviceId: null, // UUID for device-based favorites
     savedItems: [],
     savedRestaurantIds: new Set(), // Quick lookup for saved status
+    trips: [], // User's trips (registered users only)
+    currentTrip: null, // Currently viewed trip
     searchResults: [],
     placesCache: {}, // Cache all fetched places by ID for detail page
     filters: {
@@ -253,7 +255,14 @@ const DOM = {
     // Saved Page
     savedContainer: null,
     savedTabs: null,
-    
+
+    // Trips Page
+    tripsContainer: null,
+    tripsGuestMessage: null,
+    tripDetailTitle: null,
+    tripDetailInfo: null,
+    tripTimelineContainer: null,
+
     // Loading & States
     loadingOverlay: null,
     toastContainer: null
@@ -286,7 +295,14 @@ function initDOM() {
     // Saved
     DOM.savedContainer = document.getElementById('saved-container');
     DOM.savedTabs = document.getElementById('saved-tabs');
-    
+
+    // Trips
+    DOM.tripsContainer = document.getElementById('trips-container');
+    DOM.tripsGuestMessage = document.getElementById('trips-guest-message');
+    DOM.tripDetailTitle = document.getElementById('trip-detail-title');
+    DOM.tripDetailInfo = document.getElementById('trip-detail-info');
+    DOM.tripTimelineContainer = document.getElementById('trip-timeline-container');
+
     // States
     DOM.loadingOverlay = document.getElementById('loading-overlay');
     DOM.toastContainer = document.getElementById('toast-container');
@@ -339,26 +355,27 @@ function updateBottomNav(activePage) {
 /**
  * Update bottom navigation visibility based on auth status
  * Guests see: Home, Search, Rides (3 tabs)
- * Authenticated users see: Home, Search, Rides, Saved, Profile (5 tabs)
+ * Authenticated users see: Home, Search, Rides, Trips, Saved, Profile (6 tabs)
  */
 function updateBottomNavForAuthStatus() {
     if (!DOM.bottomNav) return;
 
     const isAuth = window.authManager && window.authManager.isAuthenticated();
+    const isGuest = window.authManager && window.authManager.isGuest();
     const navItems = DOM.bottomNav.querySelectorAll('.nav-item');
 
     navItems.forEach(item => {
         const page = item.dataset.page;
 
-        // Show only Home, Search, and Rides for guests
-        if (!isAuth) {
-            if (page === 'saved' || page === 'profile') {
+        // Show only Home, Search, and Rides for guests and non-authenticated users
+        if (!isAuth || isGuest) {
+            if (page === 'trips' || page === 'saved' || page === 'profile') {
                 item.style.display = 'none';
             } else {
                 item.style.display = 'flex';
             }
         } else {
-            // Show all tabs for authenticated users
+            // Show all tabs for authenticated non-guest users
             item.style.display = 'flex';
         }
     });
@@ -407,6 +424,12 @@ function onPageEnter(pageName, data) {
             break;
         case 'saved':
             initSavedPage();
+            break;
+        case 'trips':
+            initTripsPage();
+            break;
+        case 'trip-detail':
+            initTripDetailPage(data);
             break;
         case 'profile':
             initProfilePage();
@@ -604,6 +627,9 @@ function renderPlaceCard(place) {
                 <div class="place-card-footer">
                     <span class="place-card-rating">⭐ ${place.rating}</span>
                     <span class="place-card-distance">${place.distance}</span>
+                    <button class="place-card-action" onclick="event.stopPropagation(); showAddToTripDialog('restaurant', ${JSON.stringify(place).replace(/"/g, '&quot;')})" title="Add to trip" style="background: none; border: none; cursor: pointer; font-size: 18px; padding: 4px 8px;">
+                        🗺️
+                    </button>
                     <button class="place-card-save ${isSaved ? 'saved' : ''}" data-save-id="${placeId}" onclick="event.stopPropagation(); toggleSave('${placeId}')">
                         ${isSaved ? '❤️' : '🤍'}
                     </button>
@@ -665,6 +691,9 @@ function renderRideCard(ride, isSelected = false, badgeType = null) {
                 <span class="ride-card-detail"><span class="icon">⏱️</span> ${ride.pickup} min pickup</span>
                 <span class="ride-card-detail"><span class="icon">🚙</span> ${ride.duration} min trip</span>
                 <span class="ride-card-detail"><span class="icon">⭐</span> ${ride.rating}</span>
+                <button class="ride-card-action" onclick="event.stopPropagation(); showAddToTripDialog('ride', ${JSON.stringify(ride).replace(/"/g, '&quot;')})" title="Add to trip" style="background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 8px; margin-left: auto; color: #667eea;">
+                    + Add to Trip
+                </button>
             </div>
         </div>
     `;
@@ -928,6 +957,426 @@ function updateSavedCategoryCounts() {
         <button class="filter-chip">🎡 Activities <span class="count">${counts.activities}</span></button>
         <button class="filter-chip">🚗 Routes <span class="count">${counts.routes}</span></button>
     `;
+}
+
+// ============================================================================
+// TRIP PLANNING FUNCTIONS (Registered Users Only)
+// ============================================================================
+
+/**
+ * Initialize trips page - show guest message or load user's trips
+ */
+async function initTripsPage() {
+    const isAuth = window.authManager && window.authManager.isAuthenticated();
+    const isGuest = window.authManager && window.authManager.isGuest();
+
+    // Show guest message for non-authenticated users or guests
+    if (!isAuth || isGuest) {
+        if (DOM.tripsGuestMessage) {
+            DOM.tripsGuestMessage.style.display = 'block';
+        }
+        if (DOM.tripsContainer) {
+            DOM.tripsContainer.style.display = 'none';
+        }
+        return;
+    }
+
+    // Hide guest message for authenticated users
+    if (DOM.tripsGuestMessage) {
+        DOM.tripsGuestMessage.style.display = 'none';
+    }
+    if (DOM.tripsContainer) {
+        DOM.tripsContainer.style.display = 'block';
+    }
+
+    // Load user's trips
+    await loadTrips();
+}
+
+/**
+ * Load trips from API and render
+ */
+async function loadTrips() {
+    if (!DOM.tripsContainer) return;
+
+    showLoading();
+
+    try {
+        const api = new HopwiseAPI();
+        const response = await api.getTrips();
+
+        if (response.success && response.data) {
+            AppState.trips = response.data;
+            renderTripsList();
+        } else {
+            throw new Error(response.error || 'Failed to load trips');
+        }
+    } catch (error) {
+        console.error('Error loading trips:', error);
+        showToast('Failed to load trips: ' + error.message, 'error');
+        DOM.tripsContainer.innerHTML = renderEmptyState('trips');
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * Render trips list
+ */
+function renderTripsList() {
+    if (!DOM.tripsContainer) return;
+
+    if (AppState.trips.length === 0) {
+        DOM.tripsContainer.innerHTML = renderEmptyState('trips');
+        return;
+    }
+
+    DOM.tripsContainer.innerHTML = AppState.trips
+        .map(trip => renderTripCard(trip))
+        .join('');
+}
+
+/**
+ * Render a single trip card
+ */
+function renderTripCard(trip) {
+    const itemCount = trip.items?.length || 0;
+    const startDate = trip.start_date ? new Date(trip.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+    const endDate = trip.end_date ? new Date(trip.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+    const dateRange = startDate && endDate ? `${startDate} - ${endDate}` : 'No dates set';
+
+    return `
+        <div class="trip-card" onclick="navigateTo('trip-detail', { tripId: '${trip.id}' })" style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <h3 style="font-size: 18px; font-weight: 800; margin: 0;">${trip.name}</h3>
+                <button onclick="event.stopPropagation(); deleteTrip('${trip.id}')" style="background: none; border: none; color: #999; font-size: 20px; cursor: pointer; padding: 4px 8px;">×</button>
+            </div>
+            <div style="display: flex; gap: 16px; color: #666; font-size: 14px;">
+                <span>📅 ${dateRange}</span>
+                <span>📍 ${itemCount} ${itemCount === 1 ? 'item' : 'items'}</span>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Show create trip dialog
+ */
+function showCreateTripDialog() {
+    const isAuth = window.authManager && window.authManager.isAuthenticated();
+    const isGuest = window.authManager && window.authManager.isGuest();
+
+    if (!isAuth || isGuest) {
+        showToast('Please sign up to create trips', 'info');
+        navigateTo('register');
+        return;
+    }
+
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-overlay';
+    dialog.innerHTML = `
+        <div class="modal" style="background: white; border-radius: 24px; padding: 24px; max-width: 400px; width: 90%;">
+            <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Create New Trip</h2>
+            <form id="create-trip-form">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Trip Name</label>
+                    <input type="text" name="name" placeholder="Weekend in SF" required style="width: 100%; padding: 12px; border: 1px solid #E0E0E0; border-radius: 12px; font-size: 16px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Start Date</label>
+                    <input type="date" name="start_date" style="width: 100%; padding: 12px; border: 1px solid #E0E0E0; border-radius: 12px; font-size: 16px;">
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">End Date</label>
+                    <input type="date" name="end_date" style="width: 100%; padding: 12px; border: 1px solid #E0E0E0; border-radius: 12px; font-size: 16px;">
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" onclick="this.closest('.modal-overlay').remove()" style="flex: 1; padding: 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: white; font-weight: 700; cursor: pointer;">Cancel</button>
+                    <button type="submit" style="flex: 1; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 700; cursor: pointer;">Create</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(dialog);
+
+    // Handle form submission
+    document.getElementById('create-trip-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const tripData = {
+            name: formData.get('name'),
+            start_date: formData.get('start_date') || null,
+            end_date: formData.get('end_date') || null
+        };
+
+        await createTrip(tripData);
+        dialog.remove();
+    });
+}
+
+/**
+ * Create a new trip
+ */
+async function createTrip(tripData) {
+    showLoading();
+
+    try {
+        const api = new HopwiseAPI();
+        const response = await api.createTrip(tripData);
+
+        if (response.success && response.data) {
+            showToast('Trip created!', 'success');
+            AppState.trips.push(response.data);
+            renderTripsList();
+        } else {
+            throw new Error(response.error || 'Failed to create trip');
+        }
+    } catch (error) {
+        console.error('Error creating trip:', error);
+        showToast('Failed to create trip: ' + error.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * Delete a trip
+ */
+async function deleteTrip(tripId) {
+    if (!confirm('Are you sure you want to delete this trip?')) {
+        return;
+    }
+
+    showLoading();
+
+    try {
+        const api = new HopwiseAPI();
+        const response = await api.deleteTrip(tripId);
+
+        if (response.success) {
+            showToast('Trip deleted', 'success');
+            AppState.trips = AppState.trips.filter(t => t.id !== tripId);
+            renderTripsList();
+        } else {
+            throw new Error(response.error || 'Failed to delete trip');
+        }
+    } catch (error) {
+        console.error('Error deleting trip:', error);
+        showToast('Failed to delete trip: ' + error.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * Initialize trip detail page
+ */
+async function initTripDetailPage(data) {
+    if (!data || !data.tripId) {
+        showToast('Trip not found', 'error');
+        navigateTo('trips');
+        return;
+    }
+
+    showLoading();
+
+    try {
+        const api = new HopwiseAPI();
+        const response = await api.getTrip(data.tripId);
+
+        if (response.success && response.data) {
+            AppState.currentTrip = response.data;
+            renderTripDetail(response.data);
+        } else {
+            throw new Error(response.error || 'Failed to load trip');
+        }
+    } catch (error) {
+        console.error('Error loading trip:', error);
+        showToast('Failed to load trip: ' + error.message, 'error');
+        navigateTo('trips');
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * Render trip detail page
+ */
+function renderTripDetail(trip) {
+    // Update title
+    if (DOM.tripDetailTitle) {
+        DOM.tripDetailTitle.textContent = trip.name;
+    }
+
+    // Render trip info
+    if (DOM.tripDetailInfo) {
+        const startDate = trip.start_date ? new Date(trip.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not set';
+        const endDate = trip.end_date ? new Date(trip.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not set';
+
+        DOM.tripDetailInfo.innerHTML = `
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 20px; color: white;">
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Dates</div>
+                    <div style="font-size: 16px; font-weight: 700;">📅 ${startDate} - ${endDate}</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Items</div>
+                    <div style="font-size: 16px; font-weight: 700;">📍 ${trip.items?.length || 0} ${trip.items?.length === 1 ? 'item' : 'items'}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Render timeline
+    if (DOM.tripTimelineContainer) {
+        if (!trip.items || trip.items.length === 0) {
+            DOM.tripTimelineContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: #999;">
+                    <div style="font-size: 48px; margin-bottom: 12px;">📍</div>
+                    <p style="font-size: 16px;">No items in this trip yet</p>
+                    <p style="font-size: 14px;">Tap the + button to add restaurants or rides</p>
+                </div>
+            `;
+        } else {
+            DOM.tripTimelineContainer.innerHTML = trip.items
+                .sort((a, b) => a.item_order - b.item_order)
+                .map((item, index) => renderTripItem(item, index))
+                .join('');
+        }
+    }
+}
+
+/**
+ * Render a single trip item in timeline
+ */
+function renderTripItem(item, index) {
+    const data = item.item_data;
+    let icon = '📍';
+    let title = 'Item';
+    let subtitle = '';
+
+    if (item.item_type === 'restaurant') {
+        icon = '🍽️';
+        title = data.name || 'Restaurant';
+        subtitle = data.cuisine || data.category || '';
+    } else if (item.item_type === 'ride') {
+        icon = '🚗';
+        title = `Ride to ${data.destination || 'destination'}`;
+        subtitle = data.service || '';
+    }
+
+    return `
+        <div class="trip-item" style="display: flex; gap: 16px; margin-bottom: 20px; padding: 16px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);">
+            <div style="flex-shrink: 0;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%); display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                    ${icon}
+                </div>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">${title}</div>
+                ${subtitle ? `<div style="color: #666; font-size: 14px;">${subtitle}</div>` : ''}
+            </div>
+            <button onclick="removeTripItem('${item.trip_id}', '${item.id}')" style="background: none; border: none; color: #999; font-size: 18px; cursor: pointer; padding: 4px 8px;">×</button>
+        </div>
+    `;
+}
+
+/**
+ * Show add to trip dialog
+ */
+function showAddToTripDialog(itemType, itemData) {
+    const isAuth = window.authManager && window.authManager.isAuthenticated();
+    const isGuest = window.authManager && window.authManager.isGuest();
+
+    if (!isAuth || isGuest) {
+        showToast('Please sign up to use trip planning', 'info');
+        navigateTo('register');
+        return;
+    }
+
+    if (!AppState.trips || AppState.trips.length === 0) {
+        showToast('Create a trip first!', 'info');
+        showCreateTripDialog();
+        return;
+    }
+
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-overlay';
+    dialog.innerHTML = `
+        <div class="modal" style="background: white; border-radius: 24px; padding: 24px; max-width: 400px; width: 90%;">
+            <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Add to Trip</h2>
+            <div style="margin-bottom: 24px;">
+                ${AppState.trips.map(trip => `
+                    <div class="trip-option" onclick="addItemToTrip('${trip.id}', '${itemType}', ${JSON.stringify(itemData).replace(/"/g, '&quot;')})" style="padding: 16px; border: 1px solid #E0E0E0; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;">
+                        <div style="font-weight: 700; margin-bottom: 4px;">${trip.name}</div>
+                        <div style="font-size: 14px; color: #666;">${trip.items?.length || 0} items</div>
+                    </div>
+                `).join('')}
+            </div>
+            <button onclick="this.closest('.modal-overlay').remove()" style="width: 100%; padding: 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: white; font-weight: 700; cursor: pointer;">Cancel</button>
+        </div>
+    `;
+
+    document.body.appendChild(dialog);
+}
+
+/**
+ * Add item to trip
+ */
+async function addItemToTrip(tripId, itemType, itemData) {
+    // Close dialog
+    const dialog = document.querySelector('.modal-overlay');
+    if (dialog) dialog.remove();
+
+    showLoading();
+
+    try {
+        const api = new HopwiseAPI();
+        const response = await api.addTripItem(tripId, {
+            item_type: itemType,
+            item_data: itemData,
+            item_order: 999 // Will be sorted later
+        });
+
+        if (response.success) {
+            showToast('Added to trip!', 'success');
+        } else {
+            throw new Error(response.error || 'Failed to add item to trip');
+        }
+    } catch (error) {
+        console.error('Error adding item to trip:', error);
+        showToast('Failed to add to trip: ' + error.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * Remove item from trip
+ */
+async function removeTripItem(tripId, itemId) {
+    showLoading();
+
+    try {
+        const api = new HopwiseAPI();
+        const response = await api.removeTripItem(tripId, itemId);
+
+        if (response.success) {
+            showToast('Item removed', 'success');
+            // Reload trip detail
+            if (AppState.currentTrip && AppState.currentTrip.id === tripId) {
+                await initTripDetailPage({ tripId });
+            }
+        } else {
+            throw new Error(response.error || 'Failed to remove item');
+        }
+    } catch (error) {
+        console.error('Error removing item:', error);
+        showToast('Failed to remove item: ' + error.message, 'error');
+    } finally {
+        hideLoading();
+    }
 }
 
 function initProfilePage() {
