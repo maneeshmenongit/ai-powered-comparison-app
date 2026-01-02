@@ -33,7 +33,7 @@ from api.cost_tracker import CostTracker, create_cost_tracker_blueprint
 
 # Database imports
 from api.database import SessionLocal, close_db
-from api.models import User, SavedRestaurant
+from api.models import User, SavedRestaurant, Trip, TripItem
 from api.db_init import initialize_database
 import uuid
 
@@ -757,6 +757,409 @@ def delete_saved_restaurant(saved_id):
     except Exception as e:
         db.rollback()
         print(f"Error in /api/user/saved DELETE: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        db.close()
+
+
+# ============================================================================
+# TRIP PLANNING ROUTES (Registered Users Only)
+# ============================================================================
+
+@app.route('/api/trips', methods=['POST'])
+@jwt_required()
+def create_trip():
+    """
+    Create a new trip.
+    Requires JWT authentication (registered users only).
+    """
+    db = SessionLocal()
+    try:
+        # Get user from JWT token
+        user = get_current_user_from_jwt(db)
+
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+
+        # Guest users cannot create trips
+        if user.is_guest == True:
+            return jsonify({
+                'success': False,
+                'error': 'Trip planning is only available for registered users. Please sign up!'
+            }), 403
+
+        data = request.get_json()
+
+        # Validate required fields
+        if not data.get('name'):
+            return jsonify({
+                'success': False,
+                'error': 'Trip name is required'
+            }), 400
+
+        # Create trip
+        trip = Trip(
+            user_id=user.id,
+            name=data['name'],
+            start_date=data.get('start_date'),
+            end_date=data.get('end_date')
+        )
+
+        db.add(trip)
+        db.commit()
+        db.refresh(trip)
+
+        return jsonify({
+            'success': True,
+            'data': trip.to_dict()
+        })
+
+    except Exception as e:
+        db.rollback()
+        print(f"Error in /api/trips POST: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/trips', methods=['GET'])
+@jwt_required()
+def get_trips():
+    """
+    Get all trips for the current user.
+    Requires JWT authentication.
+    """
+    db = SessionLocal()
+    try:
+        # Get user from JWT token
+        user = get_current_user_from_jwt(db)
+
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+
+        # Guest users have no trips
+        if user.is_guest:
+            return jsonify({
+                'success': True,
+                'data': []
+            })
+
+        # Get all trips for this user
+        trips = db.query(Trip).filter(Trip.user_id == user.id).order_by(Trip.created_at.desc()).all()
+
+        return jsonify({
+            'success': True,
+            'data': [trip.to_dict() for trip in trips]
+        })
+
+    except Exception as e:
+        print(f"Error in /api/trips GET: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/trips/<trip_id>', methods=['GET'])
+@jwt_required()
+def get_trip(trip_id):
+    """
+    Get a specific trip by ID.
+    Requires JWT authentication.
+    """
+    db = SessionLocal()
+    try:
+        # Get user from JWT token
+        user = get_current_user_from_jwt(db)
+
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+
+        # Get trip (ensure it belongs to this user)
+        trip = db.query(Trip).filter(
+            Trip.id == trip_id,
+            Trip.user_id == user.id
+        ).first()
+
+        if not trip:
+            return jsonify({
+                'success': False,
+                'error': 'Trip not found'
+            }), 404
+
+        return jsonify({
+            'success': True,
+            'data': trip.to_dict()
+        })
+
+    except Exception as e:
+        print(f"Error in /api/trips/<trip_id> GET: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/trips/<trip_id>', methods=['PUT'])
+@jwt_required()
+def update_trip(trip_id):
+    """
+    Update a trip.
+    Requires JWT authentication.
+    """
+    db = SessionLocal()
+    try:
+        # Get user from JWT token
+        user = get_current_user_from_jwt(db)
+
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+
+        # Get trip (ensure it belongs to this user)
+        trip = db.query(Trip).filter(
+            Trip.id == trip_id,
+            Trip.user_id == user.id
+        ).first()
+
+        if not trip:
+            return jsonify({
+                'success': False,
+                'error': 'Trip not found'
+            }), 404
+
+        data = request.get_json()
+
+        # Update fields
+        if 'name' in data:
+            trip.name = data['name']
+        if 'start_date' in data:
+            trip.start_date = data['start_date']
+        if 'end_date' in data:
+            trip.end_date = data['end_date']
+
+        db.commit()
+        db.refresh(trip)
+
+        return jsonify({
+            'success': True,
+            'data': trip.to_dict()
+        })
+
+    except Exception as e:
+        db.rollback()
+        print(f"Error in /api/trips/<trip_id> PUT: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/trips/<trip_id>', methods=['DELETE'])
+@jwt_required()
+def delete_trip(trip_id):
+    """
+    Delete a trip.
+    Requires JWT authentication.
+    """
+    db = SessionLocal()
+    try:
+        # Get user from JWT token
+        user = get_current_user_from_jwt(db)
+
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+
+        # Get trip (ensure it belongs to this user)
+        trip = db.query(Trip).filter(
+            Trip.id == trip_id,
+            Trip.user_id == user.id
+        ).first()
+
+        if not trip:
+            return jsonify({
+                'success': False,
+                'error': 'Trip not found'
+            }), 404
+
+        # Delete (will cascade to trip_items)
+        db.delete(trip)
+        db.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Trip deleted successfully'
+        })
+
+    except Exception as e:
+        db.rollback()
+        print(f"Error in /api/trips/<trip_id> DELETE: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/trips/<trip_id>/items', methods=['POST'])
+@jwt_required()
+def add_trip_item(trip_id):
+    """
+    Add an item to a trip.
+    Requires JWT authentication.
+    """
+    db = SessionLocal()
+    try:
+        # Get user from JWT token
+        user = get_current_user_from_jwt(db)
+
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+
+        # Get trip (ensure it belongs to this user)
+        trip = db.query(Trip).filter(
+            Trip.id == trip_id,
+            Trip.user_id == user.id
+        ).first()
+
+        if not trip:
+            return jsonify({
+                'success': False,
+                'error': 'Trip not found'
+            }), 404
+
+        data = request.get_json()
+
+        # Validate required fields
+        if not data.get('item_type') or not data.get('item_data'):
+            return jsonify({
+                'success': False,
+                'error': 'item_type and item_data are required'
+            }), 400
+
+        # Get next order number
+        max_order = db.query(TripItem).filter(TripItem.trip_id == trip_id).count()
+
+        # Create trip item
+        trip_item = TripItem(
+            trip_id=trip.id,
+            item_type=data['item_type'],
+            item_data=data['item_data'],
+            item_order=data.get('item_order', max_order),
+            scheduled_time=data.get('scheduled_time')
+        )
+
+        db.add(trip_item)
+        db.commit()
+        db.refresh(trip_item)
+
+        return jsonify({
+            'success': True,
+            'data': trip_item.to_dict()
+        })
+
+    except Exception as e:
+        db.rollback()
+        print(f"Error in /api/trips/<trip_id>/items POST: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/trips/<trip_id>/items/<item_id>', methods=['DELETE'])
+@jwt_required()
+def delete_trip_item(trip_id, item_id):
+    """
+    Delete an item from a trip.
+    Requires JWT authentication.
+    """
+    db = SessionLocal()
+    try:
+        # Get user from JWT token
+        user = get_current_user_from_jwt(db)
+
+        if not user:
+            return jsonify({
+                'success': False,
+                'error': 'User not found'
+            }), 404
+
+        # Get trip (ensure it belongs to this user)
+        trip = db.query(Trip).filter(
+            Trip.id == trip_id,
+            Trip.user_id == user.id
+        ).first()
+
+        if not trip:
+            return jsonify({
+                'success': False,
+                'error': 'Trip not found'
+            }), 404
+
+        # Get trip item
+        trip_item = db.query(TripItem).filter(
+            TripItem.id == item_id,
+            TripItem.trip_id == trip_id
+        ).first()
+
+        if not trip_item:
+            return jsonify({
+                'success': False,
+                'error': 'Trip item not found'
+            }), 404
+
+        # Delete
+        db.delete(trip_item)
+        db.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Item removed from trip'
+        })
+
+    except Exception as e:
+        db.rollback()
+        print(f"Error in /api/trips/<trip_id>/items/<item_id> DELETE: {str(e)}")
         traceback.print_exc()
         return jsonify({
             'success': False,

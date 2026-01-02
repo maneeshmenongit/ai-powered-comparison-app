@@ -125,6 +125,92 @@ class HopwiseAPI {
             method: 'DELETE'
         });
     }
+
+    // ============================================================================
+    // Trip Planning API Methods (Registered Users Only)
+    // ============================================================================
+
+    /**
+     * Create a new trip
+     * @param {object} tripData - Trip data {name, start_date, end_date}
+     * @returns {Promise} API response with trip data
+     */
+    async createTrip(tripData) {
+        return this.request('/trips', {
+            method: 'POST',
+            body: JSON.stringify(tripData)
+        });
+    }
+
+    /**
+     * Get all trips for the current user
+     * @returns {Promise} API response with trips array
+     */
+    async getTrips() {
+        return this.request('/trips', {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * Get a specific trip by ID
+     * @param {string} tripId - Trip ID
+     * @returns {Promise} API response with trip data
+     */
+    async getTrip(tripId) {
+        return this.request(`/trips/${tripId}`, {
+            method: 'GET'
+        });
+    }
+
+    /**
+     * Update a trip
+     * @param {string} tripId - Trip ID
+     * @param {object} tripData - Updated trip data {name, start_date, end_date}
+     * @returns {Promise} API response with updated trip data
+     */
+    async updateTrip(tripId, tripData) {
+        return this.request(`/trips/${tripId}`, {
+            method: 'PUT',
+            body: JSON.stringify(tripData)
+        });
+    }
+
+    /**
+     * Delete a trip
+     * @param {string} tripId - Trip ID
+     * @returns {Promise} API response
+     */
+    async deleteTrip(tripId) {
+        return this.request(`/trips/${tripId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * Add an item to a trip
+     * @param {string} tripId - Trip ID
+     * @param {object} itemData - Item data {item_type, item_data, item_order, scheduled_time}
+     * @returns {Promise} API response with trip item data
+     */
+    async addTripItem(tripId, itemData) {
+        return this.request(`/trips/${tripId}/items`, {
+            method: 'POST',
+            body: JSON.stringify(itemData)
+        });
+    }
+
+    /**
+     * Remove an item from a trip
+     * @param {string} tripId - Trip ID
+     * @param {string} itemId - Item ID
+     * @returns {Promise} API response
+     */
+    async removeTripItem(tripId, itemId) {
+        return this.request(`/trips/${tripId}/items/${itemId}`, {
+            method: 'DELETE'
+        });
+    }
 }
 
 // ============================================================================

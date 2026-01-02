@@ -32,6 +32,13 @@ class User(Base):
         cascade='all, delete-orphan'
     )
 
+    # Relationship to trips
+    trips = relationship(
+        'Trip',
+        back_populates='user',
+        cascade='all, delete-orphan'
+    )
+
     def set_password(self, password):
         """Hash and set the user's password."""
         password_bytes = password.encode('utf-8')
@@ -88,3 +95,74 @@ class SavedRestaurant(Base):
 
     def __repr__(self):
         return f"<SavedRestaurant(id={self.id}, user_id={self.user_id}, restaurant_id={self.restaurant_id})>"
+
+
+class Trip(Base):
+    """Trip model - stores user's trip plans (registered users only)."""
+    __tablename__ = 'trips'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    start_date = Column(DateTime, nullable=True)
+    end_date = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    # Relationship to user
+    user = relationship('User', back_populates='trips')
+
+    # Relationship to trip items
+    items = relationship(
+        'TripItem',
+        back_populates='trip',
+        cascade='all, delete-orphan',
+        order_by='TripItem.item_order'
+    )
+
+    def to_dict(self):
+        """Convert trip to dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id),
+            'name': self.name,
+            'start_date': self.start_date.isoformat() if self.start_date else None,
+            'end_date': self.end_date.isoformat() if self.end_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'items': [item.to_dict() for item in self.items] if self.items else []
+        }
+
+    def __repr__(self):
+        return f"<Trip(id={self.id}, user_id={self.user_id}, name={self.name})>"
+
+
+class TripItem(Base):
+    """TripItem model - stores items within a trip (restaurants, rides, activities)."""
+    __tablename__ = 'trip_items'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    trip_id = Column(UUID(as_uuid=True), ForeignKey('trips.id', ondelete='CASCADE'), nullable=False, index=True)
+    item_type = Column(String(50), nullable=False)  # 'restaurant', 'ride', 'activity'
+    item_data = Column(JSONB, nullable=False)  # Store full item object as JSON
+    item_order = Column(Integer, nullable=False, default=0)  # Order in the trip timeline
+    scheduled_time = Column(DateTime, nullable=True)  # When this item is scheduled
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationship to trip
+    trip = relationship('Trip', back_populates='items')
+
+    def to_dict(self):
+        """Convert trip item to dictionary."""
+        return {
+            'id': str(self.id),
+            'trip_id': str(self.trip_id),
+            'item_type': self.item_type,
+            'item_data': self.item_data,
+            'item_order': self.item_order,
+            'scheduled_time': self.scheduled_time.isoformat() if self.scheduled_time else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+    def __repr__(self):
+        return f"<TripItem(id={self.id}, trip_id={self.trip_id}, type={self.item_type})>"
