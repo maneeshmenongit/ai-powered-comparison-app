@@ -775,14 +775,32 @@ function renderEmptyState(type = 'search') {
     
     const state = states[type] || states.search;
     
-    return `
+    const html = `
         <div class="empty-state">
             <div class="empty-state-icon">${state.icon}</div>
             <h3 class="empty-state-title">${state.title}</h3>
             <p class="empty-state-text">${state.text}</p>
-            ${state.action ? `<button class="btn btn-primary" onclick="${state.action.handler}">${state.action.text}</button>` : ''}
+            ${state.action ? `<button class="btn btn-primary" id="empty-state-action-btn">${state.action.text}</button>` : ''}
         </div>
     `;
+
+    // Add event listener after rendering if there's an action
+    if (state.action) {
+        setTimeout(() => {
+            const btn = document.getElementById('empty-state-action-btn');
+            if (btn) {
+                btn.onclick = () => {
+                    // Call the handler function by name
+                    const handlerName = state.action.handler.replace('()', '');
+                    if (window[handlerName]) {
+                        window[handlerName]();
+                    }
+                };
+            }
+        }, 0);
+    }
+
+    return html;
 }
 
 /**
