@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hopwise — Trip Pages</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .screen-wrapper {
+            position: relative;
+        }
+        
+        .screen-label {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        
+        .phone {
+            background: #1a1a1a;
+            border-radius: 52px;
+            padding: 12px;
+            box-shadow: 0 0 0 2px #333, 0 30px 100px rgba(0,0,0,0.6);
+        }
+        
+        .screen {
+            background: #F5F5F5;
+            border-radius: 42px;
+            width: 375px;
+            height: 812px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Header */
+        .header {
+            background: #FFFFFF;
+            padding: 60px 20px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header-back {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #F4F4F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1E1E2E;
+        }
+        
+        .header-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .header-action-secondary {
+            background: #F4F4F5;
+            color: #1E1E2E;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 16px 20px;
+            padding-bottom: 100px;
+            overflow-y: auto;
+            height: calc(100% - 120px);
+        }
+        
+        /* Trip Card */
+        .trip-card {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .trip-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .trip-card-delete {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #F4F4F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #6C757D;
+            cursor: pointer;
+        }
+        
+        .trip-card-delete:hover {
+            background: #FEE2E2;
+            color: #EF4444;
+        }
+        
+        .trip-card-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1E1E2E;
+            margin-bottom: 8px;
+            padding-right: 30px;
+        }
+        
+        .trip-card-dates {
+            font-size: 14px;
+            color: #6C757D;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .trip-card-count {
+            font-size: 14px;
+            color: #6C757D;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1E1E2E;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-text {
+            font-size: 14px;
+            color: #6C757D;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+        }
+        
+        .btn-orange {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            box-shadow: 0 4px 16px rgba(255,107,107,0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #6C757D;
+            border: 2px solid #E9ECEF;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        /* Trip Info Card (Detail Page) */
+        .trip-info-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            padding: 24px;
+            color: white;
+            margin-bottom: 24px;
+        }
+        
+        .trip-info-name {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 16px;
+        }
+        
+        .trip-info-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.95;
+        }
+        
+        /* Section */
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1E1E2E;
+            margin-bottom: 16px;
+        }
+        
+        /* Itinerary Item */
+        .itinerary-item {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        
+        .itinerary-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #F4F4F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        
+        .itinerary-content {
+            flex: 1;
+        }
+        
+        .itinerary-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1E1E2E;
+            margin-bottom: 2px;
+        }
+        
+        .itinerary-meta {
+            font-size: 13px;
+            color: #6C757D;
+        }
+        
+        .itinerary-remove {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #F4F4F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #6C757D;
+            cursor: pointer;
+        }
+        
+        .itinerary-remove:hover {
+            background: #FEE2E2;
+            color: #EF4444;
+        }
+        
+        /* FAB */
+        .fab {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 28px rgba(102,126,234,0.5);
+        }
+        
+        /* Bottom Nav */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #FFFFFF;
+            border-top: 1px solid #E9ECEF;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 16px 28px;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #6C757D;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: #667eea;
+        }
+        
+        .nav-item .icon {
+            font-size: 22px;
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 42px;
+        }
+        
+        .modal {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 340px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1E1E2E;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #6C757D;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E9ECEF;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-input::placeholder {
+            color: #ADB5BD;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .modal-actions .btn {
+            flex: 1;
+        }
+        
+        /* Add to Trip Modal */
+        .trip-select-item {
+            padding: 16px;
+            border: 2px solid #E9ECEF;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .trip-select-item:hover {
+            border-color: #667eea;
+            background: #F8F9FF;
+        }
+        
+        .trip-select-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1E1E2E;
+            margin-bottom: 4px;
+        }
+        
+        .trip-select-count {
+            font-size: 13px;
+            color: #6C757D;
+        }
+        
+        /* Guest State */
+        .guest-state {
+            text-align: center;
+            padding: 80px 24px;
+        }
+        
+        .guest-state-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+        
+        .guest-state-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1E1E2E;
+            margin-bottom: 12px;
+        }
+        
+        .guest-state-text {
+            font-size: 15px;
+            color: #6C757D;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== TRIPS LIST PAGE ========== -->
+    <div class="screen-wrapper">
+        <div class="screen-label">Trips List (With Trips)</div>
+        <div class="phone">
+            <div class="screen">
+                <header class="header">
+                    <div style="width: 40px;"></div>
+                    <h1 class="header-title">My Trips</h1>
+                    <button class="header-action">+</button>
+                </header>
+                
+                <div class="content">
+                    <div class="trip-card">
+                        <button class="trip-card-delete">×</button>
+                        <h3 class="trip-card-name">Weekend in San Francisco</h3>
+                        <div class="trip-card-dates">📅 Jan 15 - Jan 18, 2026</div>
+                        <div class="trip-card-count">📍 5 items</div>
+                    </div>
+                    
+                    <div class="trip-card">
+                        <button class="trip-card-delete">×</button>
+                        <h3 class="trip-card-name">NYC Food Tour</h3>
+                        <div class="trip-card-dates">📅 Feb 20 - Feb 22, 2026</div>
+                        <div class="trip-card-count">📍 8 items</div>
+                    </div>
+                    
+                    <div class="trip-card">
+                        <button class="trip-card-delete">×</button>
+                        <h3 class="trip-card-name">LA Adventure</h3>
+                        <div class="trip-card-dates">📅 No dates set</div>
+                        <div class="trip-card-count">📍 3 items</div>
+                    </div>
+                </div>
+                
+                <nav class="bottom-nav">
+                    <div class="nav-item"><span class="icon">🏠</span>Home</div>
+                    <div class="nav-item"><span class="icon">🔍</span>Search</div>
+                    <div class="nav-item"><span class="icon">🚗</span>Rides</div>
+                    <div class="nav-item active"><span class="icon">🗺️</span>Trips</div>
+                    <div class="nav-item"><span class="icon">❤️</span>Saved</div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TRIPS LIST - EMPTY STATE ========== -->
+    <div class="screen-wrapper">
+        <div class="screen-label">Trips List (Empty)</div>
+        <div class="phone">
+            <div class="screen">
+                <header class="header">
+                    <div style="width: 40px;"></div>
+                    <h1 class="header-title">My Trips</h1>
+                    <button class="header-action">+</button>
+                </header>
+                
+                <div class="content">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🗺️</div>
+                        <h3 class="empty-state-title">No trips yet</h3>
+                        <p class="empty-state-text">Plan your next adventure! Create a trip to organize restaurants, rides, and activities.</p>
+                        <button class="btn btn-primary">Create Trip</button>
+                    </div>
+                </div>
+                
+                <nav class="bottom-nav">
+                    <div class="nav-item"><span class="icon">🏠</span>Home</div>
+                    <div class="nav-item"><span class="icon">🔍</span>Search</div>
+                    <div class="nav-item"><span class="icon">🚗</span>Rides</div>
+                    <div class="nav-item active"><span class="icon">🗺️</span>Trips</div>
+                    <div class="nav-item"><span class="icon">❤️</span>Saved</div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TRIPS LIST - GUEST STATE ========== -->
+    <div class="screen-wrapper">
+        <div class="screen-label">Trips List (Guest)</div>
+        <div class="phone">
+            <div class="screen">
+                <header class="header">
+                    <div style="width: 40px;"></div>
+                    <h1 class="header-title">My Trips</h1>
+                    <div style="width: 40px;"></div>
+                </header>
+                
+                <div class="content">
+                    <div class="guest-state">
+                        <div class="guest-state-icon">🗺️</div>
+                        <h3 class="guest-state-title">Trip Planning for Registered Users</h3>
+                        <p class="guest-state-text">Sign up to create and manage your travel itineraries!</p>
+                        <button class="btn btn-orange btn-block">Sign Up Now</button>
+                    </div>
+                </div>
+                
+                <nav class="bottom-nav">
+                    <div class="nav-item"><span class="icon">🏠</span>Home</div>
+                    <div class="nav-item"><span class="icon">🔍</span>Search</div>
+                    <div class="nav-item"><span class="icon">🚗</span>Rides</div>
+                    <div class="nav-item active"><span class="icon">🗺️</span>Trips</div>
+                    <div class="nav-item"><span class="icon">❤️</span>Saved</div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TRIP DETAIL PAGE ========== -->
+    <div class="screen-wrapper">
+        <div class="screen-label">Trip Detail</div>
+        <div class="phone">
+            <div class="screen">
+                <header class="header">
+                    <button class="header-back">←</button>
+                    <h1 class="header-title">Trip Details</h1>
+                    <button class="header-action header-action-secondary">✎</button>
+                </header>
+                
+                <div class="content">
+                    <div class="trip-info-card">
+                        <h2 class="trip-info-name">Weekend in San Francisco</h2>
+                        <div class="trip-info-row">📅 Jan 15 - Jan 18, 2026</div>
+                        <div class="trip-info-row">📍 5 items</div>
+                    </div>
+                    
+                    <h3 class="section-title">Itinerary</h3>
+                    
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">🍽️</div>
+                        <div class="itinerary-content">
+                            <div class="itinerary-name">Tartine Bakery</div>
+                            <div class="itinerary-meta">Bakery • Mission District</div>
+                        </div>
+                        <button class="itinerary-remove">×</button>
+                    </div>
+                    
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">🚗</div>
+                        <div class="itinerary-content">
+                            <div class="itinerary-name">Uber to Golden Gate</div>
+                            <div class="itinerary-meta">Ride • ~$25</div>
+                        </div>
+                        <button class="itinerary-remove">×</button>
+                    </div>
+                    
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">🍽️</div>
+                        <div class="itinerary-content">
+                            <div class="itinerary-name">State Bird Provisions</div>
+                            <div class="itinerary-meta">American • Fillmore</div>
+                        </div>
+                        <button class="itinerary-remove">×</button>
+                    </div>
+                    
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">🎡</div>
+                        <div class="itinerary-content">
+                            <div class="itinerary-name">Alcatraz Tour</div>
+                            <div class="itinerary-meta">Activity • Fisherman's Wharf</div>
+                        </div>
+                        <button class="itinerary-remove">×</button>
+                    </div>
+                    
+                    <div class="itinerary-item">
+                        <div class="itinerary-icon">🍽️</div>
+                        <div class="itinerary-content">
+                            <div class="itinerary-name">Hog Island Oyster</div>
+                            <div class="itinerary-meta">Seafood • Ferry Building</div>
+                        </div>
+                        <button class="itinerary-remove">×</button>
+                    </div>
+                </div>
+                
+                <button class="fab">+</button>
+                
+                <nav class="bottom-nav">
+                    <div class="nav-item"><span class="icon">🏠</span>Home</div>
+                    <div class="nav-item"><span class="icon">🔍</span>Search</div>
+                    <div class="nav-item"><span class="icon">🚗</span>Rides</div>
+                    <div class="nav-item active"><span class="icon">🗺️</span>Trips</div>
+                    <div class="nav-item"><span class="icon">❤️</span>Saved</div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TRIP DETAIL - EMPTY ========== -->
+    <div class="screen-wrapper">
+        <div class="screen-label">Trip Detail (Empty)</div>
+        <div class="phone">
+            <div class="screen">
+                <header class="header">
+                    <button class="header-back">←</button>
+                    <h1 class="header-title">Trip Details</h1>
+                    <button class="header-action header-action-secondary">✎</button>
+                </header>
+                
+                <div class="content">
+                    <div class="trip-info-card">
+                        <h2 class="trip-info-name">LA Adventure</h2>
+                        <div class="trip-info-row">📅 No dates set</div>
+                        <div class="trip-info-row">📍 0 items</div>
+                    </div>
+                    
+                    <h3 class="section-title">Itinerary</h3>
+                    
+                    <div class="empty-state" style="padding: 40px 20px;">
+                        <div class="empty-state-icon">📍</div>
+                        <h3 class="empty-state-title">No items in this trip yet</h3>
+                        <p class="empty-state-text">Tap the + button to add restaurants or rides</p>
+                    </div>
+                </div>
+                
+                <button class="fab">+</button>
+                
+                <nav class="bottom-nav">
+                    <div class="nav-item"><span class="icon">🏠</span>Home</div>
+                    <div class="nav-item"><span class="icon">🔍</span>Search</div>
+                    <div class="nav-item"><span class="icon">🚗</span>Rides</div>
+                    <div class="nav-item active"><span class="icon">🗺️</span>Trips</div>
+                    <div class="nav-item"><span class="icon">❤️</span>Saved</div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CREATE TRIP MODAL ========== -->
+    <div class="screen-wrapper">
+        <div class="screen-label">Create Trip Modal</div>
+        <div class="phone">
+            <div class="screen">
+                <header class="header">
+                    <div style="width: 40px;"></div>
+                    <h1 class="header-title">My Trips</h1>
+                    <button class="header-action">+</button>
+                </header>
+                
+                <div class="content" style="opacity: 0.3;">
+                    <div class="trip-card">
+                        <h3 class="trip-card-name">Weekend in San Francisco</h3>
+                        <div class="trip-card-dates">📅 Jan 15 - Jan 18, 2026</div>
+                        <div class="trip-card-count">📍 5 items</div>
+                    </div>
+                </div>
+                
+                <div class="modal-overlay">
+                    <div class="modal">
+                        <h2 class="modal-title">Create New Trip</h2>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Trip Name *</label>
+                            <input type="text" class="form-input" placeholder="Weekend in SF">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Start Date</label>
+                                <input type="text" class="form-input" placeholder="Jan 15">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">End Date</label>
+                                <input type="text" class="form-input" placeholder="Jan 18">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button class="btn btn-secondary">Cancel</button>
+                            <button class="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="bottom-nav" style="opacity: 0.3;">
+                    <div class="nav-item"><span class="icon">🏠</span>Home</div>
+                    <div class="nav-item"><span class="icon">🔍</span>Search</div>
+                    <div class="nav-item"><span class="icon">🚗</span>Rides</div>
+                    <div class="nav-item active"><span class="icon">🗺️</span>Trips</div>
+                    <div class="nav-item"><span class="icon">❤️</span>Saved</div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ADD TO TRIP MODAL ========== -->
+    <div class="screen-wrapper">
+        <div class="screen-label">Add to Trip Modal</div>
+        <div class="phone">
+            <div class="screen">
+                <header class="header">
+                    <button class="header-back">←</button>
+                    <h1 class="header-title">Joe's Pizza</h1>
+                    <div style="width: 40px;"></div>
+                </header>
+                
+                <div class="content" style="opacity: 0.3;">
+                    <!-- Background content -->
+                </div>
+                
+                <div class="modal-overlay">
+                    <div class="modal">
+                        <h2 class="modal-title">Add to Trip</h2>
+                        
+                        <div class="trip-select-item">
+                            <div class="trip-select-name">Weekend in San Francisco</div>
+                            <div class="trip-select-count">5 items</div>
+                        </div>
+                        
+                        <div class="trip-select-item">
+                            <div class="trip-select-name">NYC Food Tour</div>
+                            <div class="trip-select-count">8 items</div>
+                        </div>
+                        
+                        <div class="trip-select-item">
+                            <div class="trip-select-name">LA Adventure</div>
+                            <div class="trip-select-count">3 items</div>
+                        </div>
+                        
+                        <button class="btn btn-secondary btn-block" style="margin-top: 16px;">Cancel</button>
+                    </div>
+                </div>
+                
+                <nav class="bottom-nav" style="opacity: 0.3;">
+                    <div class="nav-item"><span class="icon">🏠</span>Home</div>
+                    <div class="nav-item"><span class="icon">🔍</span>Search</div>
+                    <div class="nav-item"><span class="icon">🚗</span>Rides</div>
+                    <div class="nav-item"><span class="icon">🗺️</span>Trips</div>
+                    <div class="nav-item"><span class="icon">❤️</span>Saved</div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1007,6 +1007,14 @@ async function loadTrips() {
     showLoading();
 
     try {
+        // Debug authentication state
+        console.log('[loadTrips] Auth check:', {
+            hasAuthManager: !!window.authManager,
+            isAuthenticated: window.authManager?.isAuthenticated(),
+            isGuest: window.authManager?.isGuest(),
+            hasToken: !!window.authManager?.token
+        });
+
         const api = new HopwiseAPI();
         const response = await api.getTrips();
 

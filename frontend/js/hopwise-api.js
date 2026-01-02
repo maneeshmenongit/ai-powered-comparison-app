@@ -23,6 +23,12 @@ class HopwiseAPI {
         // Get auth token from authManager if available
         const authHeader = window.authManager?.getAuthHeader();
 
+        // Debug logging for authentication
+        console.log(`[HopwiseAPI] ${options.method || 'GET'} ${endpoint}`, {
+            hasAuthHeader: !!authHeader,
+            authHeader: authHeader ? 'Bearer ***' : null
+        });
+
         try {
             const response = await fetch(url, {
                 ...options,
@@ -36,7 +42,7 @@ class HopwiseAPI {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Request failed');
+                throw new Error(data.error || data.msg || 'Request failed');
             }
 
             return data;

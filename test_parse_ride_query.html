@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Ride Query Parsing</title>
+</head>
+<body>
+    <h1>Test Ride Query Parsing</h1>
+    <script>
+        function parseRideQuerySimple(query) {
+            const queryLower = query.toLowerCase();
+            let origin = null;
+            let destination = 'Times Square, NYC';
+
+            // Try to extract destination - look for the last occurrence of "to" followed by a location
+            const toMatches = [...queryLower.matchAll(/\bto\s+([a-z\s,]+?)(?:\s*$|\.)/gi)];
+            if (toMatches.length > 0) {
+                const lastMatch = toMatches[toMatches.length - 1];
+                let dest = lastMatch[1].trim();
+
+                // Capitalize each word
+                dest = dest.split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+
+                // Add ", NYC" if not present
+                if (!dest.includes(',') && !dest.toLowerCase().includes('nyc') && !dest.toLowerCase().includes('new york')) {
+                    dest = `${dest}, NYC`;
+                }
+
+                destination = dest;
+            }
+
+            // Try to extract origin
+            const fromMatch = queryLower.match(/\bfrom\s+([a-z\s,]+?)\s+to\s+/i);
+            if (fromMatch) {
+                let orig = fromMatch[1].trim();
+                orig = orig.split(' ').map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+                if (!orig.includes(',')) {
+                    orig = `${orig}, NYC`;
+                }
+                origin = orig;
+            }
+
+            return { origin, destination };
+        }
+
+        // Test cases
+        const testCases = [
+            "need to take ride to times square",
+            "uber to JFK airport",
+            "need to go to central park",
+            "ride from brooklyn to manhattan",
+            "taxi to LaGuardia"
+        ];
+
+        console.log("Testing ride query parsing:");
+        testCases.forEach(query => {
+            const result = parseRideQuerySimple(query);
+            console.log(`\nQuery: "${query}"`);
+            console.log(`  Origin: ${result.origin || 'null (use geolocation)'}`);
+            console.log(`  Destination: ${result.destination}`);
+        });
+    </script>
+</body>
+</html>
