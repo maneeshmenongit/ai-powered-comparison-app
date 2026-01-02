@@ -776,9 +776,7 @@ console.log('🌐 API Base URL:', window.API_BASE_URL);
 <script src="./js/app.js"></script>
 <script>
 // Load configuration from backend (API keys, GA4, etc.)
-const API_BASE_URL = window.API_BASE_URL;
-
-fetch(`${API_BASE_URL}/config`)
+fetch(`${window.API_BASE_URL}/config`)
     .then(res => res.json())
     .then(config => {
         // Load Google Maps API
