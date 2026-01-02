@@ -2753,5 +2753,8 @@ window.initProfilePage = initProfilePage;
 window.toggleNotifications = toggleNotifications;
 window.toggleDarkMode = toggleDarkMode;
 
+// Export trip functions globally
+window.showCreateTripDialog = showCreateTripDialog;
+
 // Export autocomplete init function globally (called by Google Maps API)
 window.initAutocomplete = initAutocomplete;
