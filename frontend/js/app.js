@@ -740,7 +740,7 @@ function renderEmptyState(type = 'search') {
             action: { text: 'Explore now', handler: "navigateTo('home')" }
         },
         trips: {
-            icon: '<img src="./assets/images/trips_empty_icon.png" alt="Trips" style="width: 96px; height: 96px;">',
+            icon: '<img src="./assets/images/trips_empty_icon.png" alt="Trips" style="width: 128px; height: 128px; display: block; margin: 0 auto;">',
             title: 'No trips yet',
             text: 'Plan your next adventure! Create a trip to organize restaurants, rides, and activities.',
             action: { text: 'Create Trip', handler: 'showCreateTripDialog()' }
