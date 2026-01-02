@@ -723,6 +723,26 @@ function renderPlaceCardSkeleton() {
 }
 
 /**
+ * Show loading overlay
+ */
+function showLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+    }
+}
+
+/**
+ * Hide loading overlay
+ */
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+}
+
+/**
  * Render empty state
  */
 function renderEmptyState(type = 'search') {
@@ -2758,3 +2778,6 @@ window.showCreateTripDialog = showCreateTripDialog;
 
 // Export autocomplete init function globally (called by Google Maps API)
 window.initAutocomplete = initAutocomplete;
+
+// Debug: Verify trip function is exported
+console.log('[App.js] showCreateTripDialog exported:', typeof window.showCreateTripDialog);
