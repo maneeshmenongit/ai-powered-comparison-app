@@ -7,7 +7,7 @@ Runs on startup to create tables if they don't exist.
 import os
 import sys
 from api.database import engine, init_db, Base
-from api.models import User, SavedRestaurant
+from api.models import User, SavedRestaurant, Trip, TripItem
 
 
 def check_database_configured():
@@ -30,7 +30,7 @@ def check_tables_exist():
         inspector = inspect(engine)
         existing_tables = inspector.get_table_names()
 
-        required_tables = ['users', 'saved_restaurants']
+        required_tables = ['users', 'saved_restaurants', 'trips', 'trip_items']
         missing_tables = [t for t in required_tables if t not in existing_tables]
 
         if missing_tables:
