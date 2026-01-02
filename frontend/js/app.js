@@ -1046,15 +1046,11 @@ function renderTripCard(trip) {
     const dateRange = startDate && endDate ? `${startDate} - ${endDate}` : 'No dates set';
 
     return `
-        <div class="trip-card" onclick="navigateTo('trip-detail', { tripId: '${trip.id}' })" style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                <h3 style="font-size: 18px; font-weight: 800; margin: 0;">${trip.name}</h3>
-                <button onclick="event.stopPropagation(); deleteTrip('${trip.id}')" style="background: none; border: none; color: #999; font-size: 20px; cursor: pointer; padding: 4px 8px;">×</button>
-            </div>
-            <div style="display: flex; gap: 16px; color: #666; font-size: 14px;">
-                <span>📅 ${dateRange}</span>
-                <span>📍 ${itemCount} ${itemCount === 1 ? 'item' : 'items'}</span>
-            </div>
+        <div class="trip-card" onclick="navigateTo('trip-detail', { tripId: '${trip.id}' })">
+            <button class="trip-card-delete" onclick="event.stopPropagation(); deleteTrip('${trip.id}')">×</button>
+            <h3 class="trip-card-name">${trip.name}</h3>
+            <div class="trip-card-dates">📅 ${dateRange}</div>
+            <div class="trip-card-count">📍 ${itemCount} ${itemCount === 1 ? 'item' : 'items'}</div>
         </div>
     `;
 }
@@ -1215,15 +1211,10 @@ function renderTripDetail(trip) {
         const endDate = trip.end_date ? new Date(trip.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not set';
 
         DOM.tripDetailInfo.innerHTML = `
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 20px; color: white;">
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Dates</div>
-                    <div style="font-size: 16px; font-weight: 700;">📅 ${startDate} - ${endDate}</div>
-                </div>
-                <div>
-                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">Items</div>
-                    <div style="font-size: 16px; font-weight: 700;">📍 ${trip.items?.length || 0} ${trip.items?.length === 1 ? 'item' : 'items'}</div>
-                </div>
+            <div class="trip-info-card">
+                <h2 class="trip-info-name">${trip.name}</h2>
+                <div class="trip-info-row">📅 ${startDate} - ${endDate}</div>
+                <div class="trip-info-row">📍 ${trip.items?.length || 0} ${trip.items?.length === 1 ? 'item' : 'items'}</div>
             </div>
         `;
     }
@@ -1232,10 +1223,10 @@ function renderTripDetail(trip) {
     if (DOM.tripTimelineContainer) {
         if (!trip.items || trip.items.length === 0) {
             DOM.tripTimelineContainer.innerHTML = `
-                <div style="text-align: center; padding: 40px 20px; color: #999;">
-                    <div style="font-size: 48px; margin-bottom: 12px;">📍</div>
-                    <p style="font-size: 16px;">No items in this trip yet</p>
-                    <p style="font-size: 14px;">Tap the + button to add restaurants or rides</p>
+                <div class="empty-state" style="padding: 40px 20px;">
+                    <div class="empty-state-icon">📍</div>
+                    <h3 class="empty-state-title">No items in this trip yet</h3>
+                    <p class="empty-state-text">Tap the + button to add restaurants or rides</p>
                 </div>
             `;
         } else {
@@ -1267,17 +1258,13 @@ function renderTripItem(item, index) {
     }
 
     return `
-        <div class="trip-item" style="display: flex; gap: 16px; margin-bottom: 20px; padding: 16px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);">
-            <div style="flex-shrink: 0;">
-                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%); display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                    ${icon}
-                </div>
+        <div class="itinerary-item">
+            <div class="itinerary-icon">${icon}</div>
+            <div class="itinerary-content">
+                <div class="itinerary-name">${title}</div>
+                ${subtitle ? `<div class="itinerary-meta">${subtitle}</div>` : ''}
             </div>
-            <div style="flex: 1;">
-                <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">${title}</div>
-                ${subtitle ? `<div style="color: #666; font-size: 14px;">${subtitle}</div>` : ''}
-            </div>
-            <button onclick="removeTripItem('${item.trip_id}', '${item.id}')" style="background: none; border: none; color: #999; font-size: 18px; cursor: pointer; padding: 4px 8px;">×</button>
+            <button class="itinerary-remove" onclick="removeTripItem('${item.trip_id}', '${item.id}')">×</button>
         </div>
     `;
 }
@@ -1304,17 +1291,17 @@ function showAddToTripDialog(itemType, itemData) {
     const dialog = document.createElement('div');
     dialog.className = 'modal-overlay';
     dialog.innerHTML = `
-        <div class="modal" style="background: white; border-radius: 24px; padding: 24px; max-width: 400px; width: 90%;">
-            <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Add to Trip</h2>
-            <div style="margin-bottom: 24px;">
+        <div class="modal">
+            <h2 class="modal-title">Add to Trip</h2>
+            <div>
                 ${AppState.trips.map(trip => `
-                    <div class="trip-option" onclick="addItemToTrip('${trip.id}', '${itemType}', ${JSON.stringify(itemData).replace(/"/g, '&quot;')})" style="padding: 16px; border: 1px solid #E0E0E0; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;">
-                        <div style="font-weight: 700; margin-bottom: 4px;">${trip.name}</div>
-                        <div style="font-size: 14px; color: #666;">${trip.items?.length || 0} items</div>
+                    <div class="trip-select-item" onclick="addItemToTrip('${trip.id}', '${itemType}', ${JSON.stringify(itemData).replace(/"/g, '&quot;')})">
+                        <div class="trip-select-name">${trip.name}</div>
+                        <div class="trip-select-count">${trip.items?.length || 0} items</div>
                     </div>
                 `).join('')}
             </div>
-            <button onclick="this.closest('.modal-overlay').remove()" style="width: 100%; padding: 14px; border: 1px solid #E0E0E0; border-radius: 12px; background: white; font-weight: 700; cursor: pointer;">Cancel</button>
+            <button class="btn btn-secondary btn-block" onclick="this.closest('.modal-overlay').remove()" style="margin-top: 16px;">Cancel</button>
         </div>
     `;
 

@@ -399,13 +399,11 @@
 
         <!-- Guest User Message -->
         <div id="trips-guest-message" class="section" style="display: none;">
-            <div style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-left: 4px solid #FF9800; border-radius: 12px; padding: 20px; text-align: center;">
-                <div style="font-size: 48px; margin-bottom: 12px;">🗺️</div>
-                <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 8px; color: #E65100;">Trip Planning for Registered Users</h2>
-                <p style="font-size: 14px; color: #424242; margin-bottom: 16px;">
-                    Sign up to create and manage your travel itineraries!
-                </p>
-                <button class="btn btn-primary" onclick="navigateTo('register')">Sign Up Now</button>
+            <div class="guest-state">
+                <div class="guest-state-icon">🗺️</div>
+                <h3 class="guest-state-title">Trip Planning for Registered Users</h3>
+                <p class="guest-state-text">Sign up to create and manage your travel itineraries!</p>
+                <button class="btn btn-orange btn-block" onclick="navigateTo('register')">Sign Up Now</button>
             </div>
         </div>
 
@@ -441,9 +439,7 @@
         </div>
 
         <!-- Add Item FAB -->
-        <button class="fab" onclick="showAddToTripDialog()" style="position: fixed; bottom: 88px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--gradient-sunset); border: none; color: white; font-size: 24px; box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4); cursor: pointer; z-index: 100;">
-            +
-        </button>
+        <button class="fab" onclick="showAddToTripDialog()">+</button>
 
     </div>
 
