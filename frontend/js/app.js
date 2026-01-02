@@ -740,7 +740,7 @@ function renderEmptyState(type = 'search') {
             action: { text: 'Explore now', handler: "navigateTo('home')" }
         },
         trips: {
-            icon: '🗺️',
+            icon: '<img src="./assets/images/trips_empty_icon.png" alt="Trips" style="width: 96px; height: 96px;">',
             title: 'No trips yet',
             text: 'Plan your next adventure! Create a trip to organize restaurants, rides, and activities.',
             action: { text: 'Create Trip', handler: 'showCreateTripDialog()' }
@@ -1045,10 +1045,17 @@ async function loadTrips() {
 function renderTripsList() {
     if (!DOM.tripsContainer) return;
 
+    const createTripBtn = document.getElementById('create-trip-btn');
+
     if (AppState.trips.length === 0) {
         DOM.tripsContainer.innerHTML = renderEmptyState('trips');
+        // Hide + button when no trips - user should use "Create Trip" button in empty state
+        if (createTripBtn) createTripBtn.style.display = 'none';
         return;
     }
+
+    // Show + button when trips exist
+    if (createTripBtn) createTripBtn.style.display = 'flex';
 
     DOM.tripsContainer.innerHTML = AppState.trips
         .map(trip => renderTripCard(trip))

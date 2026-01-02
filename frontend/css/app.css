@@ -228,6 +228,21 @@ a {
     background: var(--color-gray-100);
 }
 
+/* Purple Create Button - for trips page + button */
+.header-action.create-trip-action {
+    background: var(--gradient-purple);
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.header-action.create-trip-action:hover {
+    background: var(--gradient-purple);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
 /* Home Header Variant */
 .header-home {
     padding: var(--space-4) var(--space-4) var(--space-2);
