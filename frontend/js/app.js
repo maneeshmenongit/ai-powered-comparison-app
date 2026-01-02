@@ -661,7 +661,12 @@ function renderGridCard(item) {
             <div class="grid-card-content">
                 <h3 class="grid-card-name">${item.name}</h3>
                 <p class="grid-card-meta">${item.meta}</p>
-                <span class="grid-card-rating">⭐ ${item.rating}</span>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span class="grid-card-rating">⭐ ${item.rating}</span>
+                    <button onclick="event.stopPropagation(); showAddToTripDialog('restaurant', ${JSON.stringify(item).replace(/"/g, '&quot;')})" title="Add to trip" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px; color: #667eea;">
+                        🗺️
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -1493,6 +1498,9 @@ function renderPlaceDetail(detail) {
                 <button class="btn btn-primary btn-block">📍 Directions</button>
                 <button class="btn btn-secondary btn-block">📞 Call</button>
             </div>
+            <button class="btn btn-block" onclick="showAddToTripDialog('restaurant', ${JSON.stringify(detail).replace(/"/g, '&quot;')})" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-bottom: 16px;">
+                🗺️ Add to Trip
+            </button>
             
             <!-- Info Card -->
             <div class="info-card mb-4">
