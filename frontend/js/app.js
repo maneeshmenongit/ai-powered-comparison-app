@@ -739,6 +739,12 @@ function renderEmptyState(type = 'search') {
             text: 'Start exploring and save your favorites!',
             action: { text: 'Explore now', handler: "navigateTo('home')" }
         },
+        trips: {
+            icon: '🗺️',
+            title: 'No trips yet',
+            text: 'Create your first trip to start planning your adventure!',
+            action: { text: 'Create Trip', handler: 'showCreateTripDialog()' }
+        },
         error: {
             icon: '⚠️',
             title: 'Something went wrong',
