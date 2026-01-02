@@ -1103,6 +1103,7 @@ function showCreateTripDialog() {
 
     const dialog = document.createElement('div');
     dialog.className = 'modal-overlay';
+    dialog.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; backdrop-filter: blur(4px);';
     dialog.innerHTML = `
         <div class="modal" style="background: white; border-radius: 24px; padding: 24px; max-width: 400px; width: 90%;">
             <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Create New Trip</h2>
