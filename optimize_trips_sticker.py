@@ -18,8 +18,8 @@ print(f"Original size: {img.size}, Mode: {img.mode}")
 if img.mode != 'RGBA':
     img = img.convert('RGBA')
 
-# Resize to appropriate size for empty state (128px - larger for visual impact)
-max_size = 128
+# Resize to appropriate size for empty state (150px - larger for visual impact)
+max_size = 150
 aspect_ratio = img.width / img.height
 
 if img.width > img.height:
