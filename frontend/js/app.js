@@ -1165,6 +1165,9 @@ function showCreateTripDialog() {
     });
 }
 
+// Export to global scope immediately so inline onclick handlers can find it
+window.showCreateTripDialog = showCreateTripDialog;
+
 /**
  * Create a new trip
  */
