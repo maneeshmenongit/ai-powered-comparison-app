@@ -1085,14 +1085,21 @@ function renderTripCard(trip) {
  * Show create trip dialog
  */
 function showCreateTripDialog() {
+    console.log('[showCreateTripDialog] Called');
+
     const isAuth = window.authManager && window.authManager.isAuthenticated();
     const isGuest = window.authManager && window.authManager.isGuest();
 
+    console.log('[showCreateTripDialog] Auth check:', { isAuth, isGuest });
+
     if (!isAuth || isGuest) {
+        console.log('[showCreateTripDialog] User not authenticated, redirecting to register');
         showToast('Please sign up to create trips', 'info');
         navigateTo('register');
         return;
     }
+
+    console.log('[showCreateTripDialog] Creating dialog');
 
     const dialog = document.createElement('div');
     dialog.className = 'modal-overlay';
