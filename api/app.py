@@ -1168,6 +1168,42 @@ def delete_trip_item(trip_id, item_id):
     finally:
         db.close()
 
+# ============================================================================
+# ADMIN / DATABASE INITIALIZATION
+# ============================================================================
+
+@app.route('/api/admin/init-db', methods=['POST'])
+def admin_init_db():
+    """
+    Initialize database tables.
+    Secure endpoint - requires admin secret key.
+    Call once after deployment to create tables.
+    """
+    # Get admin secret from request
+    admin_secret = request.headers.get('X-Admin-Secret')
+    expected_secret = os.environ.get('ADMIN_SECRET_KEY', 'change-me-in-production')
+
+    if admin_secret != expected_secret:
+        return jsonify({
+            'success': False,
+            'error': 'Unauthorized'
+        }), 401
+
+    try:
+        from api.database import init_db
+        init_db()
+        return jsonify({
+            'success': True,
+            'message': 'Database tables initialized successfully'
+        })
+    except Exception as e:
+        print(f"Error initializing database: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 
 # ============================================================================
 # RUN
