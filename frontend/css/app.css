@@ -16,6 +16,7 @@
     /* Gradients */
     --gradient-sunset: linear-gradient(135deg, #FF6B6B, #FF8E53, #FFA500);
     --gradient-sunset-2: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    --gradient-purple: linear-gradient(135deg, #667eea, #764ba2);
     
     /* Neutral Colors */
     --color-dark: #1E1E2E;
@@ -329,14 +330,14 @@ a {
 }
 
 .btn-primary {
-    background: var(--gradient-sunset);
+    background: var(--gradient-purple);
     color: var(--color-white);
-    box-shadow: 0 4px 16px rgba(255,107,107,0.3);
+    box-shadow: 0 4px 16px rgba(102,126,234,0.3);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+    box-shadow: 0 6px 20px rgba(102,126,234,0.4);
 }
 
 .btn-secondary {
