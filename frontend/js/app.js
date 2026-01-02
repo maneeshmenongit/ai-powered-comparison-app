@@ -873,8 +873,11 @@ async function initDetailPage(placeId) {
     }
 }
 
-async function initRidesPage(params = {}) {
+async function initRidesPage(params) {
     if (!DOM.ridesContainer) return;
+
+    // Ensure params is an object
+    params = params || {};
 
     // Get UI elements first
     const pickupElement = document.getElementById('ride-pickup');
