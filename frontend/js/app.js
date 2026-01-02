@@ -742,7 +742,7 @@ function renderEmptyState(type = 'search') {
         trips: {
             icon: '🗺️',
             title: 'No trips yet',
-            text: 'Create your first trip to start planning your adventure!',
+            text: 'Plan your next adventure! Create a trip to organize restaurants, rides, and activities.',
             action: { text: 'Create Trip', handler: 'showCreateTripDialog()' }
         },
         error: {
